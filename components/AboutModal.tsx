@@ -22,6 +22,7 @@ export function AboutModal({ open, onClose }: Props) {
         <li>Select one of your punks</li>
         <li>Select one of your colors</li>
         <li>Click any part of your punk to color it in</li>
+        <li>Or just mash the random button until you find something you like or undo if it gets weird</li>
         <li>Click &ldquo;Save&rdquo; to update your Punk onchain</li>
       </ul>
       <p>
