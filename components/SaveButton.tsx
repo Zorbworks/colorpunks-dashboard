@@ -61,7 +61,7 @@ export function SaveButton({ punk, getCanvas }: Props) {
         ? 'CONFIRMING ON BASE…'
         : isSuccess
           ? 'SAVED ✓'
-          : 'SAVE ON-CHAIN ↗';
+          : 'SAVE ON-CHAIN';
 
   const errorText =
     error &&
@@ -94,7 +94,7 @@ export function SaveButton({ punk, getCanvas }: Props) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            TX ↗
+            TX
           </a>
           {punk && (
             <a
@@ -102,7 +102,7 @@ export function SaveButton({ punk, getCanvas }: Props) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              OPENSEA ↗
+              OPENSEA
             </a>
           )}
         </div>

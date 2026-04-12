@@ -28,7 +28,7 @@ export function Footer() {
         target="_blank"
         rel="noopener noreferrer"
       >
-        BASECOLORS ↗
+        BASECOLORS
       </a>
     </footer>
   );

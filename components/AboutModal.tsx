@@ -32,21 +32,21 @@ export function AboutModal({ open, onClose }: Props) {
       </p>
       <div className="about-links">
         <a href={OPENSEA_URL} target="_blank" rel="noopener noreferrer">
-          Buy ColorPunks on OpenSea ↗
+          Buy ColorPunks on OpenSea
         </a>
         <a
           href="https://www.basecolors.com"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Mint Base Colors at basecolors.com ↗
+          Mint Base Colors at basecolors.com
         </a>
         <a
           href="https://www.palettes.fun"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Mint Palettes at palettes.fun ↗
+          Mint Palettes at palettes.fun
         </a>
       </div>
       <div className="about-credits">

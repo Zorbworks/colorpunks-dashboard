@@ -207,7 +207,7 @@ export default function Page() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  BUY MORE ↗
+                  BUY MORE
                 </a>
               </div>
               <PunkFilters

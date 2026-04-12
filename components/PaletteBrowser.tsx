@@ -39,7 +39,7 @@ export function PaletteBrowser({
           rel="noopener noreferrer"
           style={{ textDecoration: 'underline', marginTop: 8, display: 'inline-block' }}
         >
-          CREATE ONE AT PALETTES.FUN ↗
+          CREATE ONE AT PALETTES.FUN
         </a>
       </div>
     );

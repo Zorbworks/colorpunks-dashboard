@@ -33,7 +33,7 @@ export function Header() {
             className="opensea-btn"
             onClick={() => setRecentOpen(true)}
           >
-            RECENT ⊞
+            RECENT
           </button>
           <ThemeToggle />
           <a
@@ -42,7 +42,7 @@ export function Header() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            OPENSEA ↗
+            OPENSEA
           </a>
           <ConnectButton />
         </div>
