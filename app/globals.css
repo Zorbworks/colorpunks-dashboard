@@ -515,8 +515,7 @@ img {
   color: var(--fg);
 }
 .save-status {
-  margin-top: 8px;
-  padding: 0 12px;
+  margin: 8px 12px 12px;
   font-family: var(--font-display);
   font-size: 9px;
   letter-spacing: 0.04em;
