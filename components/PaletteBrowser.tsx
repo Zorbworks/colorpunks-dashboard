@@ -34,12 +34,12 @@ export function PaletteBrowser({
         NO PALETTES FOUND
         <br />
         <a
-          href="https://www.basecolors.com"
+          href="https://www.palettes.fun/"
           target="_blank"
           rel="noopener noreferrer"
           style={{ textDecoration: 'underline', marginTop: 8, display: 'inline-block' }}
         >
-          CREATE ONE ON BASECOLORS.COM ↗
+          CREATE ONE AT PALETTES.FUN ↗
         </a>
       </div>
     );

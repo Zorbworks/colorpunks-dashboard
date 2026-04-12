@@ -187,8 +187,7 @@ img {
   min-width: 0;
 }
 .rail-head {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--rule);
+  padding: 0 12px;
   flex-shrink: 0;
 }
 .rail-head h2 {
@@ -296,6 +295,7 @@ img {
   font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  margin-bottom: 0;
 }
 .center-head b {
   font-weight: 400;
@@ -535,18 +535,13 @@ img {
 }
 
 /* ---------- COLORS RAIL + FILTERS ---------- */
-/* Rail header with tabs (used for colors rail COLORS/PALETTES toggle). */
+/* Rail head row matches center-head: flex row with title left, tabs right,
+   consistent padding and bottom border across all three columns. */
 .rail-head-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-/* Both punks and colors rails get a divider under the h2
-   to separate the title from the filter chips below. */
-.punks-rail .rail-head h2,
-.colors-rail .rail-head h2 {
-  padding-bottom: 8px;
+  padding: 10px 0;
   border-bottom: 1px solid var(--rule);
   margin-bottom: 8px;
 }

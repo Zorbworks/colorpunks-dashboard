@@ -177,11 +177,13 @@ export default function Page() {
           {/* ---------- Punks rail ---------- */}
           <aside className="rail punks-rail">
             <div className="rail-head">
-              <h2>
-                [01] YOUR PUNKS ·{' '}
-                {String(filteredPunks.length).padStart(2, '0')}
-                {punkTypeFilter !== 'all' && ` / ${punkCount}`}
-              </h2>
+              <div className="rail-head-row">
+                <h2>
+                  [01] YOUR PUNKS ·{' '}
+                  {String(filteredPunks.length).padStart(2, '0')}
+                  {punkTypeFilter !== 'all' && ` / ${punkCount}`}
+                </h2>
+              </div>
               <PunkFilters
                 typeFilter={punkTypeFilter}
                 onTypeChange={handlePunkTypeChange}
