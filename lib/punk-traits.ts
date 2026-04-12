@@ -97,10 +97,16 @@ export function isColored(punk: AlchemyNft): boolean {
   return Boolean(img) && !img.includes(ORIGINAL_CID);
 }
 
+export interface SortMaps {
+  lastReceivedBlock?: Map<string, bigint>;
+  lastColoredBlock?: Map<string, bigint>;
+}
+
 /** Sort punks by the given criteria. */
 export function sortPunks(
   punks: AlchemyNft[],
-  sort: PunkSort
+  sort: PunkSort,
+  sortData?: SortMaps
 ): AlchemyNft[] {
   if (sort === 'default') return punks;
   const out = punks.slice();
@@ -110,13 +116,19 @@ export function sortPunks(
     case 'id-desc':
       return out.sort((a, b) => Number(b.tokenId) - Number(a.tokenId));
     case 'recent':
-      // Alchemy returns most recently acquired last; reverse for newest first.
-      return out.reverse();
-    case 'colored':
+      // Sort by the block of the most recent Transfer event to the owner.
       return out.sort((a, b) => {
-        const ac = isColored(a) ? 0 : 1;
-        const bc = isColored(b) ? 0 : 1;
-        return ac - bc;
+        const ba = sortData?.lastReceivedBlock?.get(a.tokenId) ?? 0n;
+        const bb = sortData?.lastReceivedBlock?.get(b.tokenId) ?? 0n;
+        return Number(bb - ba);
+      });
+    case 'colored':
+      // Sort by the block of the most recent TokenURIUpdated event.
+      // Uncolored punks (no event) go to the bottom.
+      return out.sort((a, b) => {
+        const ba = sortData?.lastColoredBlock?.get(a.tokenId) ?? 0n;
+        const bb = sortData?.lastColoredBlock?.get(b.tokenId) ?? 0n;
+        return Number(bb - ba);
       });
     case 'rare':
       return out.sort((a, b) => getRarityScore(b) - getRarityScore(a));

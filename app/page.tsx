@@ -20,6 +20,7 @@ import { useUserPunks } from '@/hooks/useUserPunks';
 import { useUserColors } from '@/hooks/useUserColors';
 import { useUserPalettes, type UserPalette } from '@/hooks/useUserPalettes';
 import { useResetPunk } from '@/hooks/useResetPunk';
+import { usePunkSortData } from '@/hooks/usePunkSortData';
 
 import { resolveImageUrl, type AlchemyNft } from '@/lib/alchemy';
 import { COLOR_PUNKS_ADDRESS } from '@/lib/contracts';
@@ -36,6 +37,7 @@ import {
   sortPunks,
   type PunkTypeFilter,
   type PunkSort,
+  type SortMaps,
 } from '@/lib/punk-traits';
 
 export default function Page() {
@@ -43,6 +45,7 @@ export default function Page() {
   const { data: punks, isLoading: punksLoading } = useUserPunks();
   const { data: rawColors, isLoading: colorsLoading } = useUserColors();
   const { data: palettes, isLoading: palettesLoading } = useUserPalettes();
+  const { data: punkSortData } = usePunkSortData();
 
   const [selectedPunk, setSelectedPunk] = useState<AlchemyNft | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -127,9 +130,10 @@ export default function Page() {
     resetPunk(BigInt(selectedPunk.tokenId));
   }, [selectedPunk, resetPunk]);
 
+  const sortMaps: SortMaps | undefined = punkSortData ?? undefined;
   const filteredPunks = useMemo(
-    () => sortPunks(filterPunksByType(punks ?? [], punkTypeFilter), punkSort),
-    [punks, punkTypeFilter, punkSort]
+    () => sortPunks(filterPunksByType(punks ?? [], punkTypeFilter), punkSort, sortMaps),
+    [punks, punkTypeFilter, punkSort, sortMaps]
   );
 
   const punkGroups = useMemo(() => {
