@@ -23,49 +23,44 @@ export function PunkFilters({
   activeTraitGroup,
 }: Props) {
   return (
-    <>
-      <div className="filter-row">
-        <span className="filter-label">TYPE</span>
-        <div className="filter-group">
+    <div className="filter-row">
+      <span className="filter-label">TYPE</span>
+      <div className="filter-group">
+        <button
+          type="button"
+          className={`chip${typeFilter === 'all' ? ' active' : ''}`}
+          onClick={() => onTypeChange('all')}
+        >
+          ALL
+        </button>
+        {TYPES.map((t) => (
           <button
+            key={t}
             type="button"
-            className={`chip${typeFilter === 'all' ? ' active' : ''}`}
-            onClick={() => onTypeChange('all')}
+            className={`chip${typeFilter === t ? ' active' : ''}`}
+            onClick={() => onTypeChange(t)}
           >
-            ALL
+            {PUNK_TYPE_LABELS[t]}
           </button>
-          {TYPES.map((t) => (
-            <button
-              key={t}
-              type="button"
-              className={`chip${typeFilter === t ? ' active' : ''}`}
-              onClick={() => onTypeChange(t)}
-            >
-              {PUNK_TYPE_LABELS[t]}
-            </button>
-          ))}
-        </div>
+        ))}
       </div>
-      <div className="filter-row">
-        <span className="filter-label">TRAIT</span>
-        <div className="filter-group">
-          <button
-            type="button"
-            className={`chip${!activeTraitGroup ? ' active' : ''}`}
-            onClick={() => onTypeChange(typeFilter)}
-          >
-            —
-          </button>
-          <button
-            type="button"
-            className={`chip${activeTraitGroup ? ' active' : ''}`}
-            onClick={onRandomTrait}
-            title="Group by a random trait"
-          >
-            ⚅ {activeTraitGroup ? activeTraitGroup.toUpperCase().replace('_', ' ') : 'RANDOM'}
-          </button>
-        </div>
+      <div className="filter-group" style={{ marginLeft: 8 }}>
+        <button
+          type="button"
+          className={`chip${!activeTraitGroup ? ' active' : ''}`}
+          onClick={() => onTypeChange(typeFilter)}
+        >
+          —
+        </button>
+        <button
+          type="button"
+          className={`chip${activeTraitGroup ? ' active' : ''}`}
+          onClick={onRandomTrait}
+          title="Group by a random trait"
+        >
+          ⚅ {activeTraitGroup ? activeTraitGroup.toUpperCase().replace(/_/g, ' ') : 'TRAIT'}
+        </button>
       </div>
-    </>
+    </div>
   );
 }
