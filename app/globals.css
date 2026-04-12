@@ -187,14 +187,14 @@ img {
   min-width: 0;
 }
 .rail-head {
-  padding: 12px 14px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--rule);
   flex-shrink: 0;
 }
 .rail-head h2 {
   font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -270,28 +270,30 @@ img {
   gap: 12px;
   min-height: 0;
   min-width: 0;
+  /* Match the rail border so all three columns align at the top. */
+  border: 1px solid var(--rule);
 }
 .center-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 2px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--rule);
   flex-shrink: 0;
   font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .center-head b {
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .canvas-frame {
   flex: 1;
   min-height: 0;
-  border: 1px solid var(--rule);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -336,7 +338,8 @@ img {
   display: flex;
   flex-direction: column;
   gap: 0;
-  border: 1px solid var(--rule);
+  border: none;
+  border-top: 1px solid var(--rule);
   overflow-y: auto;
   flex: 1;
   min-height: 0;
@@ -416,6 +419,7 @@ img {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
+  padding: 0 12px;
 }
 .tool {
   flex: 1;
@@ -449,7 +453,8 @@ img {
 }
 
 .save {
-  width: 100%;
+  width: calc(100% - 24px);
+  margin: 0 12px;
   background: var(--fg);
   color: var(--bg);
   border: 1px solid var(--rule);
@@ -472,6 +477,7 @@ img {
 }
 .save-status {
   margin-top: 8px;
+  padding: 0 12px;
   font-family: var(--font-display);
   font-size: 9px;
   letter-spacing: 0.04em;
@@ -492,9 +498,9 @@ img {
 
 /* ---------- COLORS RAIL + FILTERS ---------- */
 .colors-rail .rail-head h2 {
-  padding-bottom: 10px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--rule);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .filter-row {
   display: flex;
