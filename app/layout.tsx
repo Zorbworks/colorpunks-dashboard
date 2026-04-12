@@ -21,28 +21,28 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: 'Color Punks Toolbox — Power Tools for Color Punk Collectors',
+  title: 'ColorPunks Toolbox — Power Tools for ColorPunk Collectors',
   description:
     'Paint your ColorPunks with your BaseColors. On-chain coloring book on Base mainnet.',
   openGraph: {
-    title: 'Color Punks Toolbox',
+    title: 'ColorPunks Toolbox',
     description:
-      'Power tools for Color Punk collectors. Paint your punks with BaseColors and save on-chain.',
+      'Power tools for ColorPunk collectors. Paint your punks with BaseColors and save on-chain.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Color Punks Toolbox — on-chain coloring book for ColorPunks on Base',
+        alt: 'ColorPunks Toolbox — on-chain coloring book for ColorPunks on Base',
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Color Punks Toolbox',
+    title: 'ColorPunks Toolbox',
     description:
-      'Power tools for Color Punk collectors. Paint your punks with BaseColors and save on-chain.',
+      'Power tools for ColorPunk collectors. Paint your punks with BaseColors and save on-chain.',
     images: ['/og-image.png'],
   },
 };

@@ -18,7 +18,7 @@ const rpcUrl = alchemyKey && alchemyKey !== 'demo'
   : undefined; // falls back to default public RPC if no key
 
 const config = getDefaultConfig({
-  appName: 'ColorPunks Dashboard',
+  appName: 'ColorPunks Toolbox',
   projectId,
   chains: [base],
   transports: {
