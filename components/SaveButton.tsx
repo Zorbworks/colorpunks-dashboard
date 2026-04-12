@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
 import { useSavePunk } from '@/hooks/useSavePunk';
 import { uploadColoredPunk } from '@/lib/ipfs';
 import type { AlchemyNft } from '@/lib/alchemy';
@@ -16,6 +18,16 @@ export function SaveButton({ punk, getCanvas }: Props) {
   const [uploading, setUploading] = useState(false);
   const { savePunk, hash, isPending, isConfirming, isSuccess, error } =
     useSavePunk();
+  const queryClient = useQueryClient();
+  const { address } = useAccount();
+
+  // Once the tx confirms, invalidate the punks query so the grid
+  // re-fetches fresh on-chain images without needing a page reload.
+  useEffect(() => {
+    if (isSuccess && address) {
+      queryClient.invalidateQueries({ queryKey: ['user-punks', address] });
+    }
+  }, [isSuccess, address, queryClient]);
 
   const disabled = !punk || uploading || isPending || isConfirming;
 
