@@ -171,13 +171,10 @@ img {
   color: var(--bg);
 }
 
-/* ---------- MAIN GRID : canvas-first layout ---------- */
-/* Side rails get a fixed max width so the canvas (center column)
-   always gets the lion's share of horizontal space. On wide screens
-   the rails cap at 280px; on narrower ones they shrink. */
+/* ---------- MAIN GRID : 3 equal columns ---------- */
 .main {
   display: grid;
-  grid-template-columns: minmax(180px, 280px) minmax(0, 1fr) minmax(180px, 280px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
   min-height: 0;
 }
@@ -272,7 +269,7 @@ img {
   flex-direction: column;
   gap: 12px;
   min-height: 0;
-  min-width: 280px;
+  min-width: 0;
 }
 .center-head {
   display: flex;
@@ -756,16 +753,8 @@ img {
   margin-bottom: 24px;
 }
 
-/* ---------- TABLET : side rails collapse to let canvas breathe ---------- */
-@media (max-width: 1200px) {
-  .main {
-    grid-template-columns: minmax(140px, 220px) minmax(0, 1fr) minmax(140px, 220px);
-    gap: 12px;
-  }
-}
-
-/* ---------- MOBILE ---------- */
-@media (max-width: 960px) {
+/* ---------- MOBILE / NARROW — switch to single column earlier ---------- */
+@media (max-width: 1100px) {
   html,
   body {
     overflow-x: hidden;
