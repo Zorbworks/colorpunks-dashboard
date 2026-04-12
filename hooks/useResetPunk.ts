@@ -5,14 +5,13 @@ import { base } from 'wagmi/chains';
 import { COLOR_PUNKS_ABI, COLOR_PUNKS_ADDRESS } from '@/lib/contracts';
 
 /**
- * The original ColorPunks metadata lives at this IPFS base URI.
- * Each token's original metadata is at `{BASE_URI}/{tokenId}.json`.
- * We reset by writing this URI back via updateTokenURI, which is more
- * reliable than writing "" (which depends on the contract's baseURI
- * fallback behavior).
+ * The original black-and-white ColorPunks metadata lives at this IPFS CID.
+ * Each token's original metadata is at `{BASE}/{tokenId}` (no .json extension).
+ * This is the same CID used by the original colorpunks.com reset function.
+ * Source: https://github.com/mykcryptodev/punk-coloring-book/blob/main/src/components/ResetToOriginal.tsx
  */
 const ORIGINAL_BASE_URI =
-  'ipfs://QmaUtpnjauXT81DFABAmrhUkjLVZvKaAf7QTi5L63xinN6';
+  'ipfs://QmZzBSaDAEwJhSUkhrcfVmZmbD1GwVLHd4GGoGGTWJWmSQ';
 
 export function useResetPunk() {
   const {
@@ -29,10 +28,7 @@ export function useResetPunk() {
   } = useWaitForTransactionReceipt({ hash });
 
   const resetPunk = (tokenId: bigint) => {
-    // Write the original IPFS metadata URI directly rather than clearing
-    // to "". This guarantees tokenURI(id) returns the original grey punk
-    // regardless of how the contract handles empty-string overrides.
-    const originalUri = `${ORIGINAL_BASE_URI}/${tokenId}.json`;
+    const originalUri = `${ORIGINAL_BASE_URI}/${tokenId}`;
     writeContract({
       address: COLOR_PUNKS_ADDRESS,
       abi: COLOR_PUNKS_ABI,

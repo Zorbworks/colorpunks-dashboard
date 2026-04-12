@@ -79,8 +79,8 @@ export default function Page() {
     if (!selectedPunk) return;
     const ok = window.confirm(
       `Reset punk #${selectedPunk.tokenId} to its original uncolored state?\n\n` +
-        'This calls updateTokenURI on-chain with an empty URI, clearing ' +
-        'any custom artwork. You\u2019ll need to sign a transaction.'
+        'This restores the original black-and-white artwork on-chain. ' +
+        'You\u2019ll need to sign a transaction.'
     );
     if (!ok) return;
     resetPunk(BigInt(selectedPunk.tokenId));
