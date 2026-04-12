@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
-import { Jost, Silkscreen } from 'next/font/google';
+import { Jost, Press_Start_2P } from 'next/font/google';
 import './globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 import { Providers } from './providers';
 
 // next/font sets the resolved font-family as CSS custom properties on the
 // <body>. globals.css reads these via var(--font-silkscreen) / var(--font-jost).
-const silkscreen = Silkscreen({
-  weight: ['400', '700'],
+const pressStart = Press_Start_2P({
+  weight: '400',
   subsets: ['latin'],
   variable: '--font-silkscreen',
   display: 'swap',
@@ -54,7 +54,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" data-theme="light" suppressHydrationWarning>
-      <body className={`${silkscreen.variable} ${jost.variable}`}>
+      <body className={`${pressStart.variable} ${jost.variable}`}>
         <Providers>{children}</Providers>
       </body>
     </html>
