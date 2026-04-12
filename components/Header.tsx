@@ -18,7 +18,7 @@ export function Header() {
       <header className="header">
         <div className="logo-wrap">
           <div className="logo">COLORPUNKS</div>
-          <div className="logo-sub">POWER TOOLS FOR COLORPUNKS</div>
+          <div className="logo-sub">POWER TOOLS FOR COLOR PUNK COLLECTORS</div>
         </div>
         <div className="header-right">
           <button

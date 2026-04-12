@@ -13,6 +13,7 @@ import { Canvas, CanvasHandle, type ColorInfo } from '@/components/Canvas';
 import { Toolbar } from '@/components/Toolbar';
 import { SaveButton } from '@/components/SaveButton';
 import { PunkPalette } from '@/components/PunkPalette';
+import { PunkFilters } from '@/components/PunkFilters';
 
 import { useUserPunks } from '@/hooks/useUserPunks';
 import { useUserColors } from '@/hooks/useUserColors';
@@ -25,6 +26,12 @@ import {
   enrichColors,
   type ColorFilters as Filters,
 } from '@/lib/color';
+import {
+  filterPunksByType,
+  getAllTraitTypes,
+  groupPunksByTrait,
+  type PunkTypeFilter,
+} from '@/lib/punk-traits';
 
 export default function Page() {
   const { isConnected, address } = useAccount();
@@ -34,8 +41,10 @@ export default function Page() {
   const [selectedPunk, setSelectedPunk] = useState<AlchemyNft | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
-  const [centerTab, setCenterTab] = useState<'canvas' | 'palette'>('canvas');
+  const [centerTab, setCenterTab] = useState<'canvas' | 'details'>('canvas');
   const [paletteColors, setPaletteColors] = useState<ColorInfo[]>([]);
+  const [punkTypeFilter, setPunkTypeFilter] = useState<PunkTypeFilter>('all');
+  const [traitGroupBy, setTraitGroupBy] = useState<string | null>(null);
   const canvasRef = useRef<CanvasHandle>(null);
   const {
     resetPunk,
@@ -72,7 +81,7 @@ export default function Page() {
   // Re-extract palette colors when the punk changes while palette tab is open.
   // Small delay lets the canvas finish drawing the new image first.
   useEffect(() => {
-    if (centerTab !== 'palette' || !selectedPunk) return;
+    if (centerTab !== 'details' || !selectedPunk) return;
     const timer = setTimeout(() => {
       setPaletteColors(canvasRef.current?.extractColors() ?? []);
     }, 500);
@@ -98,6 +107,28 @@ export default function Page() {
     if (!ok) return;
     resetPunk(BigInt(selectedPunk.tokenId));
   }, [selectedPunk, resetPunk]);
+
+  const filteredPunks = useMemo(
+    () => filterPunksByType(punks ?? [], punkTypeFilter),
+    [punks, punkTypeFilter]
+  );
+
+  const punkGroups = useMemo(() => {
+    if (!traitGroupBy || !filteredPunks.length) return null;
+    return groupPunksByTrait(filteredPunks, traitGroupBy);
+  }, [filteredPunks, traitGroupBy]);
+
+  const handleRandomTrait = useCallback(() => {
+    const traitTypes = getAllTraitTypes(punks ?? []);
+    if (traitTypes.length === 0) return;
+    const random = traitTypes[Math.floor(Math.random() * traitTypes.length)];
+    setTraitGroupBy((prev) => (prev === random ? null : random));
+  }, [punks]);
+
+  const handlePunkTypeChange = useCallback((t: PunkTypeFilter) => {
+    setPunkTypeFilter(t);
+    setTraitGroupBy(null);
+  }, []);
 
   const enriched = useMemo(
     () => enrichColors(rawColors ?? []),
@@ -143,15 +174,23 @@ export default function Page() {
             <div className="rail-head">
               <h2>
                 [01] YOUR PUNKS ·{' '}
-                {String(punkCount).padStart(2, '0')}
+                {String(filteredPunks.length).padStart(2, '0')}
+                {punkTypeFilter !== 'all' && ` / ${punkCount}`}
               </h2>
+              <PunkFilters
+                typeFilter={punkTypeFilter}
+                onTypeChange={handlePunkTypeChange}
+                onRandomTrait={handleRandomTrait}
+                activeTraitGroup={traitGroupBy}
+              />
             </div>
             <div className="rail-scroll">
               <PunkSelector
-                punks={punks ?? []}
+                punks={filteredPunks}
                 selectedTokenId={selectedPunk?.tokenId ?? null}
                 onSelect={setSelectedPunk}
                 isLoading={punksLoading}
+                groups={punkGroups}
               />
             </div>
           </aside>
@@ -170,13 +209,13 @@ export default function Page() {
                 </button>
                 <button
                   type="button"
-                  className={`center-tab${centerTab === 'palette' ? ' active' : ''}`}
+                  className={`center-tab${centerTab === 'details' ? ' active' : ''}`}
                   onClick={() => {
                     setPaletteColors(canvasRef.current?.extractColors() ?? []);
-                    setCenterTab('palette');
+                    setCenterTab('details');
                   }}
                 >
-                  PALETTE
+                  DETAILS
                 </button>
               </div>
               <b>{selectedPunk ? `#${selectedPunk.tokenId}` : '—'}</b>
@@ -190,12 +229,13 @@ export default function Page() {
                 selectedColor={selectedColor}
               />
             </div>
-            {centerTab === 'palette' && (
+            {centerTab === 'details' && (
               <PunkPalette
                 colors={paletteColors}
                 baseColors={rawColors ?? []}
                 selectedColor={selectedColor}
                 onSelect={setSelectedColor}
+                punk={selectedPunk}
               />
             )}
             <Toolbar

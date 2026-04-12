@@ -253,6 +253,17 @@ img {
   border: 1px solid var(--rule);
   letter-spacing: 0;
 }
+.punk-group-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 4px 0 6px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 6px;
+}
 .empty-rail {
   font-family: var(--font-display);
   font-size: 10px;
@@ -343,6 +354,33 @@ img {
   overflow-y: auto;
   flex: 1;
   min-height: 0;
+}
+.punk-palette-section {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 12px 6px;
+  border-bottom: 1px solid var(--rule);
+}
+.punk-palette-trait {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.punk-palette-trait-type {
+  color: var(--muted);
+}
+.punk-palette-trait-value {
+  font-weight: 400;
 }
 .punk-palette-row {
   display: flex;
