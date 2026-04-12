@@ -54,6 +54,20 @@ export function ColorFilters({ filters, onChange }: Props) {
           >
             DARK ↓
           </button>
+          <button
+            type="button"
+            className={`chip${filters.tone === 'vivid' ? ' active' : ''}`}
+            onClick={() => setTone('vivid')}
+          >
+            VIVID ↓
+          </button>
+          <button
+            type="button"
+            className={`chip${filters.tone === 'muted' ? ' active' : ''}`}
+            onClick={() => setTone('muted')}
+          >
+            MUTED ↓
+          </button>
         </div>
       </div>
 

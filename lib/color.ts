@@ -10,8 +10,8 @@ export type HueBucket =
   | 'purple'
   | 'gray';
 
-/** 'all' = default order, 'light' = lightest first, 'dark' = darkest first */
-export type Tone = 'all' | 'light' | 'dark';
+/** Tone sorts: light/dark by luminance, vivid/muted by saturation */
+export type Tone = 'all' | 'light' | 'dark' | 'vivid' | 'muted';
 export type Age = 'new' | 'old';
 export type HueFilter = 'all' | HueBucket;
 
@@ -97,10 +97,12 @@ export function applyFilters(
     return true;
   });
 
-  // Tone sorts ALL colors by luminance — lightest or darkest first.
-  // It does NOT filter them out.
+  // Tone sorts ALL colors — does NOT filter them out.
+  // Light/dark sort by luminance, vivid/muted sort by saturation.
   if (filters.tone === 'light') out = out.slice().sort((a, b) => b.hsl.l - a.hsl.l);
   if (filters.tone === 'dark')  out = out.slice().sort((a, b) => a.hsl.l - b.hsl.l);
+  if (filters.tone === 'vivid') out = out.slice().sort((a, b) => b.hsl.s - a.hsl.s);
+  if (filters.tone === 'muted') out = out.slice().sort((a, b) => a.hsl.s - b.hsl.s);
 
   // Age sorts by tokenId (= mint order in ERC721A). Higher id = newer.
   // Only applied when tone is 'all' (otherwise tone sort takes precedence).
