@@ -12,7 +12,7 @@ export function Footer() {
         >
           @MYK
         </a>{' '}
-        · TOOL BY{' '}
+        · TOOLBOX BY{' '}
         <a
           href="https://farcaster.xyz/deebee"
           target="_blank"
