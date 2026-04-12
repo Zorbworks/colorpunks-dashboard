@@ -495,7 +495,7 @@ img {
 
 .save {
   width: calc(100% - 24px);
-  margin: 0 12px;
+  margin: 0 12px 12px;
   background: var(--fg);
   color: var(--bg);
   border: 1px solid var(--rule);
