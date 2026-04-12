@@ -9,6 +9,8 @@ import { resolveImageUrl } from '@/lib/alchemy';
 export interface RecentColoredItem {
   tokenId: string;
   user: string;
+  /** ENS name if resolvable, otherwise truncated address. */
+  displayName: string;
   imageUrl: string | null;
   timestamp: number;
   txHash: string;
@@ -93,6 +95,7 @@ async function loadRecent(
       return {
         tokenId,
         user,
+        displayName: truncateAddress(user),
         imageUrl,
         timestamp: blockTimes.get(log.blockNumber ?? 0n) ?? 0,
         txHash: log.transactionHash ?? '',
@@ -100,5 +103,34 @@ async function loadRecent(
     })
   );
 
+  // Try to resolve ENS names via a free API. Best-effort — falls back
+  // to truncated address if the lookup fails.
+  try {
+    const uniqueAddrs = Array.from(new Set(items.map((i) => i.user)));
+    const ensMap = new Map<string, string>();
+    await Promise.allSettled(
+      uniqueAddrs.map(async (addr) => {
+        try {
+          const res = await fetch(
+            `https://api.ensideas.com/ens/resolve/${addr}`
+          );
+          if (res.ok) {
+            const data = (await res.json()) as { name?: string };
+            if (data.name) ensMap.set(addr.toLowerCase(), data.name);
+          }
+        } catch { /* skip */ }
+      })
+    );
+    for (const item of items) {
+      const ens = ensMap.get(item.user.toLowerCase());
+      if (ens) item.displayName = ens;
+    }
+  } catch { /* keep truncated addresses */ }
+
   return items;
+}
+
+function truncateAddress(addr: string): string {
+  if (!addr || addr.length < 10) return addr;
+  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }

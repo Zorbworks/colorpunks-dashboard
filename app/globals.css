@@ -887,34 +887,37 @@ img {
 }
 .gallery-item {
   border: 1px solid var(--rule);
-  aspect-ratio: 1;
-  position: relative;
   overflow: hidden;
   background: var(--bg);
+  display: flex;
+  flex-direction: column;
 }
 .gallery-item img {
   width: 100%;
-  height: 100%;
+  aspect-ratio: 1;
   display: block;
+  object-fit: cover;
 }
-.gallery-meta {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--bg);
-  color: var(--fg);
-  padding: 3px 6px;
+.gallery-meta-below {
+  padding: 6px 8px;
+  border-top: 1px solid var(--rule);
   font-family: var(--font-display);
-  font-size: 8px;
+  font-size: 9px;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  border-top: 1px solid var(--rule);
   display: flex;
   justify-content: space-between;
+  gap: 6px;
 }
-.gallery-meta .muted {
+.gallery-meta-id {
+  flex-shrink: 0;
+}
+.gallery-meta-name {
   color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
 }
 .gallery-loading {
   grid-column: 1 / -1;

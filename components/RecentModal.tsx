@@ -8,15 +8,6 @@ interface Props {
   onClose: () => void;
 }
 
-function timeAgo(timestamp: number): string {
-  if (!timestamp) return '—';
-  const seconds = Math.max(0, Math.floor(Date.now() / 1000 - timestamp));
-  if (seconds < 60) return `${seconds}S AGO`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}M AGO`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}H AGO`;
-  return `${Math.floor(seconds / 86400)}D AGO`;
-}
-
 export function RecentModal({ open, onClose }: Props) {
   const { data, isLoading, error } = useRecentColored(open, 24);
 
@@ -36,7 +27,7 @@ export function RecentModal({ open, onClose }: Props) {
             <div
               className="gallery-item"
               key={`${item.tokenId}-${item.txHash}`}
-              title={`#${item.tokenId} · ${item.user}`}
+              title={item.user}
             >
               {item.imageUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -46,9 +37,9 @@ export function RecentModal({ open, onClose }: Props) {
                   loading="lazy"
                 />
               )}
-              <div className="gallery-meta">
-                <span>#{item.tokenId}</span>
-                <span className="muted">{timeAgo(item.timestamp)}</span>
+              <div className="gallery-meta-below">
+                <span className="gallery-meta-id">#{item.tokenId}</span>
+                <span className="gallery-meta-name">{item.displayName}</span>
               </div>
             </div>
           ))}

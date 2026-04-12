@@ -60,6 +60,13 @@ export default function Page() {
   } = useResetPunk();
   const queryClient = useQueryClient();
 
+  // Clear selected punk when wallet changes so the canvas doesn't
+  // show a punk from the previous wallet.
+  useEffect(() => {
+    setSelectedPunk(null);
+    setActivePalette(null);
+  }, [address]);
+
   // Auto-select the first punk on load, and keep selectedPunk in sync
   // with the latest query data so the canvas always shows the freshest
   // image (e.g. after save or reset triggers a refetch).
@@ -70,9 +77,12 @@ export default function Page() {
     } else {
       // If we already have a punk selected, update it to the fresh
       // version from the latest query so the imageUrl refreshes.
+      // Also clear selection if the punk no longer belongs to this wallet.
       const fresh = punks.find((p) => p.tokenId === selectedPunk.tokenId);
       if (fresh && fresh !== selectedPunk) {
         setSelectedPunk(fresh);
+      } else if (!fresh) {
+        setSelectedPunk(punks[0]);
       }
     }
   }, [punks]); // eslint-disable-line react-hooks/exhaustive-deps
