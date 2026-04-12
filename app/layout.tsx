@@ -21,7 +21,7 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: 'ColorPunks Dashboard — Power Tools for ColorPunks',
+  title: 'Color Punks Toolbox — Power Tools for Color Punk Collectors',
   description:
     'Paint your ColorPunks with your BaseColors. On-chain coloring book on Base mainnet.',
 };
