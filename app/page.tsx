@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { Header } from '@/components/Header';
+import { ConnectButton } from '@/components/ConnectButton';
 import { Footer } from '@/components/Footer';
 import { PunkSelector } from '@/components/PunkSelector';
 import { ColorPalette } from '@/components/ColorPalette';
@@ -180,15 +181,14 @@ export default function Page() {
       <Header />
 
       {!isConnected ? (
-        <main className="main" style={{ gridTemplateColumns: '1fr' }}>
-          <section className="connect-screen">
-            <h2>CONNECT YOUR WALLET</h2>
-            <p>
-              Connect a wallet on Base that owns at least one ColorPunk and one
-              BaseColor. The app will load your punks and colors, and you&apos;ll
-              be able to paint and save on-chain.
+        <main className="hero-screen">
+          <div className="hero-overlay">
+            <h1 className="hero-title">WE ARE SO BACK</h1>
+            <p className="hero-sub">
+              Connect your wallet and bring your ColorPunks back to life
             </p>
-          </section>
+            <ConnectButton />
+          </div>
         </main>
       ) : (
         <main className="main">
