@@ -41,6 +41,47 @@ export const COLOR_PUNKS_ABI = [
   },
 ] as const;
 
+export const PALETTES_ADDRESS =
+  '0xAb83a7824A42fa2082c0796645e467C3415aC0DE' as const;
+
+/** Minimal ABI for the Palettes contract — enumerate + read colors. */
+export const PALETTES_ABI = [
+  {
+    inputs: [{ internalType: 'address', name: 'owner', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'owner', type: 'address' },
+      { internalType: 'uint256', name: 'index', type: 'uint256' },
+    ],
+    name: 'tokenOfOwnerByIndex',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'uint256', name: 'tokenId', type: 'uint256' },
+      { internalType: 'uint256', name: 'index', type: 'uint256' },
+    ],
+    name: 'tokenColors',
+    outputs: [{ internalType: 'string', name: '', type: 'string' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
+    name: 'tokenURI',
+    outputs: [{ internalType: 'string', name: '', type: 'string' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const;
+
 /** Minimal ABI for the BaseColors contract — just enough to read tokenURI. */
 export const BASE_COLORS_ABI = [
   {

@@ -14,9 +14,11 @@ import { Toolbar } from '@/components/Toolbar';
 import { SaveButton } from '@/components/SaveButton';
 import { PunkPalette } from '@/components/PunkPalette';
 import { PunkFilters } from '@/components/PunkFilters';
+import { PaletteBrowser } from '@/components/PaletteBrowser';
 
 import { useUserPunks } from '@/hooks/useUserPunks';
 import { useUserColors } from '@/hooks/useUserColors';
+import { useUserPalettes, type UserPalette } from '@/hooks/useUserPalettes';
 import { useResetPunk } from '@/hooks/useResetPunk';
 
 import { resolveImageUrl, type AlchemyNft } from '@/lib/alchemy';
@@ -37,6 +39,7 @@ export default function Page() {
   const { isConnected, address } = useAccount();
   const { data: punks, isLoading: punksLoading } = useUserPunks();
   const { data: rawColors, isLoading: colorsLoading } = useUserColors();
+  const { data: palettes, isLoading: palettesLoading } = useUserPalettes();
 
   const [selectedPunk, setSelectedPunk] = useState<AlchemyNft | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -45,6 +48,8 @@ export default function Page() {
   const [paletteColors, setPaletteColors] = useState<ColorInfo[]>([]);
   const [punkTypeFilter, setPunkTypeFilter] = useState<PunkTypeFilter>('all');
   const [traitGroupBy, setTraitGroupBy] = useState<string | null>(null);
+  const [colorsTab, setColorsTab] = useState<'colors' | 'palettes'>('colors');
+  const [activePalette, setActivePalette] = useState<UserPalette | null>(null);
   const canvasRef = useRef<CanvasHandle>(null);
   const {
     resetPunk,
@@ -243,8 +248,18 @@ export default function Page() {
               onUndo={() => canvasRef.current?.undo()}
               onReset={handleReset}
               onRandom={() => {
-                if (filtered.length === 0) return;
-                canvasRef.current?.randomize(filtered);
+                // Use palette colors if a palette is active, otherwise filtered BaseColors.
+                const palette = activePalette
+                  ? activePalette.colors.map((c) => ({
+                      tokenId: '',
+                      color: c.hex,
+                      name: c.name,
+                      isNamed: c.isNamed,
+                      image: null,
+                    }))
+                  : filtered;
+                if (palette.length === 0) return;
+                canvasRef.current?.randomize(palette);
               }}
               resetState={resetState as 'idle' | 'pending' | 'confirming' | 'success'}
             />
@@ -254,24 +269,62 @@ export default function Page() {
             />
           </section>
 
-          {/* ---------- Colors rail ---------- */}
+          {/* ---------- Colors / Palettes rail ---------- */}
           <aside className="rail colors-rail">
             <div className="rail-head">
-              <h2>
-                [03] BASECOLORS ·{' '}
-                {String(filtered.length).padStart(2, '0')} /{' '}
-                {String(allColorCount).padStart(2, '0')}
-              </h2>
-              <ColorFilters filters={filters} onChange={setFilters} />
+              <div className="rail-head-row">
+                <h2>
+                  {colorsTab === 'colors'
+                    ? `[03] BASECOLORS · ${String(filtered.length).padStart(2, '0')} / ${String(allColorCount).padStart(2, '0')}`
+                    : `[03] PALETTES · ${String(palettes?.length ?? 0).padStart(2, '0')}`}
+                </h2>
+                <div className="center-tabs">
+                  <button
+                    type="button"
+                    className={`center-tab${colorsTab === 'colors' ? ' active' : ''}`}
+                    onClick={() => {
+                      setColorsTab('colors');
+                      setActivePalette(null);
+                    }}
+                  >
+                    COLORS
+                  </button>
+                  <button
+                    type="button"
+                    className={`center-tab${colorsTab === 'palettes' ? ' active' : ''}`}
+                    onClick={() => setColorsTab('palettes')}
+                  >
+                    PALETTES
+                  </button>
+                </div>
+              </div>
+              {colorsTab === 'colors' && (
+                <ColorFilters filters={filters} onChange={setFilters} />
+              )}
             </div>
             <div className="rail-scroll">
-              <ColorPalette
-                colors={filtered}
-                allColorCount={allColorCount}
-                selectedColor={selectedColor}
-                onSelect={setSelectedColor}
-                isLoading={colorsLoading}
-              />
+              {colorsTab === 'colors' ? (
+                <ColorPalette
+                  colors={filtered}
+                  allColorCount={allColorCount}
+                  selectedColor={selectedColor}
+                  onSelect={setSelectedColor}
+                  isLoading={colorsLoading}
+                />
+              ) : (
+                <PaletteBrowser
+                  palettes={palettes ?? []}
+                  isLoading={palettesLoading}
+                  selectedPaletteId={activePalette?.tokenId ?? null}
+                  onSelect={(p) =>
+                    setActivePalette(
+                      activePalette?.tokenId === p.tokenId ? null : p
+                    )
+                  }
+                  selectedColor={selectedColor}
+                  onSelectColor={setSelectedColor}
+                />
+              )}
             </div>
           </aside>
         </main>
