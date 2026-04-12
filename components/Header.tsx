@@ -42,7 +42,7 @@ export function Header() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            BUY ON OPENSEA ↗
+            OPENSEA ↗
           </a>
           <ConnectButton />
         </div>

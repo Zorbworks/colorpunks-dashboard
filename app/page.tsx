@@ -22,6 +22,7 @@ import { useUserPalettes, type UserPalette } from '@/hooks/useUserPalettes';
 import { useResetPunk } from '@/hooks/useResetPunk';
 
 import { resolveImageUrl, type AlchemyNft } from '@/lib/alchemy';
+import { COLOR_PUNKS_ADDRESS } from '@/lib/contracts';
 import {
   applyFilters,
   DEFAULT_FILTERS,
@@ -183,6 +184,14 @@ export default function Page() {
                   {String(filteredPunks.length).padStart(2, '0')}
                   {punkTypeFilter !== 'all' && ` / ${punkCount}`}
                 </h2>
+                <a
+                  className="center-tab"
+                  href={`https://opensea.io/assets/base/${COLOR_PUNKS_ADDRESS}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  BUY MORE ↗
+                </a>
               </div>
               <PunkFilters
                 typeFilter={punkTypeFilter}
