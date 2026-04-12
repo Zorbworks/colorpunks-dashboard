@@ -16,7 +16,7 @@ interface Props {
 export function SaveButton({ punk, getCanvas }: Props) {
   const [status, setStatus] = useState<string>('');
   const [uploading, setUploading] = useState(false);
-  const { savePunk, hash, isPending, isConfirming, isSuccess, error } =
+  const { savePunk, hash, isPending, isConfirming, isSuccess, error, reset } =
     useSavePunk();
   const queryClient = useQueryClient();
   const { address } = useAccount();
@@ -28,6 +28,13 @@ export function SaveButton({ punk, getCanvas }: Props) {
       queryClient.invalidateQueries({ queryKey: ['user-punks', address] });
     }
   }, [isSuccess, address, queryClient]);
+
+  // Reset the save state when a different punk is selected so the
+  // button goes back to "SAVE ON-CHAIN" instead of staying on "SAVED".
+  useEffect(() => {
+    reset();
+    setStatus('');
+  }, [punk?.tokenId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const disabled = !punk || uploading || isPending || isConfirming;
 
