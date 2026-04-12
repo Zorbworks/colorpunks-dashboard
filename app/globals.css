@@ -989,7 +989,7 @@ img {
 .hero-screen {
   flex: 1;
   min-height: 0;
-  background: url('/hero-bg.png') center center / cover no-repeat;
+  background: url('/hero-bg.png') center top / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
