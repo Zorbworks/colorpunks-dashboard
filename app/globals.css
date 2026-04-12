@@ -187,7 +187,8 @@ img {
   min-width: 0;
 }
 .rail-head {
-  padding: 0 12px;
+  padding: 0 12px 8px;
+  border-bottom: 1px solid var(--rule);
   flex-shrink: 0;
 }
 .rail-head h2 {
@@ -541,9 +542,7 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--rule);
-  margin-bottom: 8px;
+  padding: 10px 0 8px;
 }
 .filter-row {
   display: flex;
