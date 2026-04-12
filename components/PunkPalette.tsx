@@ -38,7 +38,7 @@ export function PunkPalette({
   const traits = punk ? getPunkTraits(punk) : [];
 
   return (
-    <div className="punk-palette">
+    <>
       {/* Punk traits section */}
       {punk && (
         <>
@@ -99,6 +99,6 @@ export function PunkPalette({
           </button>
         );
       })}
-    </div>
+    </>
   );
 }

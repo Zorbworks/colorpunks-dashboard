@@ -255,16 +255,23 @@ export default function Page() {
               </div>
               <b>{selectedPunk ? `#${selectedPunk.tokenId}` : '—'}</b>
             </div>
-            {/* Always render Canvas (even when palette tab is active) so the
-                image loads in the background and extractColors works. */}
-            <div style={{ display: centerTab === 'canvas' ? undefined : 'none' }}>
+            {/* Both views always rendered; only one visible at a time.
+                This keeps the flex layout identical so the toolbar
+                doesn't shift when switching tabs. */}
+            <div
+              className="canvas-frame"
+              style={{ display: centerTab === 'canvas' ? undefined : 'none' }}
+            >
               <Canvas
                 ref={canvasRef}
                 imageUrl={imageUrl}
                 selectedColor={selectedColor}
               />
             </div>
-            {centerTab === 'details' && (
+            <div
+              className="punk-palette"
+              style={{ display: centerTab === 'details' ? undefined : 'none' }}
+            >
               <PunkPalette
                 colors={paletteColors}
                 baseColors={rawColors ?? []}
@@ -272,7 +279,7 @@ export default function Page() {
                 onSelect={setSelectedColor}
                 punk={selectedPunk}
               />
-            )}
+            </div>
             <Toolbar
               disabled={!selectedPunk}
               onUndo={() => canvasRef.current?.undo()}

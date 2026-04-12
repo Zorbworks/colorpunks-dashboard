@@ -213,7 +213,7 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
   }
 
   return (
-    <div className="canvas-frame">
+    <>
       {imageUrl ? (
         <canvas
           ref={canvasRef}
@@ -228,6 +228,6 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
       )}
       {loading && <div className="canvas-error">LOADING…</div>}
       {error && <div className="canvas-error">{error}</div>}
-    </div>
+    </>
   );
 });
