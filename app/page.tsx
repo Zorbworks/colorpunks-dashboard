@@ -317,7 +317,7 @@ export default function Page() {
                       setActivePalette(null);
                     }}
                   >
-                    COLORS
+                    BASE COLORS
                   </button>
                   <button
                     type="button"

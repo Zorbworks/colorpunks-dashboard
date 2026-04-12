@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback } from 'react';
 import type {
   ColorFilters as Filters,
   HueBucket,
@@ -25,8 +26,24 @@ const HUES: { key: HueBucket; color: string; label: string }[] = [
 
 export function ColorFilters({ filters, onChange }: Props) {
   const setTone = (tone: Tone) => onChange({ ...filters, tone });
-  const setHue = (hue: Filters['hue']) => onChange({ ...filters, hue });
   const setSort = (sort: Sort) => onChange({ ...filters, sort });
+
+  const toggleHue = useCallback(
+    (bucket: HueBucket) => {
+      const next = new Set(filters.hue);
+      if (next.has(bucket)) {
+        next.delete(bucket);
+      } else {
+        next.add(bucket);
+      }
+      onChange({ ...filters, hue: next });
+    },
+    [filters, onChange]
+  );
+
+  const clearHue = useCallback(() => {
+    onChange({ ...filters, hue: new Set() });
+  }, [filters, onChange]);
 
   return (
     <>
@@ -76,8 +93,8 @@ export function ColorFilters({ filters, onChange }: Props) {
         <div className="filter-group">
           <button
             type="button"
-            className={`chip${filters.hue === 'all' ? ' active' : ''}`}
-            onClick={() => setHue('all')}
+            className={`chip${filters.hue.size === 0 ? ' active' : ''}`}
+            onClick={clearHue}
           >
             ALL
           </button>
@@ -85,11 +102,11 @@ export function ColorFilters({ filters, onChange }: Props) {
             <button
               key={key}
               type="button"
-              className={`hue-swatch${filters.hue === key ? ' active' : ''}`}
+              className={`hue-swatch${filters.hue.has(key) ? ' active' : ''}`}
               style={{ background: color }}
               title={label}
-              aria-label={`Filter to ${label}`}
-              onClick={() => setHue(key)}
+              aria-label={`Toggle ${label}`}
+              onClick={() => toggleHue(key)}
             />
           ))}
         </div>

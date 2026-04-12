@@ -13,7 +13,8 @@ export type HueBucket =
 /** Tone sorts: light/dark by luminance, vivid/muted by saturation */
 export type Tone = 'all' | 'light' | 'dark' | 'vivid' | 'muted';
 export type Sort = 'new' | 'old' | 'az';
-export type HueFilter = 'all' | HueBucket;
+/** Set of selected hue buckets. Empty set = all hues shown. */
+export type HueFilter = Set<HueBucket>;
 
 export interface ColorFilters {
   tone: Tone;
@@ -23,7 +24,7 @@ export interface ColorFilters {
 
 export const DEFAULT_FILTERS: ColorFilters = {
   tone: 'all',
-  hue: 'all',
+  hue: new Set<HueBucket>(),
   sort: 'new',
 };
 
@@ -94,9 +95,9 @@ export function applyFilters(
   enriched: EnrichedColor[],
   filters: ColorFilters
 ): EnrichedColor[] {
-  // 1. Hue filter (keeps or removes colors).
+  // 1. Hue filter — empty set means all, otherwise only matching buckets.
   let out = enriched.filter((c) => {
-    if (filters.hue !== 'all' && c.bucket !== filters.hue) return false;
+    if (filters.hue.size > 0 && !filters.hue.has(c.bucket)) return false;
     return true;
   });
 
