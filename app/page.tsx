@@ -42,23 +42,28 @@ export default function Page() {
   } = useResetPunk();
   const queryClient = useQueryClient();
 
-  // Auto-select the first punk once they load so the canvas isn't empty.
+  // Auto-select the first punk on load, and keep selectedPunk in sync
+  // with the latest query data so the canvas always shows the freshest
+  // image (e.g. after save or reset triggers a refetch).
   useEffect(() => {
-    if (!selectedPunk && punks && punks.length > 0) {
+    if (!punks || punks.length === 0) return;
+    if (!selectedPunk) {
       setSelectedPunk(punks[0]);
+    } else {
+      // If we already have a punk selected, update it to the fresh
+      // version from the latest query so the imageUrl refreshes.
+      const fresh = punks.find((p) => p.tokenId === selectedPunk.tokenId);
+      if (fresh && fresh !== selectedPunk) {
+        setSelectedPunk(fresh);
+      }
     }
-  }, [punks, selectedPunk]);
+  }, [punks]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // After reset tx confirms: refetch punk data (fresh on-chain tokenURI)
-  // and force the canvas to reload the new image.
+  // After reset tx confirms, invalidate the punks query so the grid
+  // and canvas both pick up the restored original image.
   useEffect(() => {
-    if (!resetSuccess || !address || !selectedPunk) return;
-    // Invalidate the punks query so the grid re-fetches fresh images.
+    if (!resetSuccess || !address) return;
     queryClient.invalidateQueries({ queryKey: ['user-punks', address] });
-    // Force canvas reload by briefly clearing and re-setting the selected punk.
-    const punk = selectedPunk;
-    setSelectedPunk(null);
-    setTimeout(() => setSelectedPunk(punk), 100);
   }, [resetSuccess]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Determine the Reset button's display state.
