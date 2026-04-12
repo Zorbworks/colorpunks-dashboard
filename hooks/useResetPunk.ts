@@ -5,13 +5,15 @@ import { base } from 'wagmi/chains';
 import { COLOR_PUNKS_ABI, COLOR_PUNKS_ADDRESS } from '@/lib/contracts';
 
 /**
- * Calls `updateTokenURI(tokenId, "")` on the ColorPunks contract.
- *
- * The Thirdweb ERC721Base implementation stores per-token URI overrides.
- * Setting the override to an empty string clears it, causing `tokenURI()`
- * to fall back to `baseURI + tokenId` — which is the original uncolored
- * grey punk that was set at contract deploy time.
+ * The original ColorPunks metadata lives at this IPFS base URI.
+ * Each token's original metadata is at `{BASE_URI}/{tokenId}.json`.
+ * We reset by writing this URI back via updateTokenURI, which is more
+ * reliable than writing "" (which depends on the contract's baseURI
+ * fallback behavior).
  */
+const ORIGINAL_BASE_URI =
+  'ipfs://QmaUtpnjauXT81DFABAmrhUkjLVZvKaAf7QTi5L63xinN6';
+
 export function useResetPunk() {
   const {
     writeContract,
@@ -27,11 +29,15 @@ export function useResetPunk() {
   } = useWaitForTransactionReceipt({ hash });
 
   const resetPunk = (tokenId: bigint) => {
+    // Write the original IPFS metadata URI directly rather than clearing
+    // to "". This guarantees tokenURI(id) returns the original grey punk
+    // regardless of how the contract handles empty-string overrides.
+    const originalUri = `${ORIGINAL_BASE_URI}/${tokenId}.json`;
     writeContract({
       address: COLOR_PUNKS_ADDRESS,
       abi: COLOR_PUNKS_ABI,
       functionName: 'updateTokenURI',
-      args: [tokenId, ''],
+      args: [tokenId, originalUri],
       chain: base,
     });
   };

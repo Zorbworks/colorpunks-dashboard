@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAccount } from 'wagmi';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -25,7 +26,7 @@ import {
 } from '@/lib/color';
 
 export default function Page() {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const { data: punks, isLoading: punksLoading } = useUserPunks();
   const { data: rawColors, isLoading: colorsLoading } = useUserColors();
 
@@ -39,6 +40,7 @@ export default function Page() {
     isConfirming: resetConfirming,
     isSuccess: resetSuccess,
   } = useResetPunk();
+  const queryClient = useQueryClient();
 
   // Auto-select the first punk once they load so the canvas isn't empty.
   useEffect(() => {
@@ -46,6 +48,18 @@ export default function Page() {
       setSelectedPunk(punks[0]);
     }
   }, [punks, selectedPunk]);
+
+  // After reset tx confirms: refetch punk data (fresh on-chain tokenURI)
+  // and force the canvas to reload the new image.
+  useEffect(() => {
+    if (!resetSuccess || !address || !selectedPunk) return;
+    // Invalidate the punks query so the grid re-fetches fresh images.
+    queryClient.invalidateQueries({ queryKey: ['user-punks', address] });
+    // Force canvas reload by briefly clearing and re-setting the selected punk.
+    const punk = selectedPunk;
+    setSelectedPunk(null);
+    setTimeout(() => setSelectedPunk(punk), 100);
+  }, [resetSuccess]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Determine the Reset button's display state.
   const resetState = resetPending
