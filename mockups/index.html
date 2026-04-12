@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>COLORPUNKS / DIY — MOCKUPS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: #fff;
+      color: #000;
+      font-family: 'Jost', 'Futura', sans-serif;
+      font-weight: 500;
+    }
+    body { padding: 56px; max-width: 1200px; margin: 0 auto; }
+    h1 {
+      font-size: 88px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 0.85;
+      text-transform: uppercase;
+      border-bottom: 3px solid #000;
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+    h1 small { display: block; font-size: 14px; font-weight: 600; letter-spacing: 0.28em; margin-top: 16px; }
+    p { max-width: 640px; font-size: 14px; line-height: 1.6; margin-bottom: 32px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .card {
+      border: 3px solid #000;
+      padding: 24px;
+      text-decoration: none;
+      color: #000;
+      display: block;
+      transition: background 0.15s;
+    }
+    .card:hover { background: #000; color: #fff; }
+    .card .num {
+      font-size: 64px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .card .name {
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 20px;
+      margin-bottom: 12px;
+    }
+    .card .desc {
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .card .tags {
+      margin-top: 18px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .card .tag {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      border: 2px solid currentColor;
+      padding: 3px 7px;
+    }
+  </style>
+</head>
+<body>
+  <h1>
+    COLORPUNKS<br/>MOCKUPS
+    <small>BRUTALIST · BLACK &amp; WHITE · JOST / FUTURA</small>
+  </h1>
+  <p>
+    Three directions for the interface. All share the same mock data and flood-fill
+    engine — click any card to try the variation. Pick a punk, pick a color, click to
+    fill. Reset / Undo work.
+  </p>
+
+  <div class="grid">
+    <a class="card" href="./grid.html">
+      <div class="num">A</div>
+      <div class="name">GRID</div>
+      <div class="desc">
+        Classic three-panel brutalist. Thick 3px rules, numbered sections
+        (01 / 02 / 03), blocky save button. Dense, functional, workshop-floor feel.
+      </div>
+      <div class="tags">
+        <span class="tag">HEAVY RULES</span>
+        <span class="tag">NUMBERED</span>
+        <span class="tag">DENSE</span>
+      </div>
+    </a>
+
+    <a class="card" href="./editorial.html">
+      <div class="name"><span class="num">B</span></div>
+      <div class="name">EDITORIAL</div>
+      <div class="desc">
+        Swiss magazine layout. Massive display title, thin 1px hairlines,
+        huge negative space, centered canvas dominance. Exhibition catalog energy.
+      </div>
+      <div class="tags">
+        <span class="tag">DISPLAY TITLE</span>
+        <span class="tag">HAIRLINES</span>
+        <span class="tag">NEGATIVE SPACE</span>
+      </div>
+    </a>
+
+    <a class="card" href="./negative.html">
+      <div class="name"><span class="num">C</span></div>
+      <div class="name">NEGATIVE</div>
+      <div class="desc">
+        Inverted. Pure black background, white hairlines, monospace metadata
+        like a terminal, asymmetric rail layout. Studio / lab feel.
+      </div>
+      <div class="tags">
+        <span class="tag">DARK</span>
+        <span class="tag">TERMINAL</span>
+        <span class="tag">ASYMMETRIC</span>
+      </div>
+    </a>
+  </div>
+</body>
+</html>

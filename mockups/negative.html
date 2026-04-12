@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>COLORPUNKS / C · NEGATIVE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700;800;900&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Light default, dark on [data-theme="dark"]. */
+    :root {
+      --bg: #fff;
+      --fg: #000;
+      --rule: #000;
+      --muted: #666;
+      --font-display: 'Silkscreen', ui-monospace, Menlo, monospace;
+      --font-body: 'Jost', 'Futura', 'Century Gothic', sans-serif;
+      color-scheme: light;
+    }
+    html[data-theme="dark"] {
+      --bg: #000;
+      --fg: #fff;
+      --rule: #fff;
+      --muted: #888;
+      color-scheme: dark;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Jost', 'Futura', 'Century Gothic', sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      height: 100vh;
+      overflow: hidden;
+    }
+    canvas, img { image-rendering: pixelated; }
+
+    .page {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 20px 28px 16px;
+      gap: 14px;
+    }
+
+    /* ---------- HEADER ---------- */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--rule);
+      gap: 20px;
+    }
+    .logo-wrap { flex: 1; min-width: 0; }
+    .logo {
+      font-family: var(--font-display);
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 0.95;
+      text-transform: uppercase;
+    }
+    .logo-sub {
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-top: 12px;
+      font-weight: 400;
+      color: var(--muted);
+    }
+    .header-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    /* Wallet connect button (primary). In the mockup we just show a
+       connected state with a truncated address + green status dot. */
+    .connect-btn {
+      background: var(--fg);
+      color: var(--bg);
+      border: 1px solid var(--rule);
+      padding: 0 14px;
+      height: 34px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .connect-btn:hover { background: var(--bg); color: var(--fg); }
+    .connect-btn .dot {
+      color: #22c55e;
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    /* Secondary outlined action: links to the collection on OpenSea. */
+    .opensea-btn {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--rule);
+      padding: 0 14px;
+      height: 34px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .opensea-btn:hover { background: var(--fg); color: var(--bg); }
+
+    /* Tiny icon-only theme toggle. */
+    .theme-toggle {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--rule);
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      font-family: var(--font-display);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { background: var(--fg); color: var(--bg); }
+
+    /* ---------- MAIN GRID : 3 equal columns ---------- */
+    .main {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .rail {
+      border: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      min-width: 0;
+    }
+    .rail-head {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--rule);
+      flex-shrink: 0;
+    }
+    .rail-head h2 {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .rail-scroll {
+      overflow-y: auto;
+      flex: 1;
+      padding: 12px;
+      min-height: 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--rule) var(--bg);
+    }
+    .rail-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+    .rail-scroll::-webkit-scrollbar-track { background: var(--bg); }
+    .rail-scroll::-webkit-scrollbar-thumb { background: var(--rule); }
+
+    /* ---------- PUNKS : 4 per row ---------- */
+    .punks-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .punk {
+      background: transparent;
+      border: 1px solid var(--rule);
+      cursor: pointer;
+      padding: 0;
+      position: relative;
+      aspect-ratio: 1;
+      min-width: 0;
+    }
+    .punk.sel { outline: 2px solid var(--rule); outline-offset: 2px; }
+    .punk img { width: 100%; height: 100%; display: block; }
+    html[data-theme="dark"] .punk img { filter: invert(1); }
+    .punk-num {
+      position: absolute;
+      bottom: 3px; left: 3px;
+      font-family: var(--font-display);
+      font-size: 7px;
+      color: var(--fg);
+      background: var(--bg);
+      padding: 1px 3px;
+      border: 1px solid var(--rule);
+      letter-spacing: 0;
+    }
+
+    /* ---------- CENTER / CANVAS ---------- */
+    .center {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+      min-width: 0;
+    }
+    /* Same typographic treatment as rail-head h2 so all three column
+       titles read as a matched set. */
+    .center-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 2px;
+      border-bottom: 1px solid var(--rule);
+      flex-shrink: 0;
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .center-head b { font-weight: 700; }
+
+    .canvas-frame {
+      flex: 1;
+      min-height: 0;
+      border: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      overflow: hidden;
+      position: relative;
+      padding: 12px;
+    }
+    .canvas-frame canvas {
+      height: 100%;
+      width: auto;
+      max-width: 100%;
+      aspect-ratio: 1 / 1;
+      cursor: crosshair;
+      display: block;
+    }
+
+    .toolbar { display: flex; gap: 8px; flex-shrink: 0; }
+    .tool {
+      flex: 1;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--rule);
+      padding: 9px 6px;
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      min-width: 0;
+    }
+    .tool:hover { background: var(--fg); color: var(--bg); }
+    .tool.random { background: var(--fg); color: var(--bg); }
+    .tool.random:hover { background: var(--bg); color: var(--fg); }
+
+    .save {
+      width: 100%;
+      background: var(--fg);
+      color: var(--bg);
+      border: 1px solid var(--rule);
+      padding: 13px 12px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .save:hover { background: var(--bg); color: var(--fg); }
+
+    /* ---------- COLORS RAIL + FILTERS ---------- */
+    .colors-rail .rail-head h2 {
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 10px;
+    }
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: nowrap;
+    }
+    .filter-label {
+      font-family: var(--font-display);
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      flex-shrink: 0;
+      width: 32px;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: nowrap;
+      min-width: 0;
+    }
+    .chip {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--rule);
+      padding: 4px 7px;
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 9px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .chip:hover { background: var(--fg); color: var(--bg); }
+    .chip.active { background: var(--fg); color: var(--bg); }
+    .hue-swatch {
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border: 1px solid var(--rule);
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .hue-swatch.active::after {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      border: 2px solid var(--rule);
+      box-shadow: 0 0 0 1px var(--bg) inset;
+    }
+
+    /* ---------- COLORS GRID : 4 per row ---------- */
+    .colors-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      border-top: 1px solid var(--rule);
+      border-left: 1px solid var(--rule);
+    }
+    .color {
+      border-right: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      aspect-ratio: 1;
+      position: relative;
+      cursor: pointer;
+      padding: 0;
+      background: transparent;
+      min-width: 0;
+    }
+    .color.sel::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 2px solid var(--rule);
+      box-shadow: 0 0 0 2px var(--bg) inset;
+    }
+    .color-name {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      font-family: var(--font-display);
+      font-size: 7px;
+      text-align: center;
+      padding: 2px 2px;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      color: var(--fg);
+      border-top: 1px solid var(--rule);
+      text-transform: uppercase;
+      letter-spacing: 0;
+      font-weight: 400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 24px 12px;
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ---------- FOOTER ---------- */
+    /* 3-column grid so the middle slot is truly centered regardless of
+       the widths of the left credits and right chain-info. */
+    .footer {
+      padding-top: 12px;
+      border-top: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .footer > .credits      { justify-self: start; }
+    .footer > .footer-actions { justify-self: center; }
+    .footer > .chain-info   { justify-self: end; }
+
+    /* Credits read as paragraph text, so use the body font (Jost) instead
+       of Silkscreen and let the @handles sit only slightly heavier than
+       the surrounding copy. */
+    .credits {
+      font-family: var(--font-body);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg);
+      font-weight: 400;
+      min-width: 0;
+    }
+    .credits a {
+      color: var(--fg);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 500;
+    }
+    .credits a:hover { color: var(--muted); }
+
+    .footer-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .footer-actions > * {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--rule);
+      padding: 5px 10px;
+      text-decoration: none;
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .footer-actions > *:hover { background: var(--fg); color: var(--bg); }
+
+    .chain-info {
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--fg);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .chain-info .sep { color: var(--muted); margin: 0 6px; }
+    .chain-info:hover { color: var(--muted); }
+
+    /* ---------- MODAL ---------- */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: color-mix(in srgb, var(--fg) 45%, transparent);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--bg);
+      border: 2px solid var(--rule);
+      max-width: 760px;
+      max-height: 84vh;
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .modal.open { display: flex; }
+    .modal-head {
+      padding: 14px 16px;
+      border-bottom: 2px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .modal-head h3 {
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .modal-close {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--rule);
+      width: 28px;
+      height: 28px;
+      font-family: var(--font-display);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-close:hover { background: var(--fg); color: var(--bg); }
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      min-height: 0;
+      flex: 1;
+    }
+    .modal-body p {
+      font-family: var(--font-body);
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--fg);
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .gallery-item {
+      border: 1px solid var(--rule);
+      aspect-ratio: 1;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .gallery-meta {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      background: var(--bg);
+      color: var(--fg);
+      padding: 3px 6px;
+      font-family: var(--font-display);
+      font-size: 8px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+    }
+    .gallery-meta .muted { color: var(--muted); }
+    .gallery-loading {
+      grid-column: 1 / -1;
+      padding: 40px;
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ---------- MOBILE ---------- */
+    @media (max-width: 960px) {
+      html, body {
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: auto;
+      }
+      .page { height: auto; padding: 14px; gap: 12px; }
+      .header { flex-direction: column; align-items: stretch; gap: 12px; }
+      .logo { font-size: 40px; }
+      .header-right {
+        width: 100%;
+        justify-content: flex-end;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .connect-btn, .opensea-btn { flex: 1 1 auto; justify-content: center; }
+
+      .main {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto auto;
+        gap: 12px;
+      }
+
+      .rail.punks-rail { max-height: 180px; order: 0; overflow: hidden; }
+      .punks-rail .rail-scroll { overflow-x: auto; overflow-y: hidden; }
+      .punks-list {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        width: max-content;
+      }
+      .punk { width: 130px; flex-shrink: 0; }
+
+      .center { order: 1; display: block; }
+      .center-head { margin-bottom: 12px; }
+      .canvas-frame {
+        display: block;
+        flex: none;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        max-height: none;
+        padding: 18px;
+        margin-bottom: 12px;
+      }
+      .canvas-frame canvas {
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        aspect-ratio: auto;
+      }
+      .toolbar   { margin-bottom: 10px; }
+      .picked-bar { margin-bottom: 10px; }
+
+      .rail.colors-rail { max-height: 380px; order: 2; overflow: hidden; }
+      .colors-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .filter-row { flex-wrap: wrap; }
+
+      .footer { flex-direction: column; gap: 10px; align-items: flex-start; }
+      .credits { flex: none; }
+      .footer-actions { flex-wrap: wrap; }
+      .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 520px) {
+      .logo { font-size: 28px; }
+      .page { padding: 10px; }
+      .colors-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="logo-wrap">
+        <div class="logo">COLORPUNKS</div>
+        <div class="logo-sub">POWER TOOLS FOR COLORPUNKS</div>
+      </div>
+      <div class="header-right">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">◐</button>
+        <a class="opensea-btn"
+           href="https://opensea.io/assets/base/0x67c7187031819a83e86286a64d117305b1902eb2"
+           target="_blank" rel="noopener noreferrer">
+          BUY ON OPENSEA ↗
+        </a>
+        <button class="connect-btn" id="connectBtn" title="Wallet — click to disconnect">
+          <span class="dot">●</span>
+          <span class="addr">0xDEAD…4242</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="main">
+      <aside class="rail punks-rail">
+        <div class="rail-head">
+          <h2>[01] YOUR PUNKS · <span id="punkCount">—</span></h2>
+        </div>
+        <div class="rail-scroll">
+          <div id="punks" class="punks-list"></div>
+        </div>
+      </aside>
+
+      <section class="center">
+        <div class="center-head">
+          <span>[02] CANVAS</span>
+          <b id="tokenInfo">#0001</b>
+        </div>
+        <div class="canvas-frame">
+          <canvas id="canvas" width="512" height="512"></canvas>
+        </div>
+        <div class="toolbar">
+          <button class="tool" id="undo">UNDO</button>
+          <button class="tool" id="reset">RESET</button>
+          <button class="tool random" id="random">RANDOM ⚅</button>
+        </div>
+        <button class="save">SAVE ON-CHAIN ↗</button>
+      </section>
+
+      <aside class="rail colors-rail">
+        <div class="rail-head">
+          <h2>[03] BASECOLORS · <span id="colorCount">—</span></h2>
+
+          <div class="filter-row">
+            <span class="filter-label">TONE</span>
+            <div class="filter-group" id="toneFilters">
+              <button class="chip active" data-tone="all">ALL</button>
+              <button class="chip" data-tone="light">◐ LIGHT</button>
+              <button class="chip" data-tone="dark">● DARK</button>
+            </div>
+          </div>
+
+          <div class="filter-row">
+            <span class="filter-label">HUE</span>
+            <div class="filter-group" id="hueFilters">
+              <button class="chip active" data-hue="all">ALL</button>
+              <button class="hue-swatch" data-hue="red"    style="background:#E53935" title="Red"></button>
+              <button class="hue-swatch" data-hue="orange" style="background:#FB8C00" title="Orange"></button>
+              <button class="hue-swatch" data-hue="yellow" style="background:#FDD835" title="Yellow"></button>
+              <button class="hue-swatch" data-hue="green"  style="background:#43A047" title="Green"></button>
+              <button class="hue-swatch" data-hue="cyan"   style="background:#00ACC1" title="Cyan"></button>
+              <button class="hue-swatch" data-hue="blue"   style="background:#1E88E5" title="Blue"></button>
+              <button class="hue-swatch" data-hue="purple" style="background:#8E24AA" title="Purple"></button>
+              <button class="hue-swatch" data-hue="gray"   style="background:#999999" title="Gray"></button>
+            </div>
+          </div>
+
+          <div class="filter-row">
+            <span class="filter-label">AGE</span>
+            <div class="filter-group" id="ageFilters">
+              <button class="chip active" data-age="new">NEW ↓</button>
+              <button class="chip" data-age="old">OLD ↑</button>
+            </div>
+          </div>
+        </div>
+        <div class="rail-scroll">
+          <div id="colors" class="colors-list"></div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <span class="credits">
+        COLORPUNKS BY <a href="https://farcaster.xyz/myk" target="_blank" rel="noopener noreferrer">@MYK</a>
+        · TOOL BY <a href="https://farcaster.xyz/deebee" target="_blank" rel="noopener noreferrer">@DEEBEE</a>
+      </span>
+      <div class="footer-actions">
+        <button type="button" id="aboutBtn">ABOUT</button>
+        <button type="button" id="galleryBtn">RECENT ⊞</button>
+        <a href="https://www.basecolors.com" target="_blank" rel="noopener noreferrer">BASECOLORS ↗</a>
+      </div>
+      <a class="chain-info"
+         href="https://basescan.org/address/0x67c7187031819a83e86286a64d117305b1902eb2"
+         target="_blank" rel="noopener noreferrer">
+        BASE 8453<span class="sep">·</span>0X67C7…02EB2 ↗
+      </a>
+    </footer>
+  </div>
+
+  <!-- ---------- MODALS ---------- -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" id="aboutModal">
+      <div class="modal-head">
+        <h3>[ ABOUT ] COLORPUNKS DIY</h3>
+        <button class="modal-close" data-close aria-label="Close">×</button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+          veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+          commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+          velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+          occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+          mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus
+          error sit voluptatem accusantium doloremque laudantium, totam rem
+          aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
+          architecto beatae vitae dicta sunt explicabo.
+        </p>
+      </div>
+    </div>
+    <div class="modal" id="galleryModal">
+      <div class="modal-head">
+        <h3>[ RECENT ] LATEST 24</h3>
+        <button class="modal-close" data-close aria-label="Close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="gallery-grid" id="galleryGrid">
+          <div class="gallery-loading">LOADING…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./_shared.js"></script>
+  <script>
+    // ---------- Theme toggle (icon only) ----------
+    const themeBtn = document.getElementById('themeToggle');
+    function setTheme(next) {
+      document.documentElement.setAttribute('data-theme', next);
+      themeBtn.textContent = next === 'light' ? '◐' : '◑';
+    }
+    themeBtn.addEventListener('click', () => {
+      const curr = document.documentElement.getAttribute('data-theme');
+      setTheme(curr === 'light' ? 'dark' : 'light');
+    });
+
+    // ---------- Canvas ----------
+    const canvas = document.getElementById('canvas');
+    const api = Mockup.mountCanvas(canvas);
+
+    // ---------- Extended mock punks ----------
+    const EXTENDED_PUNKS = [];
+    for (let i = 0; i < 24; i++) {
+      const base = Mockup.PUNKS[i % Mockup.PUNKS.length];
+      EXTENDED_PUNKS.push({
+        tokenId: String(i * 17 + 1).padStart(4, '0'),
+        name: base.name,
+        src: base.src,
+      });
+    }
+
+    const punksEl = document.getElementById('punks');
+    let currentPunk = EXTENDED_PUNKS[0];
+    function renderPunks() {
+      punksEl.innerHTML = '';
+      EXTENDED_PUNKS.forEach(p => {
+        const b = document.createElement('button');
+        b.className = 'punk' + (p.tokenId === currentPunk.tokenId ? ' sel' : '');
+        b.innerHTML =
+          '<img src="' + p.src + '" alt="' + p.name + '"/>' +
+          '<span class="punk-num">#' + p.tokenId + '</span>';
+        b.addEventListener('click', () => {
+          currentPunk = p;
+          api.loadPunk(p.src);
+          document.getElementById('tokenInfo').textContent = '#' + p.tokenId;
+          renderPunks();
+        });
+        punksEl.appendChild(b);
+      });
+      document.getElementById('punkCount').textContent =
+        String(EXTENDED_PUNKS.length).padStart(2, '0');
+    }
+
+    // ---------- Extended mock colors ----------
+    function hexToHsl(hex) {
+      const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      const r = parseInt(m[1], 16) / 255;
+      const g = parseInt(m[2], 16) / 255;
+      const b = parseInt(m[3], 16) / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+      if (max === min) { h = 0; s = 0; }
+      else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        if (max === r) h = ((g - b) / d + (g < b ? 6 : 0));
+        else if (max === g) h = (b - r) / d + 2;
+        else h = (r - g) / d + 4;
+        h *= 60;
+      }
+      return { h, s, l };
+    }
+    function hueBucket(h, s) {
+      if (s < 0.15) return 'gray';
+      if (h < 20 || h >= 340) return 'red';
+      if (h < 45) return 'orange';
+      if (h < 65) return 'yellow';
+      if (h < 165) return 'green';
+      if (h < 200) return 'cyan';
+      if (h < 250) return 'blue';
+      return 'purple';
+    }
+
+    const MORE_COLORS = [
+      ['#E74C3C', 'Tomato'],  ['#F39C12', 'Amber'],   ['#F1C40F', null],
+      ['#2ECC71', 'Emerald'], ['#1ABC9C', 'Teal'],    ['#3498DB', 'Sky'],
+      ['#9B59B6', null],      ['#34495E', 'Slate'],   ['#95A5A6', null],
+      ['#ECF0F1', 'Mist'],    ['#BDC3C7', null],      ['#16A085', 'Jade'],
+      ['#27AE60', null],      ['#2980B9', 'Ocean'],   ['#D35400', 'Rust'],
+      ['#7F8C8D', null],      ['#FF6B6B', 'Coral'],   ['#4ECDC4', 'Lagoon'],
+      ['#45B7D1', null],      ['#96CEB4', 'Sage'],    ['#FFEAA7', 'Cream'],
+      ['#DFE6E9', null],      ['#2D3436', 'Graphite'],['#636E72', null],
+    ];
+    const allSources = Mockup.COLORS.concat(
+      MORE_COLORS.map(([hex, name]) => ({ hex, name }))
+    );
+    const EXTENDED_COLORS = allSources.map((c, i) => {
+      const hsl = hexToHsl(c.hex);
+      return {
+        hex: c.hex,
+        name: c.name,
+        hsl,
+        bucket: hueBucket(hsl.h, hsl.s),
+        age: i, // lower index = older
+      };
+    });
+
+    const filters = { tone: 'all', hue: 'all', age: 'new' };
+    const colorsEl = document.getElementById('colors');
+    let currentColor = null;
+
+    function applyFilters(list) {
+      let out = list.filter(c => {
+        if (filters.tone === 'light' && c.hsl.l < 0.55) return false;
+        if (filters.tone === 'dark'  && c.hsl.l > 0.35) return false;
+        if (filters.hue !== 'all' && c.bucket !== filters.hue) return false;
+        return true;
+      });
+      if (filters.age === 'new') out = out.slice().sort((a, b) => b.age - a.age);
+      if (filters.age === 'old') out = out.slice().sort((a, b) => a.age - b.age);
+      return out;
+    }
+
+    function renderColors() {
+      colorsEl.innerHTML = '';
+      const list = applyFilters(EXTENDED_COLORS);
+      if (list.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.textContent = 'NO COLORS MATCH';
+        colorsEl.appendChild(empty);
+      } else {
+        list.forEach(c => {
+          const b = document.createElement('button');
+          b.className = 'color' + (c.hex === currentColor ? ' sel' : '');
+          b.style.backgroundColor = c.hex;
+          // Always show a label: named colors show the name, unnamed show the hex.
+          const label = c.name ? c.name.toUpperCase() : c.hex.toUpperCase();
+          b.innerHTML = '<span class="color-name">' + label + '</span>';
+          b.title = (c.name ? c.name + ' — ' : '') + c.hex;
+          b.addEventListener('click', () => {
+            currentColor = c.hex;
+            api.setColor(c.hex);
+            renderColors();
+          });
+          colorsEl.appendChild(b);
+        });
+      }
+      document.getElementById('colorCount').textContent =
+        String(list.length).padStart(2, '0') + ' / ' + String(EXTENDED_COLORS.length).padStart(2, '0');
+    }
+
+    function setupFilterGroup(id, key) {
+      const group = document.getElementById(id);
+      group.querySelectorAll('[data-' + key + ']').forEach(chip => {
+        chip.addEventListener('click', () => {
+          group.querySelectorAll('[data-' + key + ']').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          filters[key] = chip.getAttribute('data-' + key);
+          renderColors();
+        });
+      });
+    }
+    setupFilterGroup('toneFilters', 'tone');
+    setupFilterGroup('hueFilters',  'hue');
+    setupFilterGroup('ageFilters',  'age');
+
+    document.getElementById('undo').addEventListener('click',  () => api.undo());
+    document.getElementById('reset').addEventListener('click', () => api.reset());
+    document.getElementById('random').addEventListener('click', () => {
+      // Randomize using the currently-filtered palette — so filtering to
+      // e.g. "Blue only" produces a monochrome blue punk.
+      const list = applyFilters(EXTENDED_COLORS);
+      if (list.length === 0) return;
+      api.randomize(list);
+    });
+
+    renderPunks();
+    renderColors();
+    api.loadPunk(currentPunk.src);
+    document.getElementById('tokenInfo').textContent = '#' + currentPunk.tokenId;
+
+    // ---------- Modals ----------
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const aboutModal    = document.getElementById('aboutModal');
+    const galleryModal  = document.getElementById('galleryModal');
+
+    function openModal(el) {
+      document.querySelectorAll('.modal').forEach(m => m.classList.remove('open'));
+      el.classList.add('open');
+      modalBackdrop.classList.add('open');
+    }
+    function closeModal() {
+      modalBackdrop.classList.remove('open');
+      document.querySelectorAll('.modal').forEach(m => m.classList.remove('open'));
+    }
+    modalBackdrop.addEventListener('click', (e) => {
+      if (e.target === modalBackdrop) closeModal();
+    });
+    document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeModal));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    document.getElementById('aboutBtn').addEventListener('click', () => openModal(aboutModal));
+    document.getElementById('galleryBtn').addEventListener('click', async () => {
+      openModal(galleryModal);
+      if (!galleryGenerated) {
+        galleryGenerated = true;
+        await renderGallery();
+      }
+    });
+
+    // ---------- Gallery (randomised colored mock punks) ----------
+    function hexToRgba(hex) {
+      const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return m ? [parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16), 255] : [0,0,0,255];
+    }
+
+    let galleryGenerated = false;
+    function renderGallery() {
+      return new Promise((resolve) => {
+        const grid = document.getElementById('galleryGrid');
+        const tmp = document.createElement('canvas');
+        tmp.width = 256;
+        tmp.height = 256;
+        const tctx = tmp.getContext('2d', { willReadFrequently: true });
+        tctx.imageSmoothingEnabled = false;
+
+        // Pick 24 punks, fake "time ago" strings — enough content to
+        // force the modal body to scroll.
+        const picks = EXTENDED_PUNKS.slice(0, 24);
+        const ages = [
+          '2M AGO',  '9M AGO',  '23M AGO', '41M AGO',
+          '1H AGO',  '2H AGO',  '3H AGO',  '5H AGO',
+          '8H AGO',  '12H AGO', '16H AGO', '19H AGO',
+          '1D AGO',  '2D AGO',  '2D AGO',  '3D AGO',
+          '4D AGO',  '5D AGO',  '6D AGO',  '1W AGO',
+          '1W AGO',  '2W AGO',  '2W AGO',  '3W AGO',
+        ];
+        const palette = EXTENDED_COLORS;
+
+        // Pre-create empty slots so ordering is deterministic regardless
+        // of the order the image onloads fire.
+        grid.innerHTML = '';
+        const items = picks.map((p, i) => {
+          const item = document.createElement('div');
+          item.className = 'gallery-item';
+          item.innerHTML =
+            '<div class="gallery-meta">' +
+              '<span>#' + p.tokenId + '</span>' +
+              '<span class="muted">' + ages[i] + '</span>' +
+            '</div>';
+          grid.appendChild(item);
+          return item;
+        });
+
+        let done = 0;
+        picks.forEach((p, i) => {
+          const img = new Image();
+          img.onload = () => {
+            tctx.clearRect(0, 0, 256, 256);
+            tctx.drawImage(img, 0, 0, 256, 256);
+            // Palette replace: same idea as api.randomize().
+            const data = tctx.getImageData(0, 0, 256, 256);
+            const pixels = data.data;
+            const replacements = new Map();
+            for (let j = 0; j < pixels.length; j += 4) {
+              if (pixels[j] < 24 && pixels[j+1] < 24 && pixels[j+2] < 24) continue;
+              const key = (pixels[j] << 16) | (pixels[j+1] << 8) | pixels[j+2];
+              let c = replacements.get(key);
+              if (!c) {
+                const rnd = palette[Math.floor(Math.random() * palette.length)];
+                c = hexToRgba(rnd.hex);
+                replacements.set(key, c);
+              }
+              pixels[j]   = c[0];
+              pixels[j+1] = c[1];
+              pixels[j+2] = c[2];
+            }
+            tctx.putImageData(data, 0, 0);
+            const src = tmp.toDataURL('image/png');
+
+            const imgEl = document.createElement('img');
+            imgEl.src = src;
+            imgEl.alt = '#' + p.tokenId;
+            items[i].insertBefore(imgEl, items[i].firstChild);
+
+            done++;
+            if (done === picks.length) resolve();
+          };
+          img.src = p.src;
+        });
+      });
+    }
+  </script>
+</body>
+</html>
