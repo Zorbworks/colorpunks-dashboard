@@ -69,6 +69,16 @@ export default function Page() {
     queryClient.invalidateQueries({ queryKey: ['user-punks', address] });
   }, [resetSuccess]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Re-extract palette colors when the punk changes while palette tab is open.
+  // Small delay lets the canvas finish drawing the new image first.
+  useEffect(() => {
+    if (centerTab !== 'palette' || !selectedPunk) return;
+    const timer = setTimeout(() => {
+      setPaletteColors(canvasRef.current?.extractColors() ?? []);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [selectedPunk, centerTab]);
+
   // Determine the Reset button's display state.
   const resetState = resetPending
     ? 'pending'
@@ -171,13 +181,16 @@ export default function Page() {
               </div>
               <b>{selectedPunk ? `#${selectedPunk.tokenId}` : '—'}</b>
             </div>
-            {centerTab === 'canvas' ? (
+            {/* Always render Canvas (even when palette tab is active) so the
+                image loads in the background and extractColors works. */}
+            <div style={{ display: centerTab === 'canvas' ? undefined : 'none' }}>
               <Canvas
                 ref={canvasRef}
                 imageUrl={imageUrl}
                 selectedColor={selectedColor}
               />
-            ) : (
+            </div>
+            {centerTab === 'palette' && (
               <PunkPalette
                 colors={paletteColors}
                 baseColors={rawColors ?? []}
