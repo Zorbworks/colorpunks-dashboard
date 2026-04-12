@@ -351,8 +351,17 @@ img {
   font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  background: var(--bg);
+  color: var(--fg);
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
 }
 .punk-palette-row:last-child { border-bottom: none; }
+.punk-palette-row:hover { background: color-mix(in srgb, var(--fg) 8%, var(--bg)); }
+.punk-palette-row.selected { background: var(--fg); color: var(--bg); }
+.punk-palette-row.selected .punk-palette-hex,
+.punk-palette-row.selected .punk-palette-pct { color: color-mix(in srgb, var(--bg) 60%, var(--fg)); }
 .punk-palette-swatch {
   width: 24px;
   height: 24px;

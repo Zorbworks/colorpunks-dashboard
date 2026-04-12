@@ -7,6 +7,9 @@ interface Props {
   colors: ColorInfo[];
   /** The user's BaseColors — used to look up custom names by hex. */
   baseColors: UserColor[];
+  /** When set, clicking a color row selects it as the active paint color. */
+  onSelect?: (hex: string) => void;
+  selectedColor?: string | null;
 }
 
 /**
@@ -14,7 +17,7 @@ interface Props {
  * Each color is shown as a swatch + name (if it matches a BaseColor) or hex,
  * plus what percentage of the fillable pixels it covers.
  */
-export function PunkPalette({ colors, baseColors }: Props) {
+export function PunkPalette({ colors, baseColors, onSelect, selectedColor }: Props) {
   // Build a lookup from hex → BaseColor name.
   const nameByHex = new Map<string, string>();
   for (const bc of baseColors) {
@@ -31,8 +34,14 @@ export function PunkPalette({ colors, baseColors }: Props) {
     <div className="punk-palette">
       {colors.map((c) => {
         const name = nameByHex.get(c.hex);
+        const isSelected = selectedColor === c.hex;
         return (
-          <div className="punk-palette-row" key={c.hex}>
+          <button
+            type="button"
+            className={`punk-palette-row${isSelected ? ' selected' : ''}`}
+            key={c.hex}
+            onClick={() => onSelect?.(c.hex)}
+          >
             <span
               className="punk-palette-swatch"
               style={{ backgroundColor: c.hex }}
@@ -44,7 +53,7 @@ export function PunkPalette({ colors, baseColors }: Props) {
               <span className="punk-palette-hex">{c.hex}</span>
             )}
             <span className="punk-palette-pct">{c.percentage}%</span>
-          </div>
+          </button>
         );
       })}
     </div>

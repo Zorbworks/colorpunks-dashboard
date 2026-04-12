@@ -194,6 +194,8 @@ export default function Page() {
               <PunkPalette
                 colors={paletteColors}
                 baseColors={rawColors ?? []}
+                selectedColor={selectedColor}
+                onSelect={setSelectedColor}
               />
             )}
             <Toolbar
