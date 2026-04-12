@@ -1,5 +1,8 @@
 import type { AlchemyNft } from './alchemy';
 
+/** The original uncolored metadata CID — punks with a different image have been colored. */
+const ORIGINAL_CID = 'QmZzBSaDAEwJhSUkhrcfVmZmbD1GwVLHd4GGoGGTWJWmSQ';
+
 export type PunkType = 'male' | 'female' | 'zombie' | 'ape' | 'alien';
 export type PunkTypeFilter = 'all' | PunkType;
 
@@ -61,6 +64,65 @@ export function filterPunksByType(
 ): AlchemyNft[] {
   if (filter === 'all') return punks;
   return punks.filter((p) => getPunkType(p) === filter);
+}
+
+export type PunkSort = 'default' | 'id-asc' | 'id-desc' | 'recent' | 'colored' | 'rare';
+
+const TYPE_RARITY: Record<string, number> = {
+  alien: 6,
+  ape: 5,
+  zombie: 4,
+  female: 1,
+  male: 1,
+};
+
+/** Simple rarity score: type rarity bonus + number of non-type traits. */
+export function getRarityScore(punk: AlchemyNft): number {
+  const attrs = punk.raw?.metadata?.attributes ?? [];
+  const ptype = getPunkType(punk);
+  const typeScore = ptype ? (TYPE_RARITY[ptype] ?? 1) : 1;
+  const traitCount = attrs.filter(
+    (a) => a.trait_type !== 'punks' && a.trait_type !== 'type'
+  ).length;
+  return typeScore + traitCount;
+}
+
+/** Check whether a punk has been colored (image differs from original CID). */
+export function isColored(punk: AlchemyNft): boolean {
+  const img =
+    punk.image?.cachedUrl ??
+    punk.image?.originalUrl ??
+    punk.raw?.metadata?.image ??
+    '';
+  return Boolean(img) && !img.includes(ORIGINAL_CID);
+}
+
+/** Sort punks by the given criteria. */
+export function sortPunks(
+  punks: AlchemyNft[],
+  sort: PunkSort
+): AlchemyNft[] {
+  if (sort === 'default') return punks;
+  const out = punks.slice();
+  switch (sort) {
+    case 'id-asc':
+      return out.sort((a, b) => Number(a.tokenId) - Number(b.tokenId));
+    case 'id-desc':
+      return out.sort((a, b) => Number(b.tokenId) - Number(a.tokenId));
+    case 'recent':
+      // Alchemy returns most recently acquired last; reverse for newest first.
+      return out.reverse();
+    case 'colored':
+      return out.sort((a, b) => {
+        const ac = isColored(a) ? 0 : 1;
+        const bc = isColored(b) ? 0 : 1;
+        return ac - bc;
+      });
+    case 'rare':
+      return out.sort((a, b) => getRarityScore(b) - getRarityScore(a));
+    default:
+      return out;
+  }
 }
 
 /** Group punks by a specific trait type, returning groups sorted by trait value. */

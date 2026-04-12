@@ -33,7 +33,9 @@ import {
   filterPunksByType,
   getAllTraitTypes,
   groupPunksByTrait,
+  sortPunks,
   type PunkTypeFilter,
+  type PunkSort,
 } from '@/lib/punk-traits';
 
 export default function Page() {
@@ -48,6 +50,7 @@ export default function Page() {
   const [centerTab, setCenterTab] = useState<'canvas' | 'details'>('canvas');
   const [paletteColors, setPaletteColors] = useState<ColorInfo[]>([]);
   const [punkTypeFilter, setPunkTypeFilter] = useState<PunkTypeFilter>('all');
+  const [punkSort, setPunkSort] = useState<PunkSort>('default');
   const [traitGroupBy, setTraitGroupBy] = useState<string | null>(null);
   const [colorsTab, setColorsTab] = useState<'colors' | 'palettes'>('colors');
   const [activePalette, setActivePalette] = useState<UserPalette | null>(null);
@@ -125,8 +128,8 @@ export default function Page() {
   }, [selectedPunk, resetPunk]);
 
   const filteredPunks = useMemo(
-    () => filterPunksByType(punks ?? [], punkTypeFilter),
-    [punks, punkTypeFilter]
+    () => sortPunks(filterPunksByType(punks ?? [], punkTypeFilter), punkSort),
+    [punks, punkTypeFilter, punkSort]
   );
 
   const punkGroups = useMemo(() => {
@@ -208,6 +211,8 @@ export default function Page() {
                 onTypeChange={handlePunkTypeChange}
                 onRandomTrait={handleRandomTrait}
                 activeTraitGroup={traitGroupBy}
+                sort={punkSort}
+                onSortChange={setPunkSort}
               />
             </div>
             <div className="rail-scroll">

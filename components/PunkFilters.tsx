@@ -4,63 +4,99 @@ import {
   PUNK_TYPE_LABELS,
   type PunkType,
   type PunkTypeFilter,
+  type PunkSort,
 } from '@/lib/punk-traits';
 
 interface Props {
   typeFilter: PunkTypeFilter;
   onTypeChange: (t: PunkTypeFilter) => void;
   onRandomTrait: () => void;
-  /** Currently active random trait grouping label, or null if off. */
   activeTraitGroup: string | null;
+  sort: PunkSort;
+  onSortChange: (s: PunkSort) => void;
 }
 
 const TYPES: PunkType[] = ['male', 'female', 'zombie', 'ape', 'alien'];
+
+const SORTS: { key: PunkSort; label: string }[] = [
+  { key: 'id-desc', label: 'ID ↓' },
+  { key: 'id-asc', label: 'ID ↑' },
+  { key: 'recent', label: 'RECENT' },
+  { key: 'colored', label: 'COLORED' },
+  { key: 'rare', label: 'RARE' },
+];
 
 export function PunkFilters({
   typeFilter,
   onTypeChange,
   onRandomTrait,
   activeTraitGroup,
+  sort,
+  onSortChange,
 }: Props) {
   return (
-    <div className="filter-row">
-      <span className="filter-label">TYPE</span>
-      <div className="filter-group">
-        <button
-          type="button"
-          className={`chip${typeFilter === 'all' ? ' active' : ''}`}
-          onClick={() => onTypeChange('all')}
-        >
-          ALL
-        </button>
-        {TYPES.map((t) => (
+    <>
+      <div className="filter-row">
+        <span className="filter-label">TYPE</span>
+        <div className="filter-group">
           <button
-            key={t}
             type="button"
-            className={`chip${typeFilter === t ? ' active' : ''}`}
-            onClick={() => onTypeChange(t)}
+            className={`chip${typeFilter === 'all' ? ' active' : ''}`}
+            onClick={() => onTypeChange('all')}
           >
-            {PUNK_TYPE_LABELS[t]}
+            ALL
           </button>
-        ))}
+          {TYPES.map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={`chip${typeFilter === t ? ' active' : ''}`}
+              onClick={() => onTypeChange(t)}
+            >
+              {PUNK_TYPE_LABELS[t]}
+            </button>
+          ))}
+          <div className="filter-group" style={{ marginLeft: 6 }}>
+            <button
+              type="button"
+              className={`chip${!activeTraitGroup ? ' active' : ''}`}
+              onClick={() => onTypeChange(typeFilter)}
+            >
+              —
+            </button>
+            <button
+              type="button"
+              className={`chip${activeTraitGroup ? ' active' : ''}`}
+              onClick={onRandomTrait}
+              title="Group by a random trait"
+            >
+              ⚅ {activeTraitGroup ? activeTraitGroup.toUpperCase().replace(/_/g, ' ') : 'TRAIT'}
+            </button>
+          </div>
+        </div>
       </div>
-      <div className="filter-group" style={{ marginLeft: 8 }}>
-        <button
-          type="button"
-          className={`chip${!activeTraitGroup ? ' active' : ''}`}
-          onClick={() => onTypeChange(typeFilter)}
-        >
-          —
-        </button>
-        <button
-          type="button"
-          className={`chip${activeTraitGroup ? ' active' : ''}`}
-          onClick={onRandomTrait}
-          title="Group by a random trait"
-        >
-          ⚅ {activeTraitGroup ? activeTraitGroup.toUpperCase().replace(/_/g, ' ') : 'TRAIT'}
-        </button>
+      <div className="filter-row">
+        <span className="filter-label">SORT</span>
+        <div className="filter-group">
+          <button
+            type="button"
+            className={`chip${sort === 'default' ? ' active' : ''}`}
+            onClick={() => onSortChange('default')}
+          >
+            —
+          </button>
+          {SORTS.map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              className={`chip${sort === key ? ' active' : ''}`}
+              onClick={() => onSortChange(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
