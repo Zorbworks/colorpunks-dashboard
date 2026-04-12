@@ -458,7 +458,9 @@ img {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
+  flex-grow: 0;
   padding: 0 12px;
+  margin-top: auto;
 }
 .tool {
   flex: 1;
