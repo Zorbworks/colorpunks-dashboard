@@ -1002,7 +1002,7 @@ img {
   border: 2px solid var(--rule);
   padding: 48px 56px;
   text-align: center;
-  max-width: 600px;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
   align-items: center;
