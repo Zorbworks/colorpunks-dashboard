@@ -4,7 +4,7 @@ import type {
   ColorFilters as Filters,
   HueBucket,
   Tone,
-  Age,
+  Sort,
 } from '@/lib/color';
 
 interface Props {
@@ -26,7 +26,7 @@ const HUES: { key: HueBucket; color: string; label: string }[] = [
 export function ColorFilters({ filters, onChange }: Props) {
   const setTone = (tone: Tone) => onChange({ ...filters, tone });
   const setHue = (hue: Filters['hue']) => onChange({ ...filters, hue });
-  const setAge = (age: Age) => onChange({ ...filters, age });
+  const setSort = (sort: Sort) => onChange({ ...filters, sort });
 
   return (
     <>
@@ -45,28 +45,28 @@ export function ColorFilters({ filters, onChange }: Props) {
             className={`chip${filters.tone === 'light' ? ' active' : ''}`}
             onClick={() => setTone('light')}
           >
-            LIGHT ↓
+            LIGHT
           </button>
           <button
             type="button"
             className={`chip${filters.tone === 'dark' ? ' active' : ''}`}
             onClick={() => setTone('dark')}
           >
-            DARK ↓
+            DARK
           </button>
           <button
             type="button"
             className={`chip${filters.tone === 'vivid' ? ' active' : ''}`}
             onClick={() => setTone('vivid')}
           >
-            VIVID ↓
+            VIVID
           </button>
           <button
             type="button"
             className={`chip${filters.tone === 'muted' ? ' active' : ''}`}
             onClick={() => setTone('muted')}
           >
-            MUTED ↓
+            MUTED
           </button>
         </div>
       </div>
@@ -96,21 +96,28 @@ export function ColorFilters({ filters, onChange }: Props) {
       </div>
 
       <div className="filter-row">
-        <span className="filter-label">AGE</span>
+        <span className="filter-label">SORT</span>
         <div className="filter-group">
           <button
             type="button"
-            className={`chip${filters.age === 'new' ? ' active' : ''}`}
-            onClick={() => setAge('new')}
+            className={`chip${filters.sort === 'new' ? ' active' : ''}`}
+            onClick={() => setSort('new')}
           >
             NEW ↓
           </button>
           <button
             type="button"
-            className={`chip${filters.age === 'old' ? ' active' : ''}`}
-            onClick={() => setAge('old')}
+            className={`chip${filters.sort === 'old' ? ' active' : ''}`}
+            onClick={() => setSort('old')}
           >
             OLD ↑
+          </button>
+          <button
+            type="button"
+            className={`chip${filters.sort === 'az' ? ' active' : ''}`}
+            onClick={() => setSort('az')}
+          >
+            A-Z
           </button>
         </div>
       </div>

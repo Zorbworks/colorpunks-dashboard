@@ -12,19 +12,19 @@ export type HueBucket =
 
 /** Tone sorts: light/dark by luminance, vivid/muted by saturation */
 export type Tone = 'all' | 'light' | 'dark' | 'vivid' | 'muted';
-export type Age = 'new' | 'old';
+export type Sort = 'new' | 'old' | 'az';
 export type HueFilter = 'all' | HueBucket;
 
 export interface ColorFilters {
   tone: Tone;
   hue: HueFilter;
-  age: Age;
+  sort: Sort;
 }
 
 export const DEFAULT_FILTERS: ColorFilters = {
   tone: 'all',
   hue: 'all',
-  age: 'new',
+  sort: 'new',
 };
 
 export interface Hsl {
@@ -88,27 +88,42 @@ export function enrichColors(colors: UserColor[]): EnrichedColor[] {
   });
 }
 
+const TONE_LIMIT = 50;
+
 export function applyFilters(
   enriched: EnrichedColor[],
   filters: ColorFilters
 ): EnrichedColor[] {
+  // 1. Hue filter (keeps or removes colors).
   let out = enriched.filter((c) => {
     if (filters.hue !== 'all' && c.bucket !== filters.hue) return false;
     return true;
   });
 
-  // Tone sorts ALL colors — does NOT filter them out.
-  // Light/dark sort by luminance, vivid/muted sort by saturation.
-  if (filters.tone === 'light') out = out.slice().sort((a, b) => b.hsl.l - a.hsl.l);
-  if (filters.tone === 'dark')  out = out.slice().sort((a, b) => a.hsl.l - b.hsl.l);
-  if (filters.tone === 'vivid') out = out.slice().sort((a, b) => b.hsl.s - a.hsl.s);
-  if (filters.tone === 'muted') out = out.slice().sort((a, b) => a.hsl.s - b.hsl.s);
+  // 2. Tone picks the top 50 in each category (not just reorder).
+  if (filters.tone === 'light') {
+    out = out.slice().sort((a, b) => b.hsl.l - a.hsl.l).slice(0, TONE_LIMIT);
+  } else if (filters.tone === 'dark') {
+    out = out.slice().sort((a, b) => a.hsl.l - b.hsl.l).slice(0, TONE_LIMIT);
+  } else if (filters.tone === 'vivid') {
+    out = out.slice().sort((a, b) => b.hsl.s - a.hsl.s).slice(0, TONE_LIMIT);
+  } else if (filters.tone === 'muted') {
+    out = out.slice().sort((a, b) => a.hsl.s - b.hsl.s).slice(0, TONE_LIMIT);
+  }
 
-  // Age sorts by tokenId (= mint order in ERC721A). Higher id = newer.
-  // Only applied when tone is 'all' (otherwise tone sort takes precedence).
-  if (filters.tone === 'all') {
-    if (filters.age === 'new') out = out.slice().sort((a, b) => b.mintOrder - a.mintOrder);
-    if (filters.age === 'old') out = out.slice().sort((a, b) => a.mintOrder - b.mintOrder);
+  // 3. Sort order.
+  if (filters.sort === 'new') {
+    out = out.slice().sort((a, b) => b.mintOrder - a.mintOrder);
+  } else if (filters.sort === 'old') {
+    out = out.slice().sort((a, b) => a.mintOrder - b.mintOrder);
+  } else if (filters.sort === 'az') {
+    out = out.slice().sort((a, b) => {
+      const nameA = a.isNamed ? a.name.toLowerCase() : a.color.toLowerCase();
+      const nameB = b.isNamed ? b.name.toLowerCase() : b.color.toLowerCase();
+      // Named colors first, then alphabetical within each group.
+      if (a.isNamed !== b.isNamed) return a.isNamed ? -1 : 1;
+      return nameA.localeCompare(nameB);
+    });
   }
 
   return out;
