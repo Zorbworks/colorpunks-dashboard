@@ -76,23 +76,29 @@ export default function Page() {
 
   // Auto-select the first punk on load, and keep selectedPunk in sync
   // with the latest query data so the canvas always shows the freshest
-  // image (e.g. after save or reset triggers a refetch).
+  // image. Runs when punks data changes OR when the user switches sort
+  // mode, so the selected punk always reflects the latest on-chain image.
   useEffect(() => {
     if (!punks || punks.length === 0) return;
     if (!selectedPunk) {
       setSelectedPunk(punks[0]);
-    } else {
-      // If we already have a punk selected, update it to the fresh
-      // version from the latest query so the imageUrl refreshes.
-      // Also clear selection if the punk no longer belongs to this wallet.
-      const fresh = punks.find((p) => p.tokenId === selectedPunk.tokenId);
-      if (fresh && fresh !== selectedPunk) {
-        setSelectedPunk(fresh);
-      } else if (!fresh) {
-        setSelectedPunk(punks[0]);
-      }
+      return;
     }
-  }, [punks]); // eslint-disable-line react-hooks/exhaustive-deps
+    const fresh = punks.find((p) => p.tokenId === selectedPunk.tokenId);
+    if (!fresh) {
+      setSelectedPunk(punks[0]);
+      return;
+    }
+    // Check if the image has changed — if so, update the selected punk
+    // so the canvas reloads with the fresh version.
+    const freshImg =
+      fresh.image?.cachedUrl ?? fresh.image?.originalUrl ?? fresh.raw?.metadata?.image;
+    const currentImg =
+      selectedPunk.image?.cachedUrl ?? selectedPunk.image?.originalUrl ?? selectedPunk.raw?.metadata?.image;
+    if (freshImg !== currentImg) {
+      setSelectedPunk(fresh);
+    }
+  }, [punks, punkSort, punkTypeFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // After reset tx confirms, invalidate the punks query so the grid
   // and canvas both pick up the restored original image.
