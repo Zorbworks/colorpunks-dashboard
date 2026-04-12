@@ -9,9 +9,10 @@ import { Footer } from '@/components/Footer';
 import { PunkSelector } from '@/components/PunkSelector';
 import { ColorPalette } from '@/components/ColorPalette';
 import { ColorFilters } from '@/components/ColorFilters';
-import { Canvas, CanvasHandle } from '@/components/Canvas';
+import { Canvas, CanvasHandle, type ColorInfo } from '@/components/Canvas';
 import { Toolbar } from '@/components/Toolbar';
 import { SaveButton } from '@/components/SaveButton';
+import { PunkPalette } from '@/components/PunkPalette';
 
 import { useUserPunks } from '@/hooks/useUserPunks';
 import { useUserColors } from '@/hooks/useUserColors';
@@ -33,6 +34,8 @@ export default function Page() {
   const [selectedPunk, setSelectedPunk] = useState<AlchemyNft | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [centerTab, setCenterTab] = useState<'canvas' | 'palette'>('canvas');
+  const [paletteColors, setPaletteColors] = useState<ColorInfo[]>([]);
   const canvasRef = useRef<CanvasHandle>(null);
   const {
     resetPunk,
@@ -147,13 +150,39 @@ export default function Page() {
           <section className="center">
             <div className="center-head">
               <span>[02] CANVAS</span>
+              <div className="center-tabs">
+                <button
+                  type="button"
+                  className={`center-tab${centerTab === 'canvas' ? ' active' : ''}`}
+                  onClick={() => setCenterTab('canvas')}
+                >
+                  PAINT
+                </button>
+                <button
+                  type="button"
+                  className={`center-tab${centerTab === 'palette' ? ' active' : ''}`}
+                  onClick={() => {
+                    setPaletteColors(canvasRef.current?.extractColors() ?? []);
+                    setCenterTab('palette');
+                  }}
+                >
+                  PALETTE
+                </button>
+              </div>
               <b>{selectedPunk ? `#${selectedPunk.tokenId}` : '—'}</b>
             </div>
-            <Canvas
-              ref={canvasRef}
-              imageUrl={imageUrl}
-              selectedColor={selectedColor}
-            />
+            {centerTab === 'canvas' ? (
+              <Canvas
+                ref={canvasRef}
+                imageUrl={imageUrl}
+                selectedColor={selectedColor}
+              />
+            ) : (
+              <PunkPalette
+                colors={paletteColors}
+                baseColors={rawColors ?? []}
+              />
+            )}
             <Toolbar
               disabled={!selectedPunk}
               onUndo={() => canvasRef.current?.undo()}

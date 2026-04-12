@@ -308,6 +308,79 @@ img {
   cursor: crosshair;
   display: block;
 }
+/* Tab toggle in center-head: sits between the title and token ID */
+.center-tabs {
+  display: flex;
+  gap: 4px;
+}
+.center-tab {
+  background: var(--bg);
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  padding: 3px 8px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.center-tab:hover { color: var(--fg); }
+.center-tab.active {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+/* Punk palette breakdown (alternative to canvas view) */
+.punk-palette {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--rule);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+.punk-palette-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.punk-palette-row:last-child { border-bottom: none; }
+.punk-palette-swatch {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--rule);
+  flex-shrink: 0;
+}
+.punk-palette-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.punk-palette-hex {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 9px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.punk-palette-pct {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 9px;
+  color: var(--muted);
+  flex-shrink: 0;
+  width: 32px;
+  text-align: right;
+}
+
 .canvas-error {
   position: absolute;
   bottom: 8px;

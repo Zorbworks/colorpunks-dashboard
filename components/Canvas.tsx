@@ -10,6 +10,12 @@ import {
 import { floodFill, hexToRgba, loadImage } from '@/lib/canvas';
 import { resolveImageUrl, type UserColor } from '@/lib/alchemy';
 
+export interface ColorInfo {
+  hex: string;
+  count: number;
+  percentage: number;
+}
+
 export interface CanvasHandle {
   /** Returns the current HTMLCanvasElement (for IPFS upload). */
   getCanvas: () => HTMLCanvasElement | null;
@@ -24,6 +30,8 @@ export interface CanvasHandle {
    * one color stay one color.
    */
   randomize: (palette: UserColor[]) => void;
+  /** Extract all unique non-outline colors from the current canvas with pixel counts. */
+  extractColors: () => ColorInfo[];
 }
 
 interface Props {
@@ -101,6 +109,38 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
       if (!canvas || !ctx) return;
       const prev = historyRef.current.pop();
       if (prev) ctx.putImageData(prev, 0, 0);
+    },
+    extractColors: (): ColorInfo[] => {
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext('2d', { willReadFrequently: true });
+      if (!canvas || !ctx) return [];
+      try {
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = data.data;
+        const counts = new Map<string, number>();
+        let totalFillable = 0;
+        for (let i = 0; i < pixels.length; i += 4) {
+          if (pixels[i] < 24 && pixels[i + 1] < 24 && pixels[i + 2] < 24) continue;
+          if (pixels[i + 3] < 128) continue;
+          const hex =
+            '#' +
+            ((1 << 24) | (pixels[i] << 16) | (pixels[i + 1] << 8) | pixels[i + 2])
+              .toString(16)
+              .slice(1)
+              .toUpperCase();
+          counts.set(hex, (counts.get(hex) || 0) + 1);
+          totalFillable++;
+        }
+        return Array.from(counts.entries())
+          .map(([hex, count]) => ({
+            hex,
+            count,
+            percentage: totalFillable > 0 ? Math.round((count / totalFillable) * 100) : 0,
+          }))
+          .sort((a, b) => b.count - a.count);
+      } catch {
+        return [];
+      }
     },
     randomize: (palette: UserColor[]) => {
       const canvas = canvasRef.current;
