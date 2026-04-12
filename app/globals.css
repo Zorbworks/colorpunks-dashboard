@@ -43,6 +43,7 @@ body {
    Define the display/body composites here so var() can resolve them. */
 body {
   --font-display: var(--font-silkscreen), ui-monospace, Menlo, monospace;
+  --font-ui: var(--font-mono), ui-monospace, 'SF Mono', Menlo, monospace;
   --font-body: var(--font-jost), 'Futura', 'Century Gothic', sans-serif;
   font-family: var(--font-body);
 }
@@ -105,9 +106,9 @@ img {
   border: 1px solid var(--rule);
   padding: 0 14px;
   height: 34px;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 8px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
@@ -133,9 +134,9 @@ img {
   border: 1px solid var(--rule);
   padding: 0 14px;
   height: 34px;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 8px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
@@ -157,7 +158,7 @@ img {
   width: 34px;
   height: 34px;
   padding: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 14px;
   line-height: 1;
   cursor: pointer;
@@ -192,9 +193,9 @@ img {
   flex-shrink: 0;
 }
 .rail-head h2 {
-  font-family: var(--font-display);
-  font-size: 10px;
-  font-weight: 400;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -245,8 +246,8 @@ img {
   position: absolute;
   bottom: 3px;
   left: 3px;
-  font-family: var(--font-display);
-  font-size: 7px;
+  font-family: var(--font-ui);
+  font-size: 8px;
   color: var(--fg);
   background: var(--bg);
   padding: 1px 3px;
@@ -254,9 +255,9 @@ img {
   letter-spacing: 0;
 }
 .punk-group-label {
-  font-family: var(--font-display);
-  font-size: 9px;
-  font-weight: 400;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
@@ -265,8 +266,8 @@ img {
   margin-bottom: 6px;
 }
 .empty-rail {
-  font-family: var(--font-display);
-  font-size: 10px;
+  font-family: var(--font-ui);
+  font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
@@ -291,15 +292,15 @@ img {
   padding: 10px 12px;
   border-bottom: 1px solid var(--rule);
   flex-shrink: 0;
-  font-family: var(--font-display);
-  font-size: 10px;
-  font-weight: 400;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin-bottom: 0;
 }
 .center-head b {
-  font-weight: 400;
+  font-weight: 600;
 }
 
 .canvas-frame {
@@ -332,9 +333,9 @@ img {
   color: var(--muted);
   border: 1px solid var(--rule);
   padding: 3px 8px;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 9px;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
@@ -357,9 +358,9 @@ img {
   min-height: 0;
 }
 .punk-palette-section {
-  font-family: var(--font-display);
-  font-size: 9px;
-  font-weight: 400;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--fg);
@@ -372,7 +373,7 @@ img {
   align-items: center;
   padding: 6px 12px;
   border-bottom: 1px solid var(--rule);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -389,7 +390,7 @@ img {
   gap: 10px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--rule);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -437,7 +438,7 @@ img {
   bottom: 8px;
   left: 8px;
   right: 8px;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 9px;
   color: #e53935;
   text-transform: uppercase;
@@ -445,7 +446,7 @@ img {
   text-align: center;
 }
 .canvas-placeholder {
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -518,7 +519,7 @@ img {
 }
 .save-status {
   margin: 8px 12px 12px;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 9px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -553,9 +554,9 @@ img {
   flex-wrap: nowrap;
 }
 .filter-label {
-  font-family: var(--font-display);
-  font-size: 9px;
-  font-weight: 400;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--muted);
@@ -574,8 +575,8 @@ img {
   color: var(--fg);
   border: 1px solid var(--rule);
   padding: 4px 7px;
-  font-family: var(--font-display);
-  font-weight: 400;
+  font-family: var(--font-ui);
+  font-weight: 500;
   font-size: 9px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -641,8 +642,8 @@ img {
   left: 0;
   right: 0;
   bottom: 0;
-  font-family: var(--font-display);
-  font-size: 9px;
+  font-family: var(--font-ui);
+  font-size: 8px;
   text-align: center;
   padding: 3px 3px;
   background: color-mix(in srgb, var(--bg) 90%, transparent);
@@ -674,7 +675,7 @@ img {
   color: var(--fg);
   border: none;
   cursor: pointer;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -721,7 +722,7 @@ img {
   border: none;
   border-bottom: 1px solid var(--rule);
   cursor: pointer;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -757,7 +758,7 @@ img {
   grid-column: 1 / -1;
   padding: 24px 12px;
   text-align: center;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -775,8 +776,8 @@ img {
   flex-shrink: 0;
 }
 .credits {
-  font-family: var(--font-body);
-  font-size: 11px;
+  font-family: var(--font-ui);
+  font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--fg);
@@ -793,7 +794,7 @@ img {
   color: var(--muted);
 }
 .chain-info {
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 10px;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -842,8 +843,8 @@ img {
   flex-shrink: 0;
 }
 .modal-head h3 {
-  font-family: var(--font-display);
-  font-size: 11px;
+  font-family: var(--font-ui);
+  font-size: 12px;
   letter-spacing: 0.04em;
   font-weight: 400;
   text-transform: uppercase;
@@ -854,7 +855,7 @@ img {
   border: 1px solid var(--rule);
   width: 28px;
   height: 28px;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 14px;
   line-height: 1;
   cursor: pointer;
@@ -907,7 +908,7 @@ img {
   border-top: 1px solid var(--rule);
 }
 .about-links a {
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -956,7 +957,7 @@ img {
 .gallery-meta-below {
   padding: 6px 8px;
   border-top: 1px solid var(--rule);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 9px;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -978,7 +979,7 @@ img {
   grid-column: 1 / -1;
   padding: 40px;
   text-align: center;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
