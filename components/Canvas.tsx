@@ -164,7 +164,7 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
         const replacements = new Map<number, [number, number, number, number]>();
         for (let i = 0; i < pixels.length; i += 4) {
           // Skip near-black outline pixels.
-          if (pixels[i] < 24 && pixels[i + 1] < 24 && pixels[i + 2] < 24) continue;
+          if (pixels[i] < 3 && pixels[i + 1] < 3 && pixels[i + 2] < 3) continue;
           const key = (pixels[i] << 16) | (pixels[i + 1] << 8) | pixels[i + 2];
           let c = replacements.get(key);
           if (!c) {

@@ -26,7 +26,9 @@ function colorsMatch(a: RGBA, b: RGBA, tolerance = 0) {
 
 function isOutline(c: RGBA): boolean {
   // Treat near-black with full alpha as outline, don't overwrite it.
-  return c[3] === 255 && c[0] < 24 && c[1] < 24 && c[2] < 24;
+  // Only treat pure black as outline. Threshold of 3 catches antialiased
+  // edges but allows very dark BaseColors to be painted over.
+  return c[3] === 255 && c[0] < 3 && c[1] < 3 && c[2] < 3;
 }
 
 /**
