@@ -120,7 +120,9 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas(
         const counts = new Map<string, number>();
         let totalFillable = 0;
         for (let i = 0; i < pixels.length; i += 4) {
-          if (pixels[i] < 24 && pixels[i + 1] < 24 && pixels[i + 2] < 24) continue;
+          // Only skip pure black (outline pixels). Threshold of 3 catches
+          // antialiased edges but preserves very dark BaseColors like #0A0A0A.
+          if (pixels[i] < 3 && pixels[i + 1] < 3 && pixels[i + 2] < 3) continue;
           if (pixels[i + 3] < 128) continue;
           const hex =
             '#' +
