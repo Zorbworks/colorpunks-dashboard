@@ -30,7 +30,7 @@ export function SaveButton({ punk, getCanvas }: Props) {
   }, [isSuccess, address, queryClient]);
 
   // Reset the save state when a different punk is selected so the
-  // button goes back to "SAVE ON-CHAIN" instead of staying on "SAVED".
+  // button goes back to "SAVE ONCHAIN" instead of staying on "SAVED".
   useEffect(() => {
     reset();
     setStatus('');
@@ -68,7 +68,7 @@ export function SaveButton({ punk, getCanvas }: Props) {
         ? 'CONFIRMING ON BASE…'
         : isSuccess
           ? 'SAVED ✓'
-          : 'SAVE ON-CHAIN';
+          : 'SAVE ONCHAIN';
 
   const errorText =
     error &&
