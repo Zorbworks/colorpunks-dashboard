@@ -21,12 +21,15 @@ export function SaveButton({ punk, getCanvas }: Props) {
   const queryClient = useQueryClient();
   const { address } = useAccount();
 
-  // Once the tx confirms, invalidate the punks query so the grid
-  // re-fetches fresh on-chain images without needing a page reload.
+  // Once the tx confirms, wait briefly for the block to propagate then
+  // invalidate all punk-related queries so the grid re-fetches fresh data.
   useEffect(() => {
-    if (isSuccess && address) {
+    if (!isSuccess || !address) return;
+    const timer = setTimeout(() => {
       queryClient.invalidateQueries({ queryKey: ['user-punks', address] });
-    }
+      queryClient.invalidateQueries({ queryKey: ['punk-sort-data', address] });
+    }, 2000);
+    return () => clearTimeout(timer);
   }, [isSuccess, address, queryClient]);
 
   // Reset the save state when a different punk is selected so the
