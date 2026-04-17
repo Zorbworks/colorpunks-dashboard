@@ -16,6 +16,7 @@ import { SaveButton } from '@/components/SaveButton';
 import { PunkPalette } from '@/components/PunkPalette';
 import { PunkFilters } from '@/components/PunkFilters';
 import { PaletteBrowser } from '@/components/PaletteBrowser';
+import { BaseWordsMintForm } from '@/components/BaseWordsMintForm';
 
 import { useUserPunks } from '@/hooks/useUserPunks';
 import { useUserColors } from '@/hooks/useUserColors';
@@ -24,7 +25,7 @@ import { useResetPunk } from '@/hooks/useResetPunk';
 import { usePunkSortData } from '@/hooks/usePunkSortData';
 
 import { resolveImageUrl, type AlchemyNft } from '@/lib/alchemy';
-import { COLOR_PUNKS_ADDRESS } from '@/lib/contracts';
+import { BASEWORDS_ADDRESS, COLOR_PUNKS_ADDRESS } from '@/lib/contracts';
 import {
   applyFilters,
   DEFAULT_FILTERS,
@@ -41,8 +42,13 @@ import {
   type SortMaps,
 } from '@/lib/punk-traits';
 
+type Project = 'basewords' | 'colorpunks';
+
 export default function Page() {
   const { isConnected, address } = useAccount();
+  // Default project is Base Words.
+  const [project, setProject] = useState<Project>('basewords');
+
   const { data: punks, isLoading: punksLoading } = useUserPunks();
   const { data: rawColors, isLoading: colorsLoading } = useUserColors();
   const { data: palettes, isLoading: palettesLoading } = useUserPalettes();
@@ -67,18 +73,16 @@ export default function Page() {
   } = useResetPunk();
   const queryClient = useQueryClient();
 
-  // Clear selected punk when wallet changes so the canvas doesn't
-  // show a punk from the previous wallet.
+  // Clear selected punk when wallet changes so the canvas doesn't show
+  // a punk from the previous wallet.
   useEffect(() => {
     setSelectedPunk(null);
     setActivePalette(null);
   }, [address]);
 
-  // Auto-select the first punk on load, and keep selectedPunk in sync
-  // with the latest query data so the canvas always shows the freshest
-  // image. Runs when punks data changes OR when the user switches sort
-  // mode, so the selected punk always reflects the latest on-chain image.
+  // Auto-select first punk and keep it fresh (only applies to ColorPunks).
   useEffect(() => {
+    if (project !== 'colorpunks') return;
     if (!punks || punks.length === 0) return;
     if (!selectedPunk) {
       setSelectedPunk(punks[0]);
@@ -89,26 +93,22 @@ export default function Page() {
       setSelectedPunk(punks[0]);
       return;
     }
-    // Check if the image has changed — if so, update the selected punk
-    // so the canvas reloads with the fresh version.
     const freshImg =
-      fresh.image?.cachedUrl ?? fresh.image?.originalUrl ?? fresh.raw?.metadata?.image;
+      fresh.image?.cachedUrl ??
+      fresh.image?.originalUrl ??
+      fresh.raw?.metadata?.image;
     const currentImg =
-      selectedPunk.image?.cachedUrl ?? selectedPunk.image?.originalUrl ?? selectedPunk.raw?.metadata?.image;
-    if (freshImg !== currentImg) {
-      setSelectedPunk(fresh);
-    }
-  }, [punks, punkSort, punkTypeFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+      selectedPunk.image?.cachedUrl ??
+      selectedPunk.image?.originalUrl ??
+      selectedPunk.raw?.metadata?.image;
+    if (freshImg !== currentImg) setSelectedPunk(fresh);
+  }, [project, punks, punkSort, punkTypeFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // After reset tx confirms, invalidate the punks query so the grid
-  // and canvas both pick up the restored original image.
   useEffect(() => {
     if (!resetSuccess || !address) return;
     queryClient.invalidateQueries({ queryKey: ['user-punks', address] });
   }, [resetSuccess]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Re-extract palette colors when the punk changes while palette tab is open.
-  // Small delay lets the canvas finish drawing the new image first.
   useEffect(() => {
     if (centerTab !== 'details' || !selectedPunk) return;
     const timer = setTimeout(() => {
@@ -117,7 +117,6 @@ export default function Page() {
     return () => clearTimeout(timer);
   }, [selectedPunk, centerTab]);
 
-  // Determine the Reset button's display state.
   const resetState = resetPending
     ? 'pending'
     : resetConfirming
@@ -139,7 +138,12 @@ export default function Page() {
 
   const sortMaps: SortMaps | undefined = punkSortData ?? undefined;
   const filteredPunks = useMemo(
-    () => sortPunks(filterPunksByType(punks ?? [], punkTypeFilter), punkSort, sortMaps),
+    () =>
+      sortPunks(
+        filterPunksByType(punks ?? [], punkTypeFilter),
+        punkSort,
+        sortMaps
+      ),
     [punks, punkTypeFilter, punkSort, sortMaps]
   );
 
@@ -160,10 +164,7 @@ export default function Page() {
     setTraitGroupBy(null);
   }, []);
 
-  const enriched = useMemo(
-    () => enrichColors(rawColors ?? []),
-    [rawColors]
-  );
+  const enriched = useMemo(() => enrichColors(rawColors ?? []), [rawColors]);
   const filtered = useMemo(
     () => applyFilters(enriched, filters),
     [enriched, filters]
@@ -198,121 +199,174 @@ export default function Page() {
         </main>
       ) : (
         <main className="main">
-          {/* ---------- Punks rail ---------- */}
+          {/* ---------- Left: Projects rail ---------- */}
           <aside className="rail punks-rail">
             <div className="rail-head">
               <div className="rail-head-row">
                 <h2>
-                  [01] YOUR PUNKS ·{' '}
-                  {String(filteredPunks.length).padStart(2, '0')}
-                  {punkTypeFilter !== 'all' && ` / ${punkCount}`}
+                  {project === 'colorpunks'
+                    ? `[01] YOUR PUNKS · ${String(filteredPunks.length).padStart(2, '0')}${
+                        punkTypeFilter !== 'all' ? ` / ${punkCount}` : ''
+                      }`
+                    : `[01] YOUR BASEWORDS`}
                 </h2>
+                <div className="center-tabs">
+                  <button
+                    type="button"
+                    className={`center-tab${project === 'basewords' ? ' active' : ''}`}
+                    onClick={() => setProject('basewords')}
+                  >
+                    BASEWORDS
+                  </button>
+                  <button
+                    type="button"
+                    className={`center-tab${project === 'colorpunks' ? ' active' : ''}`}
+                    onClick={() => setProject('colorpunks')}
+                  >
+                    COLORPUNKS
+                  </button>
+                </div>
                 <a
                   className="center-tab"
-                  href={`https://opensea.io/assets/base/${COLOR_PUNKS_ADDRESS}`}
+                  href={
+                    project === 'colorpunks'
+                      ? `https://opensea.io/assets/base/${COLOR_PUNKS_ADDRESS}`
+                      : `https://opensea.io/assets/base/${BASEWORDS_ADDRESS}`
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   BUY MORE
                 </a>
               </div>
-              <PunkFilters
-                typeFilter={punkTypeFilter}
-                onTypeChange={handlePunkTypeChange}
-                onRandomTrait={handleRandomTrait}
-                activeTraitGroup={traitGroupBy}
-                sort={punkSort}
-                onSortChange={setPunkSort}
-              />
+              {project === 'colorpunks' && (
+                <PunkFilters
+                  typeFilter={punkTypeFilter}
+                  onTypeChange={handlePunkTypeChange}
+                  onRandomTrait={handleRandomTrait}
+                  activeTraitGroup={traitGroupBy}
+                  sort={punkSort}
+                  onSortChange={setPunkSort}
+                />
+              )}
             </div>
             <div className="rail-scroll">
-              <PunkSelector
-                punks={filteredPunks}
-                selectedTokenId={selectedPunk?.tokenId ?? null}
-                onSelect={setSelectedPunk}
-                isLoading={punksLoading}
-                groups={punkGroups}
-              />
+              {project === 'colorpunks' ? (
+                <PunkSelector
+                  punks={filteredPunks}
+                  selectedTokenId={selectedPunk?.tokenId ?? null}
+                  onSelect={setSelectedPunk}
+                  isLoading={punksLoading}
+                  groups={punkGroups}
+                />
+              ) : (
+                <div className="bw-empty">
+                  <p className="bw-empty-title">
+                    COMING SOON: YOUR BASEWORDS COLLECTION
+                  </p>
+                  <p className="bw-empty-body">
+                    Mint 1–3 uppercase words as a 1/1 onchain NFT.
+                    Use the canvas to create your word, then hit MINT.
+                  </p>
+                </div>
+              )}
             </div>
           </aside>
 
-          {/* ---------- Canvas ---------- */}
+          {/* ---------- Center: Canvas (ColorPunks) / Mint form (BaseWords) ---------- */}
           <section className="center">
             <div className="center-head">
-              <span>[02] CANVAS</span>
-              <div className="center-tabs">
-                <button
-                  type="button"
-                  className={`center-tab${centerTab === 'canvas' ? ' active' : ''}`}
-                  onClick={() => setCenterTab('canvas')}
+              <span>
+                {project === 'colorpunks' ? '[02] CANVAS' : '[02] MINT'}
+              </span>
+              {project === 'colorpunks' && (
+                <div className="center-tabs">
+                  <button
+                    type="button"
+                    className={`center-tab${centerTab === 'canvas' ? ' active' : ''}`}
+                    onClick={() => setCenterTab('canvas')}
+                  >
+                    PAINT
+                  </button>
+                  <button
+                    type="button"
+                    className={`center-tab${centerTab === 'details' ? ' active' : ''}`}
+                    onClick={() => {
+                      setPaletteColors(
+                        canvasRef.current?.extractColors() ?? []
+                      );
+                      setCenterTab('details');
+                    }}
+                  >
+                    DETAILS
+                  </button>
+                </div>
+              )}
+              <b>
+                {project === 'colorpunks'
+                  ? selectedPunk
+                    ? `#${selectedPunk.tokenId}`
+                    : '—'
+                  : 'BASEWORDS'}
+              </b>
+            </div>
+
+            {project === 'colorpunks' ? (
+              <>
+                <div
+                  className="canvas-frame"
+                  style={{ display: centerTab === 'canvas' ? undefined : 'none' }}
                 >
-                  PAINT
-                </button>
-                <button
-                  type="button"
-                  className={`center-tab${centerTab === 'details' ? ' active' : ''}`}
-                  onClick={() => {
-                    setPaletteColors(canvasRef.current?.extractColors() ?? []);
-                    setCenterTab('details');
+                  <Canvas
+                    ref={canvasRef}
+                    imageUrl={imageUrl}
+                    selectedColor={selectedColor}
+                  />
+                </div>
+                <div
+                  className="punk-palette"
+                  style={{ display: centerTab === 'details' ? undefined : 'none' }}
+                >
+                  <PunkPalette
+                    colors={paletteColors}
+                    baseColors={rawColors ?? []}
+                    selectedColor={selectedColor}
+                    onSelect={setSelectedColor}
+                    punk={selectedPunk}
+                  />
+                </div>
+                <Toolbar
+                  disabled={!selectedPunk}
+                  onUndo={() => canvasRef.current?.undo()}
+                  onReset={handleReset}
+                  onRandom={() => {
+                    const palette = activePalette
+                      ? activePalette.colors.map((c) => ({
+                          tokenId: '',
+                          color: c.hex,
+                          name: c.name,
+                          isNamed: c.isNamed,
+                          image: null,
+                        }))
+                      : filtered;
+                    if (palette.length === 0) return;
+                    canvasRef.current?.randomize(palette);
                   }}
-                >
-                  DETAILS
-                </button>
-              </div>
-              <b>{selectedPunk ? `#${selectedPunk.tokenId}` : '—'}</b>
-            </div>
-            {/* Both views always rendered; only one visible at a time.
-                This keeps the flex layout identical so the toolbar
-                doesn't shift when switching tabs. */}
-            <div
-              className="canvas-frame"
-              style={{ display: centerTab === 'canvas' ? undefined : 'none' }}
-            >
-              <Canvas
-                ref={canvasRef}
-                imageUrl={imageUrl}
-                selectedColor={selectedColor}
-              />
-            </div>
-            <div
-              className="punk-palette"
-              style={{ display: centerTab === 'details' ? undefined : 'none' }}
-            >
-              <PunkPalette
-                colors={paletteColors}
-                baseColors={rawColors ?? []}
-                selectedColor={selectedColor}
-                onSelect={setSelectedColor}
-                punk={selectedPunk}
-              />
-            </div>
-            <Toolbar
-              disabled={!selectedPunk}
-              onUndo={() => canvasRef.current?.undo()}
-              onReset={handleReset}
-              onRandom={() => {
-                // Use palette colors if a palette is active, otherwise filtered BaseColors.
-                const palette = activePalette
-                  ? activePalette.colors.map((c) => ({
-                      tokenId: '',
-                      color: c.hex,
-                      name: c.name,
-                      isNamed: c.isNamed,
-                      image: null,
-                    }))
-                  : filtered;
-                if (palette.length === 0) return;
-                canvasRef.current?.randomize(palette);
-              }}
-              resetState={resetState as 'idle' | 'pending' | 'confirming' | 'success'}
-            />
-            <SaveButton
-              punk={selectedPunk}
-              getCanvas={() => canvasRef.current?.getCanvas() ?? null}
-            />
+                  resetState={
+                    resetState as 'idle' | 'pending' | 'confirming' | 'success'
+                  }
+                />
+                <SaveButton
+                  punk={selectedPunk}
+                  getCanvas={() => canvasRef.current?.getCanvas() ?? null}
+                />
+              </>
+            ) : (
+              <BaseWordsMintForm />
+            )}
           </section>
 
-          {/* ---------- Colors / Palettes rail ---------- */}
+          {/* ---------- Right: Colors / Palettes rail ---------- */}
           <aside className="rail colors-rail">
             <div className="rail-head">
               <div className="rail-head-row">

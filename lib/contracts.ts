@@ -92,3 +92,75 @@ export const BASE_COLORS_ABI = [
     type: 'function',
   },
 ] as const;
+
+/* ---------- Base Words ---------- */
+export const BASEWORDS_ADDRESS =
+  '0xe51933706C75f2f828814e1d221c3742c2cfF0df' as const;
+
+export const BASEWORDS_ABI = [
+  // Read
+  {
+    inputs: [],
+    name: 'mintPrice',
+    outputs: [{ type: 'uint256', name: '' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ type: 'uint256', name: '' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ type: 'string[]', name: 'words' }],
+    name: 'wordVerify',
+    outputs: [
+      { type: 'bool', name: '' },
+      { type: 'uint8', name: '' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ type: 'uint256', name: 'tokenId' }],
+    name: 'tokenURI',
+    outputs: [{ type: 'string', name: '' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ type: 'uint256', name: 'tokenId' }],
+    name: 'ownerOf',
+    outputs: [{ type: 'address', name: '' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ type: 'address', name: 'owner' }],
+    name: 'balanceOf',
+    outputs: [{ type: 'uint256', name: '' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  // Write
+  {
+    inputs: [{ type: 'string[]', name: 'words' }],
+    name: 'mint',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  // Event — used to extract the minted tokenId from the tx receipt.
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'from', type: 'address' },
+      { indexed: true, name: 'to', type: 'address' },
+      { indexed: true, name: 'tokenId', type: 'uint256' },
+    ],
+    name: 'Transfer',
+    type: 'event',
+  },
+] as const;
