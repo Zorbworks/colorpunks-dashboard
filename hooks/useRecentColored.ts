@@ -46,14 +46,14 @@ async function loadRecent(
   publicClient: PublicClient,
   limit: number
 ): Promise<RecentColoredItem[]> {
-  const latest = await publicClient.getBlockNumber();
-  const fromBlock = latest > 60_000n ? latest - 60_000n : 0n;
-
+  // Query from genesis — the ColorPunks contract has a manageable number
+  // of events so this is fine. Previously limited to 60k blocks (~33h on
+  // Base) which caused the modal to show too few items if saves were rare.
   const logs = await publicClient.getLogs({
     address: COLOR_PUNKS_ADDRESS,
     event: EVENT,
-    fromBlock,
-    toBlock: latest,
+    fromBlock: 0n,
+    toBlock: 'latest',
   });
 
   // Most recent first.
