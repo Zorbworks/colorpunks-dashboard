@@ -71,6 +71,78 @@ img {
   border-bottom: 1px solid var(--rule);
   gap: 20px;
 }
+
+/* ---------- TOP BAR (CWOMA.TOOLS + project links + right actions) ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 18px;
+}
+.topbar-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.topbar-nav {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.topbar-proj {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+.topbar-proj:hover { opacity: 1; }
+.topbar-proj.active {
+  opacity: 1;
+  border-color: currentColor;
+}
+.topbar-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.rail-connect {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px 16px;
+  text-align: center;
+}
+.rail-connect p {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
 .logo-wrap {
   flex: 1;
   min-width: 0;
@@ -184,6 +256,9 @@ img {
   border: 1px solid var(--rule);
   display: flex;
   flex-direction: column;
+  /* Matches .center — creates visual separation so the header sits as
+     its own bordered tile above the scrollable content. */
+  gap: 12px;
   min-height: 0;
   min-width: 0;
 }

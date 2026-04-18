@@ -1,6 +1,5 @@
 import { ProjectPage } from '@/components/ProjectPage';
 
-/** Root renders the BaseWords project as the default landing. */
-export default function RootPage() {
+export default function BaseWordsRoute() {
   return <ProjectPage project="basewords" />;
 }

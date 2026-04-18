@@ -3,6 +3,7 @@ import { Jost, Press_Start_2P, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 import { Providers } from './providers';
+import { TopBar } from '@/components/TopBar';
 
 // next/font sets the resolved font-family as CSS custom properties on the
 // <body>. globals.css reads these via var(--font-silkscreen) / var(--font-jost).
@@ -62,7 +63,12 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light" suppressHydrationWarning>
       <body className={`${pressStart.variable} ${jost.variable} ${ibmPlexMono.variable}`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="page">
+            <TopBar />
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );
