@@ -7,8 +7,8 @@ import { COLOR_PUNKS_ADDRESS } from '@/lib/contracts';
 export interface PunkSortData {
   /** tokenId → block number when last transferred to the current owner. */
   lastReceivedBlock: Map<string, bigint>;
-  /** Kept for the existing SortMaps shape — not populated anymore; the
-   *  "colored" sort now uses isColored(punk) directly (no events needed). */
+  /** Kept for the SortMaps type shape; always empty. The "colored" sort
+   *  uses isColored(punk) directly — no events needed. */
   lastColoredBlock: Map<string, bigint>;
 }
 
@@ -31,7 +31,8 @@ export function usePunkSortData() {
       if (!address || !ALCHEMY_API_KEY) {
         return { lastReceivedBlock: new Map(), lastColoredBlock: new Map() };
       }
-      return loadReceivedByOwner(address);
+      const lastReceivedBlock = await loadReceivedByOwner(address);
+      return { lastReceivedBlock, lastColoredBlock: new Map() };
     },
   });
 }
@@ -44,11 +45,10 @@ interface AssetTransfer {
 
 async function loadReceivedByOwner(
   owner: string
-): Promise<PunkSortData> {
+): Promise<Map<string, bigint>> {
   const lastReceivedBlock = new Map<string, bigint>();
   const url = `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
 
-  // Paginate through all ERC-721 transfers of the ColorPunks contract TO the owner.
   let pageKey: string | undefined;
   do {
     const body = {
@@ -86,7 +86,6 @@ async function loadReceivedByOwner(
     const transfers = data.result?.transfers ?? [];
     for (const t of transfers) {
       if (!t.tokenId) continue;
-      // tokenId from the API is a hex string like "0x1a".
       const tokenIdDec = BigInt(t.tokenId).toString();
       const block = BigInt(t.blockNum);
       const existing = lastReceivedBlock.get(tokenIdDec);
@@ -98,5 +97,5 @@ async function loadReceivedByOwner(
     pageKey = data.result?.pageKey;
   } while (pageKey);
 
-  return { lastReceivedBlock, lastColoredBlock: new Map() };
+  return lastReceivedBlock;
 }

@@ -123,7 +123,7 @@ export function sortPunks(
         return Number(bb - ba);
       });
     case 'colored':
-      // Colored punks first, uncolored second. Tiebreak by tokenId desc.
+      // Colored punks first, uncolored second; tokenId desc within each.
       return out.sort((a, b) => {
         const ca = isColored(a) ? 1 : 0;
         const cb = isColored(b) ? 1 : 0;
