@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAccount, usePublicClient } from 'wagmi';
 import { type PublicClient } from 'viem';
 import { PALETTES_ABI, PALETTES_ADDRESS } from '@/lib/contracts';
+import { retryOnce } from '@/lib/retry';
 
 export interface PaletteColor {
   hex: string;
@@ -15,6 +16,35 @@ export interface UserPalette {
   tokenId: string;
   colors: PaletteColor[];
   image: string | null;
+}
+
+/** Persisted memo of the last successful palette list per owner so a
+ * transient RPC failure doesn't wipe the rail with "NO PALETTES FOUND".
+ * Backed by localStorage — survives reloads and dev-server restarts. */
+const PALETTES_STORAGE_KEY = 'colorpunks:palettes:v1';
+const palettesCache: Map<string, UserPalette[]> = loadPalettesCache();
+
+function loadPalettesCache(): Map<string, UserPalette[]> {
+  if (typeof window === 'undefined') return new Map();
+  try {
+    const raw = window.localStorage.getItem(PALETTES_STORAGE_KEY);
+    if (!raw) return new Map();
+    const parsed = JSON.parse(raw) as Record<string, UserPalette[]>;
+    return new Map(Object.entries(parsed));
+  } catch {
+    return new Map();
+  }
+}
+
+function persistPalettesCache() {
+  if (typeof window === 'undefined') return;
+  try {
+    const obj: Record<string, UserPalette[]> = {};
+    for (const [k, v] of palettesCache) obj[k] = v;
+    window.localStorage.setItem(PALETTES_STORAGE_KEY, JSON.stringify(obj));
+  } catch {
+    /* quota or disabled; ignore */
+  }
 }
 
 /**
@@ -33,7 +63,22 @@ export function useUserPalettes() {
     staleTime: 60_000,
     queryFn: async (): Promise<UserPalette[]> => {
       if (!address || !publicClient) return [];
-      return loadPalettes(publicClient, address);
+      try {
+        const fresh = await loadPalettes(publicClient, address);
+        if (fresh.length > 0) {
+          palettesCache.set(address, fresh);
+          persistPalettesCache();
+        } else if (palettesCache.has(address)) {
+          // Empty result after a prior success is almost always a transient
+          // RPC failure — fall back to the last known good list.
+          return palettesCache.get(address)!;
+        }
+        return fresh;
+      } catch (err) {
+        const prior = palettesCache.get(address);
+        if (prior) return prior;
+        throw err;
+      }
     },
   });
 }
@@ -43,12 +88,14 @@ async function loadPalettes(
   owner: string
 ): Promise<UserPalette[]> {
   // 1. Get balance.
-  const balance = (await client.readContract({
-    address: PALETTES_ADDRESS,
-    abi: PALETTES_ABI,
-    functionName: 'balanceOf',
-    args: [owner as `0x${string}`],
-  })) as bigint;
+  const balance = (await retryOnce(() =>
+    client.readContract({
+      address: PALETTES_ADDRESS,
+      abi: PALETTES_ABI,
+      functionName: 'balanceOf',
+      args: [owner as `0x${string}`],
+    })
+  )) as bigint;
 
   if (balance === 0n) return [];
 
@@ -60,10 +107,9 @@ async function loadPalettes(
     args: [owner as `0x${string}`, BigInt(i)] as const,
   }));
 
-  const idResults = await client.multicall({
-    contracts: indexCalls,
-    allowFailure: true,
-  });
+  const idResults = await retryOnce(() =>
+    client.multicall({ contracts: indexCalls, allowFailure: true })
+  );
 
   const tokenIds = idResults
     .filter((r) => r.status === 'success')
@@ -71,33 +117,28 @@ async function loadPalettes(
 
   if (tokenIds.length === 0) return [];
 
-  // 3. For each palette, read tokenColors(id, 0..4) — 5 reads per palette.
-  const colorCalls = tokenIds.flatMap((id) =>
-    Array.from({ length: 5 }, (_, i) => ({
+  // 3. Consolidated multicall — 5× tokenColors + 1× tokenURI per palette.
+  //    One RPC round trip instead of two, which halves the chance of a
+  //    transient rate-limit stranding us with partial data.
+  const perPalette = 6; // 5 color reads + 1 URI read
+  const combinedCalls = tokenIds.flatMap((id) => [
+    ...Array.from({ length: 5 }, (_, i) => ({
       address: PALETTES_ADDRESS,
       abi: PALETTES_ABI,
       functionName: 'tokenColors' as const,
       args: [id, BigInt(i)] as const,
-    }))
+    })),
+    {
+      address: PALETTES_ADDRESS,
+      abi: PALETTES_ABI,
+      functionName: 'tokenURI' as const,
+      args: [id] as const,
+    },
+  ]);
+
+  const combinedResults = await retryOnce(() =>
+    client.multicall({ contracts: combinedCalls, allowFailure: true })
   );
-
-  const colorResults = await client.multicall({
-    contracts: colorCalls,
-    allowFailure: true,
-  });
-
-  // 4. Also read tokenURI for each palette (for names + image).
-  const uriCalls = tokenIds.map((id) => ({
-    address: PALETTES_ADDRESS,
-    abi: PALETTES_ABI,
-    functionName: 'tokenURI' as const,
-    args: [id] as const,
-  }));
-
-  const uriResults = await client.multicall({
-    contracts: uriCalls,
-    allowFailure: true,
-  });
 
   // 5. Assemble palette objects.
   const palettes: UserPalette[] = [];
@@ -106,9 +147,10 @@ async function loadPalettes(
     const tokenId = tokenIds[p].toString();
 
     // Extract hex colors (indices 0-4, skip failures = fewer colors).
+    const base = p * perPalette;
     const hexColors: string[] = [];
     for (let c = 0; c < 5; c++) {
-      const result = colorResults[p * 5 + c];
+      const result = combinedResults[base + c];
       if (result.status === 'success' && result.result) {
         const hex = (result.result as string).trim();
         if (hex && /^#[0-9a-f]{6}$/i.test(hex)) {
@@ -123,7 +165,7 @@ async function loadPalettes(
     let colorNames: Map<number, string> = new Map();
     let image: string | null = null;
 
-    const uriResult = uriResults[p];
+    const uriResult = combinedResults[base + 5];
     if (uriResult.status === 'success' && uriResult.result) {
       try {
         const uri = uriResult.result as string;

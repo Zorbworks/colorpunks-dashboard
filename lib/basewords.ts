@@ -6,27 +6,20 @@
  * see what they're about to mint before committing.
  *
  * Rules from the contract / basewords.xyz:
- *   - White background (#FFFFFF), blue text (#0E76FD) — default colors
+ *   - White background (#FFFFFF), Base-blue text (#0052FF) — default colors
  *   - Helvetica Bold, uppercase, centered
  *   - 1–3 words stacked vertically
  *   - Square canvas
  */
 
 const BG = '#FFFFFF';
-const FG = '#0E76FD';
+const FG = '#0052FF';
 const VIEW = 1000; // viewBox size
-
-/** Returns a font size (in viewBox units) that fits the longest word comfortably. */
-function fontSizeForWords(words: string[]): number {
-  const longest = Math.max(1, ...words.map((w) => w.length));
-  // Helvetica Bold character width is ~0.58 × fontSize.
-  // We want the widest word to occupy ~85% of the viewBox width.
-  const widthBudget = VIEW * 0.85;
-  const byWidth = widthBudget / (longest * 0.58);
-  // Also clamp vertically so N stacked lines fit.
-  const lineBudget = (VIEW * 0.85) / words.length;
-  return Math.floor(Math.min(byWidth, lineBudget));
-}
+// Fixed font size in viewBox units. Matches basewords.xyz — size does not
+// shrink to fit long words; short and long words render at the same height.
+export const BASEWORDS_FONT_SIZE = 95;
+// Percentage of viewBox used for font-size in the live editor preview.
+export const BASEWORDS_FONT_SIZE_CQW = (BASEWORDS_FONT_SIZE / VIEW) * 100;
 
 /**
  * Build an SVG string preview of the given words.
@@ -41,7 +34,7 @@ export function buildBaseWordsSvg(words: string[]): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VIEW} ${VIEW}"><rect width="${VIEW}" height="${VIEW}" fill="${BG}"/></svg>`;
   }
 
-  const fontSize = fontSizeForWords(cleaned);
+  const fontSize = BASEWORDS_FONT_SIZE;
   const totalHeight = fontSize * cleaned.length;
   const startY = (VIEW - totalHeight) / 2 + fontSize * 0.78; // baseline offset for first line
 

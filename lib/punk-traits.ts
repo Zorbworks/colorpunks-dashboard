@@ -123,12 +123,12 @@ export function sortPunks(
         return Number(bb - ba);
       });
     case 'colored':
-      // Sort by the block of the most recent TokenURIUpdated event.
-      // Uncolored punks (no event) go to the bottom.
+      // Colored punks first, uncolored second. Tiebreak by tokenId desc.
       return out.sort((a, b) => {
-        const ba = sortData?.lastColoredBlock?.get(a.tokenId) ?? 0n;
-        const bb = sortData?.lastColoredBlock?.get(b.tokenId) ?? 0n;
-        return Number(bb - ba);
+        const ca = isColored(a) ? 1 : 0;
+        const cb = isColored(b) ? 1 : 0;
+        if (ca !== cb) return cb - ca;
+        return Number(b.tokenId) - Number(a.tokenId);
       });
     case 'rare':
       return out.sort((a, b) => getRarityScore(b) - getRarityScore(a));

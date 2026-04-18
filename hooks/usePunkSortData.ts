@@ -1,90 +1,102 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useAccount, usePublicClient } from 'wagmi';
-import { parseAbiItem, type PublicClient } from 'viem';
+import { useAccount } from 'wagmi';
 import { COLOR_PUNKS_ADDRESS } from '@/lib/contracts';
 
 export interface PunkSortData {
   /** tokenId → block number when last transferred to the current owner. */
   lastReceivedBlock: Map<string, bigint>;
-  /** tokenId → block number when tokenURI was last updated. */
+  /** Kept for the existing SortMaps shape — not populated anymore; the
+   *  "colored" sort now uses isColored(punk) directly (no events needed). */
   lastColoredBlock: Map<string, bigint>;
 }
 
+const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
+
 /**
- * Queries Transfer and TokenURIUpdated events from the ColorPunks
- * contract to build sort-data maps. Runs once per wallet and caches
- * the result. Queries from genesis — the contract has a manageable
- * number of events.
+ * Builds a tokenId → last-received-block map for the connected wallet's
+ * ColorPunks, using Alchemy's `alchemy_getAssetTransfers`. That endpoint
+ * has no 10-block range cap (unlike free-tier `eth_getLogs`), so it works
+ * on the Alchemy Free tier.
  */
 export function usePunkSortData() {
   const { address } = useAccount();
-  const publicClient = usePublicClient();
 
   return useQuery({
     queryKey: ['punk-sort-data', address],
-    enabled: Boolean(address) && Boolean(publicClient),
+    enabled: Boolean(address) && Boolean(ALCHEMY_API_KEY),
     staleTime: 60_000,
     queryFn: async (): Promise<PunkSortData> => {
-      if (!address || !publicClient) {
+      if (!address || !ALCHEMY_API_KEY) {
         return { lastReceivedBlock: new Map(), lastColoredBlock: new Map() };
       }
-      return loadSortData(publicClient, address as `0x${string}`);
+      return loadReceivedByOwner(address);
     },
   });
 }
 
-async function loadSortData(
-  client: PublicClient,
-  owner: `0x${string}`
+interface AssetTransfer {
+  blockNum: string; // hex string
+  tokenId?: string; // hex string
+  category: string;
+}
+
+async function loadReceivedByOwner(
+  owner: string
 ): Promise<PunkSortData> {
   const lastReceivedBlock = new Map<string, bigint>();
-  const lastColoredBlock = new Map<string, bigint>();
+  const url = `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
 
-  // Query both event types in parallel.
-  const [transferLogs, coloredLogs] = await Promise.all([
-    // Transfer events TO this owner.
-    client.getLogs({
-      address: COLOR_PUNKS_ADDRESS,
-      event: parseAbiItem(
-        'event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)'
-      ),
-      args: { to: owner },
-      fromBlock: 0n,
-      toBlock: 'latest',
-    }).catch(() => []),
+  // Paginate through all ERC-721 transfers of the ColorPunks contract TO the owner.
+  let pageKey: string | undefined;
+  do {
+    const body = {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'alchemy_getAssetTransfers',
+      params: [
+        {
+          fromBlock: '0x0',
+          toBlock: 'latest',
+          toAddress: owner,
+          contractAddresses: [COLOR_PUNKS_ADDRESS],
+          category: ['erc721'],
+          order: 'asc',
+          maxCount: '0x3e8', // 1000 per page (max)
+          withMetadata: false,
+          ...(pageKey ? { pageKey } : {}),
+        },
+      ],
+    };
 
-    // All TokenURIUpdated events on the contract.
-    client.getLogs({
-      address: COLOR_PUNKS_ADDRESS,
-      event: parseAbiItem(
-        'event TokenURIUpdated(uint256 indexed tokenId, string uri, address indexed user)'
-      ),
-      fromBlock: 0n,
-      toBlock: 'latest',
-    }).catch(() => []),
-  ]);
-
-  // For each token, keep the LATEST (highest block) Transfer to this owner.
-  for (const log of transferLogs) {
-    const tokenId = (log.args.tokenId ?? 0n).toString();
-    const block = log.blockNumber ?? 0n;
-    const existing = lastReceivedBlock.get(tokenId);
-    if (!existing || block > existing) {
-      lastReceivedBlock.set(tokenId, block);
+    let data: { result?: { transfers: AssetTransfer[]; pageKey?: string } };
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) break;
+      data = await res.json();
+    } catch {
+      break;
     }
-  }
 
-  // For each token, keep the LATEST TokenURIUpdated event.
-  for (const log of coloredLogs) {
-    const tokenId = (log.args.tokenId ?? 0n).toString();
-    const block = log.blockNumber ?? 0n;
-    const existing = lastColoredBlock.get(tokenId);
-    if (!existing || block > existing) {
-      lastColoredBlock.set(tokenId, block);
+    const transfers = data.result?.transfers ?? [];
+    for (const t of transfers) {
+      if (!t.tokenId) continue;
+      // tokenId from the API is a hex string like "0x1a".
+      const tokenIdDec = BigInt(t.tokenId).toString();
+      const block = BigInt(t.blockNum);
+      const existing = lastReceivedBlock.get(tokenIdDec);
+      if (!existing || block > existing) {
+        lastReceivedBlock.set(tokenIdDec, block);
+      }
     }
-  }
 
-  return { lastReceivedBlock, lastColoredBlock };
+    pageKey = data.result?.pageKey;
+  } while (pageKey);
+
+  return { lastReceivedBlock, lastColoredBlock: new Map() };
 }

@@ -144,12 +144,81 @@ export const BASEWORDS_ABI = [
     stateMutability: 'view',
     type: 'function',
   },
+  // Read — token data (words + colors + flags).
+  {
+    inputs: [{ type: 'uint256', name: 'tokenId' }],
+    name: 'getTokenData',
+    outputs: [
+      {
+        components: [
+          { type: 'string', name: 'word1' },
+          { type: 'string', name: 'word2' },
+          { type: 'string', name: 'word3' },
+          { type: 'string', name: 'backgroundColor' },
+          { type: 'string', name: 'textColor' },
+          { type: 'bool', name: 'isTextColored' },
+          { type: 'bool', name: 'isBackgroundColored' },
+          { type: 'bool', name: 'isInverted' },
+          { type: 'uint256', name: 'wordCount' },
+        ],
+        type: 'tuple',
+        name: '',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
   // Write
   {
     inputs: [{ type: 'string[]', name: 'words' }],
     name: 'mint',
     outputs: [],
     stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { type: 'uint256', name: 'tokenId' },
+      { type: 'uint256', name: 'colorTokenWord' },
+    ],
+    name: 'updateWordColor',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { type: 'uint256', name: 'tokenId' },
+      { type: 'uint256', name: 'colorTokenBackground' },
+    ],
+    name: 'updateBackgroundColor',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { type: 'uint256', name: 'tokenId' },
+      { type: 'uint256', name: 'colorTokenBackground' },
+      { type: 'uint256', name: 'colorTokenWord' },
+    ],
+    name: 'updateAllColors',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ type: 'uint256', name: 'tokenId' }],
+    name: 'resetColors',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ type: 'uint256', name: 'tokenId' }],
+    name: 'invertDefaultColors',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   // Event — used to extract the minted tokenId from the tx receipt.

@@ -9,6 +9,8 @@ interface Props {
   isLoading: boolean;
   /** When set, punks are displayed in groups with group headers. */
   groups?: { value: string; punks: AlchemyNft[] }[] | null;
+  loadingLabel?: string;
+  emptyLabel?: string;
 }
 
 export function PunkSelector({
@@ -17,13 +19,15 @@ export function PunkSelector({
   onSelect,
   isLoading,
   groups,
+  loadingLabel = 'LOADING PUNKS…',
+  emptyLabel = 'NO COLORPUNKS IN WALLET',
 }: Props) {
   if (isLoading) {
-    return <div className="empty-rail">LOADING PUNKS…</div>;
+    return <div className="empty-rail">{loadingLabel}</div>;
   }
 
   if (!punks.length) {
-    return <div className="empty-rail">NO COLORPUNKS IN WALLET</div>;
+    return <div className="empty-rail">{emptyLabel}</div>;
   }
 
   // Grouped display.

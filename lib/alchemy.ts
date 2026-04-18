@@ -1,4 +1,8 @@
-import { BASE_COLORS_ADDRESS, COLOR_PUNKS_ADDRESS } from './contracts';
+import {
+  BASE_COLORS_ADDRESS,
+  BASEWORDS_ADDRESS,
+  COLOR_PUNKS_ADDRESS,
+} from './contracts';
 
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 
@@ -53,9 +57,20 @@ function extractHex(nft: AlchemyNft): string | null {
 
 /**
  * Decide whether the BaseColor has a real custom name or is still just the hex.
- * BaseColors defaults the name to the hex string; owners may rename it.
+ * BaseColors stores the custom name in an attribute with trait_type "Color
+ * Name" (the top-level `name` field is always the hex). Check the attribute
+ * first, then fall back to `name` for any unusual metadata shape.
  */
 function extractName(nft: AlchemyNft, hex: string): { name: string; isNamed: boolean } {
+  const attrs = nft.raw?.metadata?.attributes ?? [];
+  const colorNameAttr = attrs.find(
+    (a) => String(a?.trait_type ?? '').toLowerCase() === 'color name'
+  );
+  const attrVal = String(colorNameAttr?.value ?? '').trim();
+  if (attrVal && !/^#?[0-9a-f]{6}$/i.test(attrVal)) {
+    return { name: attrVal, isNamed: true };
+  }
+
   const raw = (nft.name ?? nft.raw?.metadata?.name ?? '').trim();
   if (!raw) return { name: hex, isNamed: false };
   // Bare hex (with or without '#') → not a real name.
@@ -92,6 +107,10 @@ async function fetchNfts(owner: string, contract: string): Promise<AlchemyNft[]>
 
 export async function getUserPunks(wallet: string): Promise<AlchemyNft[]> {
   return fetchNfts(wallet, COLOR_PUNKS_ADDRESS);
+}
+
+export async function getUserBaseWords(wallet: string): Promise<AlchemyNft[]> {
+  return fetchNfts(wallet, BASEWORDS_ADDRESS);
 }
 
 export async function getUserColors(wallet: string): Promise<UserColor[]> {

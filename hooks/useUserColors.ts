@@ -10,6 +10,7 @@ import {
   type AlchemyNft,
 } from '@/lib/alchemy';
 import { BASE_COLORS_ABI, BASE_COLORS_ADDRESS } from '@/lib/contracts';
+import { retryOnce } from '@/lib/retry';
 
 /**
  * Same stale-cache problem as punks: Alchemy indexes BaseColors metadata
@@ -20,6 +21,38 @@ import { BASE_COLORS_ABI, BASE_COLORS_ADDRESS } from '@/lib/contracts';
  * owns), then multicall tokenURI on the BaseColors contract for each,
  * fetch the on-chain metadata JSON, and extract the real name from there.
  */
+
+/** Persisted memo of last successfully-resolved custom name per tokenId. */
+interface NameEntry {
+  name: string;
+  image: string | null;
+}
+const NAME_STORAGE_KEY = 'colorpunks:color-names:v1';
+const nameCache: Map<string, NameEntry> = loadNameCache();
+
+function loadNameCache(): Map<string, NameEntry> {
+  if (typeof window === 'undefined') return new Map();
+  try {
+    const raw = window.localStorage.getItem(NAME_STORAGE_KEY);
+    if (!raw) return new Map();
+    const parsed = JSON.parse(raw) as Record<string, NameEntry>;
+    return new Map(Object.entries(parsed));
+  } catch {
+    return new Map();
+  }
+}
+
+function persistNameCache() {
+  if (typeof window === 'undefined') return;
+  try {
+    const obj: Record<string, NameEntry> = {};
+    for (const [k, v] of nameCache) obj[k] = v;
+    window.localStorage.setItem(NAME_STORAGE_KEY, JSON.stringify(obj));
+  } catch {
+    /* quota or disabled; ignore */
+  }
+}
+
 export function useUserColors() {
   const { address } = useAccount();
   const publicClient = usePublicClient();
@@ -52,22 +85,32 @@ export function useUserColors() {
       // top-level `name` field (which is always just the hex).
       return alchemyColors.map((c, i) => {
         const meta = freshMeta[i];
-        if (!meta) return c;
+        if (meta) {
+          const colorNameAttr = (meta.attributes ?? []).find(
+            (a) => a.trait_type === 'Color Name'
+          );
+          const customName = colorNameAttr?.value?.trim() ?? '';
+          const img = resolveImageUrl(meta.image) ?? c.image;
+          if (customName) {
+            nameCache.set(c.tokenId, { name: customName, image: img });
+            persistNameCache();
+            return { ...c, name: customName, isNamed: true, image: img };
+          }
+          return { ...c, image: img };
+        }
 
-        // Look for a "Color Name" attribute — this is where basecolors.com
-        // stores the user-set name.
-        const colorNameAttr = (meta.attributes ?? []).find(
-          (a) => a.trait_type === 'Color Name'
-        );
-        const customName = colorNameAttr?.value?.trim() ?? '';
-        const isNamed = Boolean(customName);
-
-        return {
-          ...c,
-          name: isNamed ? customName : c.color,
-          isNamed,
-          image: resolveImageUrl(meta.image) ?? c.image,
-        };
+        // Fresh read failed — fall back to a prior successful custom name
+        // for this tokenId if we have one.
+        const cached = nameCache.get(c.tokenId);
+        if (cached) {
+          return {
+            ...c,
+            name: cached.name,
+            isNamed: true,
+            image: cached.image ?? c.image,
+          };
+        }
+        return c;
       });
     },
   });
@@ -99,10 +142,9 @@ async function readFreshBaseColorsMeta(
 
   let uris: Array<string | null>;
   try {
-    const results = await publicClient.multicall({
-      contracts,
-      allowFailure: true,
-    });
+    const results = await retryOnce(() =>
+      publicClient.multicall({ contracts, allowFailure: true })
+    );
     uris = results.map((r) =>
       r.status === 'success' ? (r.result as string) : null
     );

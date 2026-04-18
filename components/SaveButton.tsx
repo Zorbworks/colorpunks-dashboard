@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
 import { useSavePunk } from '@/hooks/useSavePunk';
 import { uploadColoredPunk } from '@/lib/ipfs';
+import { invalidateFreshImage } from '@/hooks/useUserPunks';
 import type { AlchemyNft } from '@/lib/alchemy';
 import { COLOR_PUNKS_ADDRESS } from '@/lib/contracts';
 
@@ -25,12 +26,15 @@ export function SaveButton({ punk, getCanvas }: Props) {
   // invalidate all punk-related queries so the grid re-fetches fresh data.
   useEffect(() => {
     if (!isSuccess || !address) return;
+    // Drop the stale pre-save image from our local cache so the post-save
+    // refetch can't fall back to it if the metadata fetch transiently fails.
+    if (punk?.tokenId) invalidateFreshImage(punk.tokenId);
     const timer = setTimeout(() => {
       queryClient.invalidateQueries({ queryKey: ['user-punks', address] });
       queryClient.invalidateQueries({ queryKey: ['punk-sort-data', address] });
     }, 2000);
     return () => clearTimeout(timer);
-  }, [isSuccess, address, queryClient]);
+  }, [isSuccess, address, queryClient, punk?.tokenId]);
 
   // Reset the save state when a different punk is selected so the
   // button goes back to "SAVE ONCHAIN" instead of staying on "SAVED".

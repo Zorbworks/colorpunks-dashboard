@@ -17,8 +17,18 @@ import { PunkPalette } from '@/components/PunkPalette';
 import { PunkFilters } from '@/components/PunkFilters';
 import { PaletteBrowser } from '@/components/PaletteBrowser';
 import { BaseWordsMintForm } from '@/components/BaseWordsMintForm';
+import { BaseWordEditor, type EditTarget } from '@/components/BaseWordEditor';
+import {
+  BaseWordFilters,
+  type BaseWordSort,
+  type WordCountFilter,
+} from '@/components/BaseWordFilters';
 
-import { useUserPunks } from '@/hooks/useUserPunks';
+import { useUserPunks, invalidateFreshImage } from '@/hooks/useUserPunks';
+import { useUserBaseWords } from '@/hooks/useUserBaseWords';
+import { useBaseWordsMeta } from '@/hooks/useBaseWordsMeta';
+import { useBaseWordData } from '@/hooks/useBaseWordData';
+import { BaseWordPalette } from '@/components/BaseWordPalette';
 import { useUserColors } from '@/hooks/useUserColors';
 import { useUserPalettes, type UserPalette } from '@/hooks/useUserPalettes';
 import { useResetPunk } from '@/hooks/useResetPunk';
@@ -50,6 +60,14 @@ export default function Page() {
   const [project, setProject] = useState<Project>('basewords');
 
   const { data: punks, isLoading: punksLoading } = useUserPunks();
+  const { data: baseWords, isLoading: baseWordsLoading } = useUserBaseWords();
+  const [selectedBaseWord, setSelectedBaseWord] = useState<AlchemyNft | null>(null);
+  const [bwTextColor, setBwTextColor] = useState<string | null>(null);
+  const [bwBgColor, setBwBgColor] = useState<string | null>(null);
+  const [bwEditTarget, setBwEditTarget] = useState<EditTarget>('text');
+  const [bwSort, setBwSort] = useState<BaseWordSort>('recent');
+  const [bwWordCount, setBwWordCount] = useState<WordCountFilter>('all');
+  const [bwCenterTab, setBwCenterTab] = useState<'canvas' | 'details'>('canvas');
   const { data: rawColors, isLoading: colorsLoading } = useUserColors();
   const { data: palettes, isLoading: palettesLoading } = useUserPalettes();
   const { data: punkSortData } = usePunkSortData();
@@ -77,6 +95,9 @@ export default function Page() {
   // a punk from the previous wallet.
   useEffect(() => {
     setSelectedPunk(null);
+    setSelectedBaseWord(null);
+    setBwTextColor(null);
+    setBwBgColor(null);
     setActivePalette(null);
   }, [address]);
 
@@ -133,6 +154,9 @@ export default function Page() {
         'You\u2019ll need to sign a transaction.'
     );
     if (!ok) return;
+    // Drop the stale colored image from our local cache so the next
+    // refetch (fired after tx confirms) is forced to re-read metadata.
+    invalidateFreshImage(selectedPunk.tokenId);
     resetPunk(BigInt(selectedPunk.tokenId));
   }, [selectedPunk, resetPunk]);
 
@@ -151,6 +175,40 @@ export default function Page() {
     if (!traitGroupBy || !filteredPunks.length) return null;
     return groupPunksByTrait(filteredPunks, traitGroupBy);
   }, [filteredPunks, traitGroupBy]);
+
+  const baseWordIds = useMemo(
+    () => (baseWords ?? []).map((w) => w.tokenId),
+    [baseWords]
+  );
+  const { data: baseWordsMeta } = useBaseWordsMeta(baseWordIds);
+  const { data: selectedBaseWordData } = useBaseWordData(
+    selectedBaseWord?.tokenId ?? null
+  );
+
+  const filteredBaseWords = useMemo(() => {
+    const list = baseWords ?? [];
+    const withMeta = list.map((w) => ({
+      nft: w,
+      meta: baseWordsMeta?.get(w.tokenId),
+    }));
+    const filtered =
+      bwWordCount === 'all'
+        ? withMeta
+        : withMeta.filter((x) => x.meta?.wordCount === bwWordCount);
+    const sorted = filtered.slice().sort((a, b) => {
+      if (bwSort === 'colored') {
+        const ac = a.meta?.isColored ? 1 : 0;
+        const bc = b.meta?.isColored ? 1 : 0;
+        if (ac !== bc) return bc - ac; // colored first
+      }
+      const ai = BigInt(a.nft.tokenId);
+      const bi = BigInt(b.nft.tokenId);
+      // Default tie-breaker and primary sort for recent/oldest: tokenId.
+      if (bwSort === 'oldest') return ai < bi ? -1 : ai > bi ? 1 : 0;
+      return ai < bi ? 1 : ai > bi ? -1 : 0; // recent (desc)
+    });
+    return sorted.map((x) => x.nft);
+  }, [baseWords, baseWordsMeta, bwSort, bwWordCount]);
 
   const handleRandomTrait = useCallback(() => {
     const traitTypes = getAllTraitTypes(punks ?? []);
@@ -208,7 +266,11 @@ export default function Page() {
                     ? `[01] YOUR PUNKS · ${String(filteredPunks.length).padStart(2, '0')}${
                         punkTypeFilter !== 'all' ? ` / ${punkCount}` : ''
                       }`
-                    : `[01] YOUR BASEWORDS`}
+                    : `[01] YOUR BASEWORDS · ${String(filteredBaseWords.length).padStart(2, '0')}${
+                        bwWordCount !== 'all'
+                          ? ` / ${String((baseWords ?? []).length).padStart(2, '0')}`
+                          : ''
+                      }`}
                 </h2>
                 <div className="center-tabs">
                   <button
@@ -249,6 +311,27 @@ export default function Page() {
                   onSortChange={setPunkSort}
                 />
               )}
+              {project === 'basewords' && (
+                <>
+                  <BaseWordFilters
+                    sort={bwSort}
+                    onSortChange={setBwSort}
+                    wordCount={bwWordCount}
+                    onWordCountChange={setBwWordCount}
+                  />
+                  <button
+                    type="button"
+                    className={`bw-new${selectedBaseWord === null ? ' active' : ''}`}
+                    onClick={() => {
+                      setSelectedBaseWord(null);
+                      setBwCenterTab('canvas');
+                    }}
+                    title="Clear selection and mint a new BaseWord"
+                  >
+                    + NEW WORD
+                  </button>
+                </>
+              )}
             </div>
             <div className="rail-scroll">
               {project === 'colorpunks' ? (
@@ -260,15 +343,14 @@ export default function Page() {
                   groups={punkGroups}
                 />
               ) : (
-                <div className="bw-empty">
-                  <p className="bw-empty-title">
-                    COMING SOON: YOUR BASEWORDS COLLECTION
-                  </p>
-                  <p className="bw-empty-body">
-                    Mint 1–3 uppercase words as a 1/1 onchain NFT.
-                    Use the canvas to create your word, then hit MINT.
-                  </p>
-                </div>
+                <PunkSelector
+                  punks={filteredBaseWords}
+                  selectedTokenId={selectedBaseWord?.tokenId ?? null}
+                  onSelect={setSelectedBaseWord}
+                  isLoading={baseWordsLoading}
+                  loadingLabel="LOADING BASEWORDS…"
+                  emptyLabel="NO BASEWORDS IN WALLET — MINT ONE"
+                />
               )}
             </div>
           </aside>
@@ -302,12 +384,32 @@ export default function Page() {
                   </button>
                 </div>
               )}
+              {project === 'basewords' && (
+                <div className="center-tabs">
+                  <button
+                    type="button"
+                    className={`center-tab${bwCenterTab === 'canvas' ? ' active' : ''}`}
+                    onClick={() => setBwCenterTab('canvas')}
+                  >
+                    EDIT
+                  </button>
+                  <button
+                    type="button"
+                    className={`center-tab${bwCenterTab === 'details' ? ' active' : ''}`}
+                    onClick={() => setBwCenterTab('details')}
+                  >
+                    DETAILS
+                  </button>
+                </div>
+              )}
               <b>
                 {project === 'colorpunks'
                   ? selectedPunk
                     ? `#${selectedPunk.tokenId}`
                     : '—'
-                  : 'BASEWORDS'}
+                  : selectedBaseWord
+                    ? `#${selectedBaseWord.tokenId}`
+                    : 'BASEWORDS'}
               </b>
             </div>
 
@@ -362,7 +464,49 @@ export default function Page() {
                 />
               </>
             ) : (
-              <BaseWordsMintForm />
+              <>
+                <div
+                  style={{
+                    display: bwCenterTab === 'canvas' ? 'contents' : 'none',
+                  }}
+                >
+                  {selectedBaseWord ? (
+                    <BaseWordEditor
+                      tokenId={selectedBaseWord.tokenId}
+                      textColor={bwTextColor}
+                      bgColor={bwBgColor}
+                      onTextColorChange={setBwTextColor}
+                      onBgColorChange={setBwBgColor}
+                      editTarget={bwEditTarget}
+                      onEditTargetChange={setBwEditTarget}
+                      ownedColors={rawColors ?? []}
+                    />
+                  ) : (
+                    <BaseWordsMintForm />
+                  )}
+                </div>
+                <div
+                  className="punk-palette"
+                  style={{ display: bwCenterTab === 'details' ? undefined : 'none' }}
+                >
+                  <BaseWordPalette
+                    tokenId={selectedBaseWord?.tokenId ?? null}
+                    data={selectedBaseWordData}
+                    baseColors={rawColors ?? []}
+                    selectedHex={
+                      bwEditTarget === 'text' ? bwTextColor : bwBgColor
+                    }
+                    onPickText={(hex) => {
+                      setBwEditTarget('text');
+                      setBwTextColor(hex);
+                    }}
+                    onPickBg={(hex) => {
+                      setBwEditTarget('bg');
+                      setBwBgColor(hex);
+                    }}
+                  />
+                </div>
+              </>
             )}
           </section>
 
@@ -404,8 +548,21 @@ export default function Page() {
                 <ColorPalette
                   colors={filtered}
                   allColorCount={allColorCount}
-                  selectedColor={selectedColor}
-                  onSelect={setSelectedColor}
+                  selectedColor={
+                    project === 'basewords' && selectedBaseWord
+                      ? bwEditTarget === 'text'
+                        ? bwTextColor
+                        : bwBgColor
+                      : selectedColor
+                  }
+                  onSelect={(hex) => {
+                    if (project === 'basewords' && selectedBaseWord) {
+                      if (bwEditTarget === 'text') setBwTextColor(hex);
+                      else setBwBgColor(hex);
+                    } else {
+                      setSelectedColor(hex);
+                    }
+                  }}
                   isLoading={colorsLoading}
                 />
               ) : (
