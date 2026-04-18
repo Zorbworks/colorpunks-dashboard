@@ -7,9 +7,9 @@ import { ThemeToggle } from './ThemeToggle';
 
 export function TopBar() {
   const pathname = usePathname();
-  const onBaseWords =
-    pathname === '/' || pathname?.startsWith('/basewords');
   const onColorPunks = pathname?.startsWith('/colorpunks');
+  // Click the nav — always navigate to the project you're NOT on.
+  const otherHref = onColorPunks ? '/basewords' : '/colorpunks';
 
   return (
     <header className="topbar">
@@ -18,17 +18,10 @@ export function TopBar() {
       </Link>
 
       <nav className="topbar-nav">
-        <Link
-          href="/basewords"
-          className={`topbar-btn${onBaseWords ? ' active' : ''}`}
-        >
-          BASEWORDS
-        </Link>
-        <Link
-          href="/colorpunks"
-          className={`topbar-btn${onColorPunks ? ' active' : ''}`}
-        >
-          COLORPUNKS TOOLBOX
+        <Link href={otherHref} className="topbar-nav-link">
+          <span className={onColorPunks ? 'dim' : ''}>BASEWORDS</span>
+          <span className="topbar-slash"> / </span>
+          <span className={onColorPunks ? '' : 'dim'}>COLORPUNKS</span>
         </Link>
       </nav>
 
