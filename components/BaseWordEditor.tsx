@@ -9,7 +9,9 @@ import { useUpdateBaseWord } from '@/hooks/useUpdateBaseWord';
 import {
   invalidateBaseWordImage,
   refreshBaseWordImage,
+  setBaseWordImage,
 } from '@/hooks/useUserBaseWords';
+import { buildBaseWordsSvg, svgToDataUri } from '@/lib/basewords';
 import { BASEWORDS_ADDRESS } from '@/lib/contracts';
 
 export type EditTarget = 'text' | 'bg';
@@ -108,6 +110,24 @@ export function BaseWordEditor({
     return m;
   }, [ownedColors]);
 
+  /** Write the thumbnail cache with a client-side SVG that matches what
+   *  the contract will render after the tx. Runs immediately so the rail
+   *  updates the moment the user acts; the post-save chain refresh then
+   *  overwrites with the authoritative SVG (same content in practice). */
+  const optimisticThumbnail = (
+    nextText: string | null,
+    nextBg: string | null
+  ) => {
+    const words = tokenData?.words ?? [];
+    if (words.length === 0) return;
+    const svg = buildBaseWordsSvg(words, {
+      textColor: nextText ?? '#0052FF',
+      bgColor: nextBg ?? '#FFFFFF',
+    });
+    setBaseWordImage(tokenId, svgToDataUri(svg));
+    qc.invalidateQueries({ queryKey: ['user-basewords'] });
+  };
+
   const handleSave = () => {
     if (!anyChanged) return;
     const textId = textChanged && textColor
@@ -119,7 +139,21 @@ export function BaseWordEditor({
     // Guard: user must own the BaseColor for the hex they picked.
     if (textChanged && !textId) return;
     if (bgChanged && !bgId) return;
+    optimisticThumbnail(
+      textChanged ? textColor : savedText,
+      bgChanged ? bgColor : savedBg
+    );
     save({ tokenId, textColorTokenId: textId, bgColorTokenId: bgId });
+  };
+
+  const handleReset = () => {
+    optimisticThumbnail('#0052FF', '#FFFFFF');
+    reset(tokenId);
+  };
+
+  const handleInvert = () => {
+    optimisticThumbnail('#FFFFFF', '#0052FF');
+    invert(tokenId);
   };
 
   const handleRandom = () => {
@@ -188,7 +222,7 @@ export function BaseWordEditor({
         <button
           type="button"
           className="bw-tool"
-          onClick={() => invert(tokenId)}
+          onClick={handleInvert}
           disabled={isPending || isConfirming}
           title="Swap to default inverted (white-on-blue)"
         >
@@ -205,7 +239,7 @@ export function BaseWordEditor({
         <button
           type="button"
           className="bw-tool"
-          onClick={() => reset(tokenId)}
+          onClick={handleReset}
           disabled={isPending || isConfirming}
           title="Reset to default (#0052FF on #FFFFFF)"
         >

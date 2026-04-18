@@ -23,15 +23,21 @@ export const BASEWORDS_FONT_SIZE_CQW = (BASEWORDS_FONT_SIZE / VIEW) * 100;
 
 /**
  * Build an SVG string preview of the given words.
- * Accepts up to 3 words. Empty/blank words are stripped.
+ * Accepts up to 3 words. Empty/blank words are stripped. If textColor /
+ * bgColor are omitted, the default BaseWords palette is used.
  */
-export function buildBaseWordsSvg(words: string[]): string {
+export function buildBaseWordsSvg(
+  words: string[],
+  options?: { textColor?: string; bgColor?: string }
+): string {
+  const fg = options?.textColor || FG;
+  const bg = options?.bgColor || BG;
   const cleaned = words
     .map((w) => (w ?? '').trim().toUpperCase())
     .filter((w) => w.length > 0);
 
   if (cleaned.length === 0) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VIEW} ${VIEW}"><rect width="${VIEW}" height="${VIEW}" fill="${BG}"/></svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VIEW} ${VIEW}"><rect width="${VIEW}" height="${VIEW}" fill="${bg}"/></svg>`;
   }
 
   const fontSize = BASEWORDS_FONT_SIZE;
@@ -43,13 +49,13 @@ export function buildBaseWordsSvg(words: string[]): string {
       (word, i) =>
         `<text x="${VIEW / 2}" y="${startY + i * fontSize}" ` +
         `font-family="Helvetica, Arial, sans-serif" font-weight="700" ` +
-        `font-size="${fontSize}" fill="${FG}" text-anchor="middle">${escapeXml(word)}</text>`
+        `font-size="${fontSize}" fill="${fg}" text-anchor="middle">${escapeXml(word)}</text>`
     )
     .join('');
 
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VIEW} ${VIEW}">` +
-    `<rect width="${VIEW}" height="${VIEW}" fill="${BG}"/>` +
+    `<rect width="${VIEW}" height="${VIEW}" fill="${bg}"/>` +
     lines +
     `</svg>`
   );

@@ -58,6 +58,19 @@ export function invalidateBaseWordImage(tokenId: string | bigint) {
   persistCache();
 }
 
+/** Write a fresh image data URI straight into the cache. Used optimistically
+ *  when the user triggers a color change — we already know the target
+ *  colors and the word list so we can render the expected SVG client-side
+ *  and skip the post-tx on-chain round-trip entirely. */
+export function setBaseWordImage(
+  tokenId: string | bigint,
+  image: string,
+  name?: string | null
+) {
+  freshImageCache.set(String(tokenId), { image, name: name ?? null });
+  persistCache();
+}
+
 function applyCachedImage(nft: AlchemyNft): AlchemyNft {
   const cached = freshImageCache.get(nft.tokenId);
   if (!cached) return nft;
