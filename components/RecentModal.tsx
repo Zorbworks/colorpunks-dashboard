@@ -2,13 +2,37 @@
 
 import { Modal } from './Modal';
 import { useRecentColored } from '@/hooks/useRecentColored';
+import type { Project } from './ProjectPage';
 
 interface Props {
   open: boolean;
   onClose: () => void;
+  project?: Project;
 }
 
-export function RecentModal({ open, onClose }: Props) {
+export function RecentModal({ open, onClose, project = 'colorpunks' }: Props) {
+  // Existing recent-activity hook covers ColorPunks. BaseWords recent
+  // listing is a separate build — placeholder for now.
+  if (project === 'basewords') {
+    return (
+      <Modal open={open} onClose={onClose} title="[ RECENT ] LATEST 24">
+        <div className="gallery-loading">
+          RECENT BASEWORDS — COMING SOON
+        </div>
+      </Modal>
+    );
+  }
+
+  return <RecentColorPunksModal open={open} onClose={onClose} />;
+}
+
+function RecentColorPunksModal({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
   const { data, isLoading, error } = useRecentColored(open, 24);
 
   return (

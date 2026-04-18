@@ -72,19 +72,21 @@ img {
   gap: 20px;
 }
 
-/* ---------- TOP BAR (CWOMA.TOOLS + project links + right actions) ---------- */
+/* ---------- TOP BAR (CWOMA.TOOLS — compact, secondary to project header) ---------- */
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--rule);
-  margin-bottom: 18px;
+  gap: 12px;
+  padding: 3px 10px;
+  border: 1px solid var(--rule);
+  margin-bottom: 10px;
 }
+/* Title sized to the rendered height of a button (letters tall as buttons). */
 .topbar-title {
   font-family: var(--font-display);
-  font-size: 16px;
+  font-size: 17px;
+  line-height: 1;
   font-weight: 400;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -94,35 +96,81 @@ img {
 }
 .topbar-nav {
   display: flex;
-  gap: 16px;
+  gap: 6px;
   align-items: center;
   flex: 1;
   justify-content: center;
   flex-wrap: wrap;
   min-width: 0;
 }
-.topbar-proj {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0.04em;
+.topbar-btn {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
-  padding: 8px 12px;
-  border: 1px solid transparent;
-  opacity: 0.6;
+  padding: 3px 8px;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--fg);
   white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
 }
-.topbar-proj:hover { opacity: 1; }
-.topbar-proj.active {
-  opacity: 1;
-  border-color: currentColor;
+.topbar-btn:hover:not(.active) {
+  background: var(--fg);
+  color: var(--bg);
+}
+.topbar-btn.active {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
 }
 .topbar-right {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   flex-shrink: 0;
+}
+/* Compact variants of the connect + theme controls inside the topbar so
+   they don't inflate the bar height. */
+.topbar .connect-btn {
+  height: auto;
+  padding: 3px 8px;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+.topbar .theme-toggle {
+  height: auto;
+  padding: 3px 6px;
+  font-size: 9px;
+}
+
+/* ---------- PROJECT HEADER (per-project title + menu) ---------- */
+.project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  margin-bottom: 18px;
+}
+.project-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+  margin: 0;
+}
+.project-nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 .rail-connect {
   display: flex;

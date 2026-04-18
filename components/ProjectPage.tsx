@@ -16,6 +16,7 @@ import { PunkPalette } from '@/components/PunkPalette';
 import { PunkFilters } from '@/components/PunkFilters';
 import { PaletteBrowser } from '@/components/PaletteBrowser';
 import { BaseWordsMintForm } from '@/components/BaseWordsMintForm';
+import { ProjectHeader } from '@/components/ProjectHeader';
 import { BaseWordEditor, type EditTarget } from '@/components/BaseWordEditor';
 import {
   BaseWordFilters,
@@ -34,7 +35,6 @@ import { useResetPunk } from '@/hooks/useResetPunk';
 import { usePunkSortData } from '@/hooks/usePunkSortData';
 
 import { resolveImageUrl, type AlchemyNft } from '@/lib/alchemy';
-import { BASEWORDS_ADDRESS, COLOR_PUNKS_ADDRESS } from '@/lib/contracts';
 import {
   applyFilters,
   DEFAULT_FILTERS,
@@ -238,6 +238,7 @@ export function ProjectPage({ project }: Props) {
 
   return (
     <>
+      <ProjectHeader project={project} />
       <main className="main">
         {/* ---------- Left: Projects rail ---------- */}
         <aside className="rail punks-rail">
@@ -254,18 +255,6 @@ export function ProjectPage({ project }: Props) {
                         : ''
                     }`}
               </h2>
-              <a
-                className="center-tab"
-                href={
-                  project === 'colorpunks'
-                    ? `https://opensea.io/assets/base/${COLOR_PUNKS_ADDRESS}`
-                    : `https://opensea.io/assets/base/${BASEWORDS_ADDRESS}`
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                BUY MORE
-              </a>
             </div>
             {project === 'colorpunks' && (
               <PunkFilters
