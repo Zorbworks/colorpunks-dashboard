@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import type { EnrichedColor } from '@/lib/color';
 
 interface Props {
@@ -32,16 +31,6 @@ export function ColorPalette({
     return <div className="empty-rail">NO BASECOLORS IN WALLET</div>;
   }
 
-  const selectedRef = useRef<HTMLButtonElement>(null);
-
-  // Scroll the selected swatch into view when selectedColor changes
-  // (e.g. when picked from the Palette tab).
-  useEffect(() => {
-    if (selectedRef.current) {
-      selectedRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    }
-  }, [selectedColor]);
-
   return (
     <div className="colors-list">
       {colors.length === 0 && (
@@ -54,7 +43,6 @@ export function ColorPalette({
         return (
           <button
             key={`${c.tokenId}-${c.color}`}
-            ref={isSelected ? selectedRef : undefined}
             type="button"
             className={`color${isSelected ? ' sel' : ''}`}
             style={{ backgroundColor: c.color }}
