@@ -59,7 +59,7 @@ img {
   display: flex;
   flex-direction: column;
   padding: 10px 16px;
-  gap: 10px;
+  gap: 18px;
 }
 
 /* ---------- HEADER ---------- */
@@ -72,21 +72,24 @@ img {
   gap: 20px;
 }
 
-/* ---------- TOP BAR (borderless, minimal — secondary to project header) ---------- */
+/* ---------- TOP BAR (minimal, with separator below) ---------- */
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 0;
-  margin: 0;
+  padding: 0 0 10px;
+  margin: 0 -16px 0;
+  padding-left: 16px;
+  padding-right: 16px;
+  border-bottom: 1px solid var(--rule);
 }
 .topbar-title {
-  font-family: var(--font-display);
-  font-size: 12px;
+  font-family: var(--font-title);
+  font-size: 13px;
   line-height: 1;
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--fg);
   text-decoration: none;
@@ -102,10 +105,10 @@ img {
 /* Single link containing both project labels + slash separator. Clicking
    anywhere on it navigates to whichever project you're NOT on. */
 .topbar-nav-link {
-  font-family: var(--font-display);
-  font-size: 12px;
+  font-family: var(--font-title);
+  font-size: 13px;
   line-height: 1;
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   text-decoration: none;
@@ -144,9 +147,9 @@ img {
   margin: 0;
 }
 .project-title {
-  font-family: var(--font-display);
+  font-family: var(--font-title);
   font-size: 28px;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: 0;
   line-height: 1;
   text-transform: uppercase;
@@ -302,7 +305,7 @@ img {
   flex-shrink: 0;
 }
 .rail-head h2 {
-  font-family: var(--font-ui);
+  font-family: var(--font-title);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -401,7 +404,7 @@ img {
   padding: 10px 12px;
   border-bottom: 1px solid var(--rule);
   flex-shrink: 0;
-  font-family: var(--font-ui);
+  font-family: var(--font-title);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;

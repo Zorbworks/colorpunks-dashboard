@@ -1,5 +1,10 @@
 import type { Metadata } from 'next';
-import { Jost, Press_Start_2P, IBM_Plex_Mono } from 'next/font/google';
+import {
+  Jost,
+  Press_Start_2P,
+  IBM_Plex_Mono,
+  JetBrains_Mono,
+} from 'next/font/google';
 import './globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 import { Providers } from './providers';
@@ -25,6 +30,13 @@ const ibmPlexMono = IBM_Plex_Mono({
   weight: ['400', '500', '600', '700'],
   subsets: ['latin'],
   variable: '--font-mono',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  variable: '--font-title',
   display: 'swap',
 });
 
@@ -62,7 +74,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" data-theme="light" suppressHydrationWarning>
-      <body className={`${pressStart.variable} ${jost.variable} ${ibmPlexMono.variable}`}>
+      <body className={`${pressStart.variable} ${jost.variable} ${ibmPlexMono.variable} ${jetbrainsMono.variable}`}>
         <Providers>
           <div className="page">
             <TopBar />
