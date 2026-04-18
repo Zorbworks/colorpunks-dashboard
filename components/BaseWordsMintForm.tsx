@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { formatEther } from 'viem';
 import { useAccount } from 'wagmi';
+import { useQueryClient } from '@tanstack/react-query';
 import { useMintBaseWord } from '@/hooks/useMintBaseWord';
 import {
   sanitizeWord,
@@ -13,7 +14,8 @@ import {
 import { BASEWORDS_ADDRESS } from '@/lib/contracts';
 
 export function BaseWordsMintForm() {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
+  const queryClient = useQueryClient();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // The textarea value is the source of truth. Each line is a word.
   const [raw, setRaw] = useState('');
@@ -42,6 +44,17 @@ export function BaseWordsMintForm() {
     error,
     reset,
   } = useMintBaseWord(nonEmpty);
+
+  // After a successful mint, wait for Alchemy to index the new ownership
+  // (usually a few seconds) then refresh the left rail so the new word
+  // appears without a page reload.
+  useEffect(() => {
+    if (!isSuccess || !address) return;
+    const timer = setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey: ['user-basewords', address] });
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [isSuccess, address, queryClient]);
 
   const handleInput = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {

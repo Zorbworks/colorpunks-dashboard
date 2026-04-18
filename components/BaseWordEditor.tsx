@@ -2,9 +2,14 @@
 
 import { useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { usePublicClient } from 'wagmi';
 import type { UserColor } from '@/lib/alchemy';
 import { useBaseWordData } from '@/hooks/useBaseWordData';
 import { useUpdateBaseWord } from '@/hooks/useUpdateBaseWord';
+import {
+  invalidateBaseWordImage,
+  refreshBaseWordImage,
+} from '@/hooks/useUserBaseWords';
 import { BASEWORDS_ADDRESS } from '@/lib/contracts';
 
 export type EditTarget = 'text' | 'bg';
@@ -33,6 +38,7 @@ export function BaseWordEditor({
   ownedColors,
 }: Props) {
   const qc = useQueryClient();
+  const publicClient = usePublicClient();
   const { data: tokenData, isLoading } = useBaseWordData(tokenId);
   const {
     save,
@@ -46,20 +52,40 @@ export function BaseWordEditor({
     clear,
   } = useUpdateBaseWord();
 
-  // When the selected token changes, prefill preview colors from saved state.
+  // Clear the write-tx state (isSuccess etc.) when switching tokens so the
+  // previous token's save doesn't leak into the new selection. Don't clear
+  // on plain color changes — that would flip isSuccess off mid-refresh and
+  // cancel our post-save thumbnail refresh timer.
+  useEffect(() => {
+    clear();
+  }, [tokenId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Prefill the canvas preview colors from the current on-chain token
+  // data. Also fires after a save/reset/invert because tokenData refetches
+  // with new values — which is what makes the canvas immediately reflect
+  // the new colors without a page reload.
   useEffect(() => {
     if (!tokenData) return;
     onTextColorChange(normalizeHex(tokenData.textColor));
     onBgColorChange(normalizeHex(tokenData.backgroundColor));
-    clear();
-  }, [tokenId, tokenData?.textColor, tokenData?.backgroundColor]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tokenData?.textColor, tokenData?.backgroundColor]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Refresh token data + owned list after a successful save.
+  // Refresh token data + owned list after a successful save. Also fetch
+  // the fresh on-chain image so the left-rail thumbnail updates despite
+  // Alchemy's metadata cache still being stale.
   useEffect(() => {
     if (!isSuccess) return;
+    invalidateBaseWordImage(tokenId);
     qc.invalidateQueries({ queryKey: ['baseword-data', tokenId] });
-    qc.invalidateQueries({ queryKey: ['user-basewords'] });
-  }, [isSuccess, tokenId, qc]);
+    qc.invalidateQueries({ queryKey: ['baseword-meta'] });
+    const timer = setTimeout(async () => {
+      if (publicClient) {
+        await refreshBaseWordImage(tokenId, publicClient);
+      }
+      qc.invalidateQueries({ queryKey: ['user-basewords'] });
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [isSuccess, tokenId, qc, publicClient]);
 
   const savedText = normalizeHex(tokenData?.textColor ?? null);
   const savedBg = normalizeHex(tokenData?.backgroundColor ?? null);
