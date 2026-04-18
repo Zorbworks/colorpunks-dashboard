@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePublicClient } from 'wagmi';
 import type { UserColor } from '@/lib/alchemy';
@@ -73,19 +73,28 @@ export function BaseWordEditor({
   // Refresh token data + owned list after a successful save. Also fetch
   // the fresh on-chain image so the left-rail thumbnail updates despite
   // Alchemy's metadata cache still being stale.
+  //
+  // Ref-guarded so the handler runs exactly once per confirmed tx hash —
+  // no cleanup cancels the timer on re-renders, and publicClient is
+  // captured by value so a later render swapping it out can't strand us.
+  const processedHashRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!isSuccess) return;
+    if (!isSuccess || !hash) return;
+    if (processedHashRef.current === hash) return;
+    processedHashRef.current = hash;
+
     invalidateBaseWordImage(tokenId);
     qc.invalidateQueries({ queryKey: ['baseword-data', tokenId] });
     qc.invalidateQueries({ queryKey: ['baseword-meta'] });
-    const timer = setTimeout(async () => {
-      if (publicClient) {
-        await refreshBaseWordImage(tokenId, publicClient);
+
+    const client = publicClient;
+    setTimeout(async () => {
+      if (client) {
+        await refreshBaseWordImage(tokenId, client);
       }
       qc.invalidateQueries({ queryKey: ['user-basewords'] });
     }, 2000);
-    return () => clearTimeout(timer);
-  }, [isSuccess, tokenId, qc, publicClient]);
+  }, [isSuccess, hash, tokenId, qc, publicClient]);
 
   const savedText = normalizeHex(tokenData?.textColor ?? null);
   const savedBg = normalizeHex(tokenData?.backgroundColor ?? null);
