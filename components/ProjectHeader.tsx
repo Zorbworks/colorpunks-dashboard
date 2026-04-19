@@ -54,7 +54,11 @@ export function ProjectHeader({ project }: Props) {
         </div>
       </section>
 
-      <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
+      <AboutModal
+        open={aboutOpen}
+        onClose={() => setAboutOpen(false)}
+        project={project}
+      />
       <RecentModal
         open={recentOpen}
         onClose={() => setRecentOpen(false)}

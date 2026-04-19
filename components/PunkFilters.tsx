@@ -22,8 +22,7 @@ const SORTS: { key: PunkSort; label: string }[] = [
   { key: 'id-desc', label: 'ID ↓' },
   { key: 'id-asc', label: 'ID ↑' },
   { key: 'recent', label: 'RECENT' },
-  { key: 'colored', label: 'COLORED' },
-  { key: 'rare', label: 'RARE' },
+  { key: 'rare', label: 'RARITY' },
 ];
 
 export function PunkFilters({
