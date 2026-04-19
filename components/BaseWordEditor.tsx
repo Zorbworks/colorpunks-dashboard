@@ -103,6 +103,10 @@ export function BaseWordEditor({
   const textChanged = !!textColor && textColor !== savedText;
   const bgChanged = !!bgColor && bgColor !== savedBg;
   const anyChanged = textChanged || bgChanged;
+  const sameColor =
+    !!textColor &&
+    !!bgColor &&
+    textColor.toUpperCase() === bgColor.toUpperCase();
 
   const colorByHex = useMemo(() => {
     const m = new Map<string, UserColor>();
@@ -139,6 +143,7 @@ export function BaseWordEditor({
     // Guard: user must own the BaseColor for the hex they picked.
     if (textChanged && !textId) return;
     if (bgChanged && !bgId) return;
+    if (sameColor) return; // belt-and-braces — picker already blocks this
     optimisticThumbnail(
       textChanged ? textColor : savedText,
       bgChanged ? bgColor : savedBg
@@ -251,7 +256,7 @@ export function BaseWordEditor({
         type="button"
         className="bw-mint-btn"
         onClick={handleSave}
-        disabled={!anyChanged || isPending || isConfirming || isSuccess}
+        disabled={!anyChanged || sameColor || isPending || isConfirming || isSuccess}
       >
         {saveLabel}
       </button>

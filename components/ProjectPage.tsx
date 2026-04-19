@@ -515,10 +515,26 @@ export function ProjectPage({ project }: Props) {
                       : bwBgColor
                     : selectedColor
                 }
+                disabledColor={
+                  project === 'basewords' && selectedBaseWord
+                    ? bwEditTarget === 'text'
+                      ? bwBgColor
+                      : bwTextColor
+                    : null
+                }
                 onSelect={(hex) => {
                   if (project === 'basewords' && selectedBaseWord) {
-                    if (bwEditTarget === 'text') setBwTextColor(hex);
-                    else setBwBgColor(hex);
+                    // BaseWords must have distinct text + background colors
+                    // (otherwise the word is invisible). Silently reject a
+                    // pick that would clash with the other target.
+                    const h = hex.toUpperCase();
+                    if (bwEditTarget === 'text') {
+                      if (h === (bwBgColor ?? '').toUpperCase()) return;
+                      setBwTextColor(hex);
+                    } else {
+                      if (h === (bwTextColor ?? '').toUpperCase()) return;
+                      setBwBgColor(hex);
+                    }
                   } else {
                     setSelectedColor(hex);
                   }

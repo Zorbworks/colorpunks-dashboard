@@ -749,6 +749,14 @@ img {
   border: 2px solid var(--rule);
   box-shadow: 0 0 0 2px var(--bg) inset;
 }
+.color.disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+  filter: grayscale(0.6);
+}
+.color.disabled:hover {
+  opacity: 0.4;
+}
 .color-name {
   position: absolute;
   left: 0;
