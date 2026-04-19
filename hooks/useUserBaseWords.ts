@@ -1,25 +1,32 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { useAccount } from 'wagmi';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { useAccount, usePublicClient } from 'wagmi';
 import { type PublicClient } from 'viem';
 import { getUserBaseWords, type AlchemyNft } from '@/lib/alchemy';
 import { BASEWORDS_ABI, BASEWORDS_ADDRESS } from '@/lib/contracts';
+import { retryOnce } from '@/lib/retry';
 
 /**
  * Per-token fresh-image cache for BaseWords thumbnails.
  *
- * BaseWords renders its SVG fully onchain but Alchemy still caches the
- * metadata it saw at first-index time. When an owner updates colors via
- * updateWordColor / updateAllColors, the on-chain SVG changes but
- * Alchemy's cached `image.cachedUrl` doesn't — so the left-rail thumbnail
- * would stay at the old colors until Alchemy eventually re-indexes.
+ * BaseWords renders its SVG fully on-chain but Alchemy's cached
+ * `image.cachedUrl` is whatever the token looked like at first-index
+ * time. When an owner updates colours (`updateWordColor` etc.) the
+ * on-chain SVG changes immediately but Alchemy's CDN thumbnail doesn't.
  *
- * We mirror the ColorPunks fix: after a color save, the editor calls
- * refreshBaseWordImage(tokenId) which reads tokenURI on-chain, extracts
- * the fresh image data URI from the JSON, and caches it. useUserBaseWords
- * overlays this cache on Alchemy's list so the thumbnail updates
- * immediately.
+ * Same two-layer strategy as ColorPunks:
+ *   1. `useUserBaseWords` renders instantly from Alchemy + this cache.
+ *   2. On mount, a throttled background refresh multicalls tokenURI for
+ *      every owned token (one RPC call), decodes the fully-on-chain
+ *      metadata, and patches each fresh image into React Query's cache.
+ *      BaseWords metadata is inlined in a data URI — no IPFS fetches
+ *      required, so this is cheap compared to punks.
+ *   3. Save / reset / invert call `setBaseWordImage` (optimistic) and
+ *      `refreshBaseWordImage` (authoritative) directly for the mutated
+ *      token so the thumbnail updates immediately without waiting for
+ *      the throttle to expire.
  */
 interface CacheEntry {
   image: string;
@@ -58,10 +65,10 @@ export function invalidateBaseWordImage(tokenId: string | bigint) {
   persistCache();
 }
 
-/** Write a fresh image data URI straight into the cache. Used optimistically
- *  when the user triggers a color change — we already know the target
- *  colors and the word list so we can render the expected SVG client-side
- *  and skip the post-tx on-chain round-trip entirely. */
+/** Write a fresh image data URI straight into the cache. Used
+ *  optimistically when the user triggers a color change — we already
+ *  know the target colors and the word list so we can render the
+ *  expected SVG client-side and skip waiting for the chain. */
 export function setBaseWordImage(
   tokenId: string | bigint,
   image: string,
@@ -90,21 +97,31 @@ function applyCachedImage(nft: AlchemyNft): AlchemyNft {
   };
 }
 
-/** Load the user's BaseWords tokens, applying the fresh-image cache
- *  overlay so post-save color updates show up in the left-rail thumbnails. */
+const STALE_TIME_MS = 5 * 60 * 1000;
+
 export function useUserBaseWords() {
   const { address } = useAccount();
+  const publicClient = usePublicClient();
+  const queryClient = useQueryClient();
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['user-basewords', address],
     enabled: Boolean(address),
-    staleTime: 30_000,
+    staleTime: STALE_TIME_MS,
     queryFn: async (): Promise<AlchemyNft[]> => {
       if (!address) return [];
       const owned = await getUserBaseWords(address);
       return owned.map(applyCachedImage);
     },
   });
+
+  // Authoritative background refresh (throttled, progressive).
+  useEffect(() => {
+    if (!address || !publicClient) return;
+    void backgroundRefresh(address, publicClient, queryClient);
+  }, [address, publicClient, queryClient]);
+
+  return query;
 }
 
 interface BaseWordMeta {
@@ -114,8 +131,8 @@ interface BaseWordMeta {
 
 /**
  * Fetch a single token's on-chain tokenURI, pull the image data-URI out of
- * the decoded metadata, and cache it. Call after a save so the thumbnail
- * shows the new colors even though Alchemy's cache is still stale.
+ * the decoded metadata, and cache it. Used from the save/reset/invert
+ * flow in BaseWordEditor after the tx confirms.
  */
 export async function refreshBaseWordImage(
   tokenId: string | bigint,
@@ -129,27 +146,94 @@ export async function refreshBaseWordImage(
       functionName: 'tokenURI',
       args: [BigInt(tokenId)],
     })) as string;
-
-    // BaseWords tokenURI is a fully on-chain data URI — either base64 JSON
-    // or URI-encoded JSON. Decode it and pull out the `image` field.
-    let json: string | null = null;
-    if (uri.startsWith('data:application/json;base64,')) {
-      json = atob(uri.replace('data:application/json;base64,', ''));
-    } else if (uri.startsWith('data:application/json,')) {
-      json = decodeURIComponent(uri.replace('data:application/json,', ''));
-    }
-    if (!json) return false;
-
-    const meta = JSON.parse(json) as BaseWordMeta;
-    if (!meta.image) return false;
-
-    freshImageCache.set(idStr, {
-      image: meta.image,
-      name: meta.name ?? null,
-    });
-    persistCache();
-    return true;
+    return decodeAndCache(idStr, uri);
   } catch {
     return false;
   }
+}
+
+// ---------- Internal: bulk background refresh ----------
+
+const lastRefreshAt = new Map<string, number>();
+const REFRESH_INTERVAL_MS = STALE_TIME_MS;
+
+async function backgroundRefresh(
+  address: string,
+  publicClient: PublicClient,
+  queryClient: QueryClient
+): Promise<void> {
+  const key = address.toLowerCase();
+  const last = lastRefreshAt.get(key) ?? 0;
+  if (Date.now() - last < REFRESH_INTERVAL_MS) return;
+  lastRefreshAt.set(key, Date.now());
+
+  const owned = await getUserBaseWords(address);
+  if (!owned.length) return;
+
+  const contracts = owned.map((nft) => ({
+    address: BASEWORDS_ADDRESS,
+    abi: BASEWORDS_ABI,
+    functionName: 'tokenURI' as const,
+    args: [BigInt(nft.tokenId)] as const,
+  }));
+
+  let results;
+  try {
+    results = await retryOnce(() =>
+      publicClient.multicall({ contracts, allowFailure: true })
+    );
+  } catch {
+    return;
+  }
+
+  let anyUpdated = false;
+  for (let i = 0; i < owned.length; i++) {
+    const r = results[i];
+    if (r.status !== 'success' || !r.result) continue;
+    const nft = owned[i];
+    if (!decodeAndCache(nft.tokenId, r.result as string)) continue;
+    anyUpdated = true;
+    queryClient.setQueryData<AlchemyNft[]>(
+      ['user-basewords', address],
+      (prev) =>
+        prev
+          ? prev.map((n) => (n.tokenId === nft.tokenId ? applyCachedImage(n) : n))
+          : prev
+    );
+  }
+
+  if (anyUpdated) persistCache();
+}
+
+/** Decode a BaseWords data URI tokenURI and write it to the cache. */
+function decodeAndCache(tokenId: string, uri: string): boolean {
+  let json: string | null = null;
+  if (uri.startsWith('data:application/json;base64,')) {
+    try {
+      json = atob(uri.replace('data:application/json;base64,', ''));
+    } catch {
+      return false;
+    }
+  } else if (uri.startsWith('data:application/json,')) {
+    try {
+      json = decodeURIComponent(uri.replace('data:application/json,', ''));
+    } catch {
+      return false;
+    }
+  }
+  if (!json) return false;
+
+  let meta: BaseWordMeta;
+  try {
+    meta = JSON.parse(json) as BaseWordMeta;
+  } catch {
+    return false;
+  }
+  if (!meta.image) return false;
+
+  freshImageCache.set(tokenId, {
+    image: meta.image,
+    name: meta.name ?? null,
+  });
+  return true;
 }
