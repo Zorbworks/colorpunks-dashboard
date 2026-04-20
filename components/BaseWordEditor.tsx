@@ -219,26 +219,38 @@ export function BaseWordEditor({
       (error as { shortMessage?: string }).shortMessage) ||
       (error as Error).message);
 
+  // Build the preview SVG client-side from the current word list + preview
+  // colours. Using an <img> here (instead of HTML/CSS text) guarantees the
+  // canvas renders identically to the grid thumbnails — same font metrics,
+  // same sizing, no overflow.
+  const previewSvgUri = useMemo(
+    () =>
+      previewWords.length > 0
+        ? svgToDataUri(
+            buildBaseWordsSvg(previewWords, {
+              textColor: previewText,
+              bgColor: previewBg,
+            })
+          )
+        : null,
+    [previewWords, previewText, previewBg]
+  );
+
   return (
     <div className="bw-mint">
-      <div
-        className="bw-canvas"
-        style={{ backgroundColor: previewBg, borderColor: previewText }}
-      >
+      <div className="bw-canvas bw-canvas-borderless">
         {isLoading ? (
           <div className="bw-canvas-msg" style={{ color: previewText }}>
             LOADING…
           </div>
-        ) : (
-          <div
-            className="bw-canvas-readonly"
-            style={{ color: previewText }}
-          >
-            {previewWords.map((w, i) => (
-              <span key={i}>{w}</span>
-            ))}
-          </div>
-        )}
+        ) : previewSvgUri ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            className="bw-canvas-svg"
+            src={previewSvgUri}
+            alt={previewWords.join(' ')}
+          />
+        ) : null}
       </div>
 
       <div className="bw-toolbar">

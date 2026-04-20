@@ -338,33 +338,39 @@ img {
 }
 .punk {
   background: transparent;
-  border: 1px solid var(--rule);
+  border: none;
   cursor: pointer;
   padding: 0;
-  position: relative;
-  aspect-ratio: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
 }
-.punk.sel {
+.punk.sel .punk-img {
   outline: 2px solid var(--rule);
   outline-offset: 2px;
 }
-.punk img {
+.punk-img {
+  display: block;
+  aspect-ratio: 1;
+  width: 100%;
+  border: 1px solid var(--rule);
+  overflow: hidden;
+}
+.punk-img img {
   width: 100%;
   height: 100%;
   display: block;
 }
 .punk-num {
-  position: absolute;
-  bottom: 3px;
-  left: 3px;
   font-family: var(--font-ui);
-  font-size: 8px;
-  color: var(--fg);
-  background: var(--bg);
-  padding: 1px 3px;
-  border: 1px solid var(--rule);
-  letter-spacing: 0;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-align: center;
+  padding: 0;
 }
 .punk-group-label {
   font-family: var(--font-ui);
@@ -705,6 +711,16 @@ img {
 .chip.active {
   background: var(--fg);
   color: var(--bg);
+}
+/* Refresh-thumbnails chip — pushed to the far right of the WORDS row.
+   Square-ish with a larger glyph so the ↻ icon reads at a glance. */
+.chip-refresh {
+  margin-left: auto;
+  padding: 2px 7px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
 }
 .hue-swatch {
   width: 22px;
@@ -1270,6 +1286,17 @@ img {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 0 2px;
+}
+/* Editor canvas variant: borderless, renders the word as an SVG <img>
+   so it matches the grid thumbnails byte-for-byte. */
+.bw-canvas-borderless {
+  border: none;
+  background: transparent;
+}
+.bw-canvas-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 /* Read-only word render for the editor (colors come from inline style). */
 .bw-canvas-readonly {
