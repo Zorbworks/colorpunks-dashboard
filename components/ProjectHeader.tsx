@@ -12,7 +12,7 @@ interface Props {
 
 const LABELS: Record<Project, string> = {
   basewords: 'BASEWORDS',
-  colorpunks: 'COLOR PUNKS',
+  colorpunks: 'COLORPUNKS',
 };
 
 const OPENSEA: Record<Project, string> = {

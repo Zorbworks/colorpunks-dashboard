@@ -98,10 +98,12 @@ function PunkButton({
       onClick={() => onSelect(punk)}
       title={punk.name ?? `#${punk.tokenId}`}
     >
-      {src ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt={punk.name ?? `Punk ${punk.tokenId}`} />
-      ) : null}
+      <span className="punk-img">
+        {src ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={src} alt={punk.name ?? `Punk ${punk.tokenId}`} />
+        ) : null}
+      </span>
       {!hideLabel && <span className="punk-num">#{punk.tokenId}</span>}
     </button>
   );
