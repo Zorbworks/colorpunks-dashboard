@@ -26,6 +26,10 @@ interface Props {
   onEditTargetChange: (t: EditTarget) => void;
   /** The wallet's owned BaseColors — used to resolve hex → tokenId for saves. */
   ownedColors: UserColor[];
+  /** Pool the RANDOM button draws from. Normally the currently-filtered
+   *  BaseColors (so hue/tone filters constrain the roll) or the active
+   *  Palette's colours when one is open. */
+  randomPool: UserColor[];
 }
 
 export function BaseWordEditor({
@@ -37,6 +41,7 @@ export function BaseWordEditor({
   editTarget,
   onEditTargetChange,
   ownedColors,
+  randomPool,
 }: Props) {
   const qc = useQueryClient();
   const publicClient = usePublicClient();
@@ -194,8 +199,12 @@ export function BaseWordEditor({
   };
 
   const handleRandom = () => {
-    if (ownedColors.length < 2) return;
-    const shuffled = [...ownedColors].sort(() => Math.random() - 0.5);
+    // Draw from the current random pool (filtered BaseColors or, when a
+    // Palette is open, that palette's colours). Fall back to all owned
+    // colours if the pool is too small to pick two distinct hexes.
+    const pool = randomPool.length >= 2 ? randomPool : ownedColors;
+    if (pool.length < 2) return;
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
     const [a, b] = shuffled;
     onTextColorChange(a.color);
     onBgColorChange(b.color);

@@ -551,6 +551,17 @@ export function ProjectPage({ project }: Props) {
                     editTarget={bwEditTarget}
                     onEditTargetChange={setBwEditTarget}
                     ownedColors={rawColors ?? []}
+                    randomPool={
+                      activePalette
+                        ? activePalette.colors.map((c) => ({
+                            tokenId: '',
+                            color: c.hex,
+                            name: c.name,
+                            isNamed: c.isNamed,
+                            image: null,
+                          }))
+                        : filtered
+                    }
                   />
                 ) : (
                   <BaseWordsMintForm />
