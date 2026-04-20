@@ -12,7 +12,6 @@ import {
   setBaseWordImage,
 } from '@/hooks/useUserBaseWords';
 import { buildBaseWordsSvg, svgToDataUri } from '@/lib/basewords';
-import { BASEWORDS_ADDRESS } from '@/lib/contracts';
 
 export type EditTarget = 'text' | 'bg';
 
@@ -294,26 +293,6 @@ export function BaseWordEditor({
       </button>
 
       {error && <div className="save-status error">{errorText}</div>}
-
-      {isSuccess && hash && (
-        <div className="save-status success">
-          SAVED.
-          <a
-            href={`https://basescan.org/tx/${hash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            TX
-          </a>
-          <a
-            href={`https://opensea.io/assets/base/${BASEWORDS_ADDRESS}/${tokenId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            OPENSEA
-          </a>
-        </div>
-      )}
     </div>
   );
 }
