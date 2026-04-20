@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { AboutModal } from './AboutModal';
 import { RecentModal } from './RecentModal';
+import { FarcasterIcon } from './FarcasterIcon';
 import { BASEWORDS_ADDRESS, COLOR_PUNKS_ADDRESS } from '@/lib/contracts';
 import type { Project } from './ProjectPage';
 
@@ -34,6 +35,13 @@ export function ProjectHeader({ project }: Props) {
       <section className="project-header">
         <h1 className="project-title">{LABELS[project]}</h1>
         <div className="project-nav">
+          <button
+            type="button"
+            className="opensea-btn"
+            onClick={() => setAboutOpen(true)}
+          >
+            ABOUT
+          </button>
           <a
             className="opensea-btn"
             href={OPENSEA[project]}
@@ -42,14 +50,6 @@ export function ProjectHeader({ project }: Props) {
           >
             OPENSEA
           </a>
-          <a
-            className="opensea-btn"
-            href={FARCASTER[project]}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            FARCASTER
-          </a>
           <button
             type="button"
             className="opensea-btn"
@@ -57,13 +57,16 @@ export function ProjectHeader({ project }: Props) {
           >
             RECENT
           </button>
-          <button
-            type="button"
-            className="opensea-btn"
-            onClick={() => setAboutOpen(true)}
+          <a
+            className="opensea-btn opensea-btn-icon"
+            href={FARCASTER[project]}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Farcaster channel"
+            title="Farcaster channel"
           >
-            ABOUT
-          </button>
+            <FarcasterIcon size={14} />
+          </a>
         </div>
       </section>
 

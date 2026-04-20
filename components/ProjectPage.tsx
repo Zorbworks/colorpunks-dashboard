@@ -18,6 +18,7 @@ import { PaletteBrowser } from '@/components/PaletteBrowser';
 import { BaseWordsMintForm } from '@/components/BaseWordsMintForm';
 import { ProjectHeader } from '@/components/ProjectHeader';
 import { ShareModal } from '@/components/ShareModal';
+import { FarcasterIcon } from '@/components/FarcasterIcon';
 import { buildBaseWordsSvg, svgToDataUri } from '@/lib/basewords';
 import { BaseWordEditor, type EditTarget } from '@/components/BaseWordEditor';
 import {
@@ -590,43 +591,32 @@ export function ProjectPage({ project }: Props) {
                   PALETTES
                 </button>
               </div>
-            </div>
-            <div className="rail-links">
-              {colorsTab === 'colors' ? (
-                <>
-                  <a
-                    href="https://www.basecolors.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    MINT ↗
-                  </a>
-                  <a
-                    href="https://farcaster.xyz/~/channel/basecolors"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    FARCASTER ↗
-                  </a>
-                </>
-              ) : (
-                <>
-                  <a
-                    href="https://www.palettes.fun"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    MINT ↗
-                  </a>
-                  <a
-                    href="https://farcaster.xyz/~/channel/palettes"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    FARCASTER ↗
-                  </a>
-                </>
-              )}
+              <a
+                className="center-tab"
+                href={
+                  colorsTab === 'colors'
+                    ? 'https://www.basecolors.com'
+                    : 'https://www.palettes.fun'
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GET MORE
+              </a>
+              <a
+                className="center-tab opensea-btn-icon"
+                href={
+                  colorsTab === 'colors'
+                    ? 'https://farcaster.xyz/~/channel/basecolors'
+                    : 'https://farcaster.xyz/~/channel/palettes'
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Farcaster channel"
+                title="Farcaster channel"
+              >
+                <FarcasterIcon size={14} />
+              </a>
             </div>
             {colorsTab === 'colors' && (
               <ColorFilters filters={filters} onChange={setFilters} />
