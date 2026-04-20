@@ -400,7 +400,11 @@ export function ProjectPage({ project }: Props) {
         <section className="center">
           <div className="center-head">
             <span>
-              {project === 'colorpunks' ? '[02] CANVAS' : '[02] MINT'}
+              {project === 'colorpunks'
+                ? '[02] CANVAS'
+                : selectedBaseWord
+                  ? '[02] COLOR'
+                  : '[02] MINT'}
             </span>
             {project === 'colorpunks' && (
               <div className="center-tabs">

@@ -452,9 +452,14 @@ img {
   border: 1px solid var(--rule);
 }
 .center-head {
-  display: flex;
-  justify-content: space-between;
+  /* 3-column grid: [title][tabs][right-label]. Using grid with fixed
+     1fr outer columns keeps the center tabs anchored to the dead-centre
+     of the row — they don't shift when the right-side label switches
+     between e.g. "BASEWORDS" and "#2341". */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
+  gap: 8px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--rule);
   flex-shrink: 0;
@@ -464,6 +469,9 @@ img {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin-bottom: 0;
+}
+.center-head > :last-child {
+  justify-self: end;
 }
 .center-head b {
   font-weight: 600;
