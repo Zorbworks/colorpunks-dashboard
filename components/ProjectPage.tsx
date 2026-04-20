@@ -421,7 +421,7 @@ export function ProjectPage({ project }: Props) {
                     setCenterTab('details');
                   }}
                 >
-                  DETAILS
+                  METADATA
                 </button>
               </div>
             )}
@@ -439,7 +439,7 @@ export function ProjectPage({ project }: Props) {
                   className={`center-tab${bwCenterTab === 'details' ? ' active' : ''}`}
                   onClick={() => setBwCenterTab('details')}
                 >
-                  DETAILS
+                  METADATA
                 </button>
                 <button
                   type="button"

@@ -198,6 +198,7 @@ img {
   border: none;
   text-decoration: none;
   flex-shrink: 0;
+  margin-left: 10px;
 }
 .fc-dot:hover { opacity: 0.85; }
 /* Push the rail's primary tab group to the right of the head-row so
@@ -1313,7 +1314,10 @@ img {
   text-transform: uppercase;
   font-family: Helvetica, Arial, sans-serif;
   font-weight: 700;
-  font-size: 9.5cqw; /* fixed — matches BASEWORDS_FONT_SIZE / VIEW = 95/1000 */
+  /* HTML text renders wider than SVG text at the same ratio (font fallback +
+     kerning differences). Nudge down so a 15-char word fits, matching the
+     grid thumbnails which render via SVG at 9.5% of the viewBox. */
+  font-size: 8cqw;
   line-height: 1.1;
   color: #0052FF;
   letter-spacing: 0;
