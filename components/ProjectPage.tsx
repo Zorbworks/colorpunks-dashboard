@@ -591,6 +591,43 @@ export function ProjectPage({ project }: Props) {
                 </button>
               </div>
             </div>
+            <div className="rail-links">
+              {colorsTab === 'colors' ? (
+                <>
+                  <a
+                    href="https://www.basecolors.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    MINT ↗
+                  </a>
+                  <a
+                    href="https://farcaster.xyz/~/channel/basecolors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    FARCASTER ↗
+                  </a>
+                </>
+              ) : (
+                <>
+                  <a
+                    href="https://www.palettes.fun"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    MINT ↗
+                  </a>
+                  <a
+                    href="https://farcaster.xyz/~/channel/palettes"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    FARCASTER ↗
+                  </a>
+                </>
+              )}
+            </div>
             {colorsTab === 'colors' && (
               <ColorFilters filters={filters} onChange={setFilters} />
             )}

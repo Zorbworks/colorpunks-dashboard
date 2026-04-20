@@ -20,6 +20,11 @@ const OPENSEA: Record<Project, string> = {
   colorpunks: `https://opensea.io/assets/base/${COLOR_PUNKS_ADDRESS}`,
 };
 
+const FARCASTER: Record<Project, string> = {
+  basewords: 'https://farcaster.xyz/~/channel/basewords',
+  colorpunks: 'https://farcaster.xyz/~/channel/colorpunks',
+};
+
 export function ProjectHeader({ project }: Props) {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [recentOpen, setRecentOpen] = useState(false);
@@ -36,6 +41,14 @@ export function ProjectHeader({ project }: Props) {
             rel="noopener noreferrer"
           >
             OPENSEA
+          </a>
+          <a
+            className="opensea-btn"
+            href={FARCASTER[project]}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            FARCASTER
           </a>
           <button
             type="button"
