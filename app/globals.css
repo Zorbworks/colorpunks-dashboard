@@ -1306,12 +1306,12 @@ img {
 }
 .bw-new.active {
   background: #0052FF;
-  color: var(--bg);
+  color: #fff;
   border-style: solid;
 }
 .bw-new:hover:not(.active) {
   background: #0052FF;
-  color: var(--bg);
+  color: #fff;
   border-style: solid;
 }
 .bw-status {
