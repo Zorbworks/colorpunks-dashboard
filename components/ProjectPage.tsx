@@ -375,6 +375,7 @@ export function ProjectPage({ project }: Props) {
                 isLoading={baseWordsLoading}
                 loadingLabel="LOADING BASEWORDS…"
                 emptyLabel="NO BASEWORDS IN WALLET — MINT ONE"
+                hideLabel
               />
             )}
           </div>

@@ -11,6 +11,8 @@ interface Props {
   groups?: { value: string; punks: AlchemyNft[] }[] | null;
   loadingLabel?: string;
   emptyLabel?: string;
+  /** Hide the tokenId bar inside each tile — leaves just the square image. */
+  hideLabel?: boolean;
 }
 
 export function PunkSelector({
@@ -21,6 +23,7 @@ export function PunkSelector({
   groups,
   loadingLabel = 'LOADING PUNKS…',
   emptyLabel = 'NO COLORPUNKS IN WALLET',
+  hideLabel = false,
 }: Props) {
   if (isLoading) {
     return <div className="empty-rail">{loadingLabel}</div>;
@@ -46,6 +49,7 @@ export function PunkSelector({
                   punk={punk}
                   isSelected={punk.tokenId === selectedTokenId}
                   onSelect={onSelect}
+                  hideLabel={hideLabel}
                 />
               ))}
             </div>
@@ -64,6 +68,7 @@ export function PunkSelector({
           punk={punk}
           isSelected={punk.tokenId === selectedTokenId}
           onSelect={onSelect}
+          hideLabel={hideLabel}
         />
       ))}
     </div>
@@ -74,10 +79,12 @@ function PunkButton({
   punk,
   isSelected,
   onSelect,
+  hideLabel,
 }: {
   punk: AlchemyNft;
   isSelected: boolean;
   onSelect: (punk: AlchemyNft) => void;
+  hideLabel?: boolean;
 }) {
   const src = resolveImageUrl(
     punk.image?.cachedUrl ??
@@ -95,7 +102,7 @@ function PunkButton({
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={punk.name ?? `Punk ${punk.tokenId}`} />
       ) : null}
-      <span className="punk-num">#{punk.tokenId}</span>
+      {!hideLabel && <span className="punk-num">#{punk.tokenId}</span>}
     </button>
   );
 }
