@@ -17,6 +17,8 @@ import { PunkFilters } from '@/components/PunkFilters';
 import { PaletteBrowser } from '@/components/PaletteBrowser';
 import { BaseWordsMintForm } from '@/components/BaseWordsMintForm';
 import { ProjectHeader } from '@/components/ProjectHeader';
+import { ShareModal } from '@/components/ShareModal';
+import { buildBaseWordsSvg, svgToDataUri } from '@/lib/basewords';
 import { BaseWordEditor, type EditTarget } from '@/components/BaseWordEditor';
 import {
   BaseWordFilters,
@@ -69,6 +71,7 @@ export function ProjectPage({ project }: Props) {
   const [bwSort, setBwSort] = useState<BaseWordSort>('recent');
   const [bwWordCount, setBwWordCount] = useState<WordCountFilter>('all');
   const [bwCenterTab, setBwCenterTab] = useState<'canvas' | 'details'>('canvas');
+  const [shareOpen, setShareOpen] = useState(false);
   const { data: rawColors, isLoading: colorsLoading } = useUserColors();
   const { data: palettes, isLoading: palettesLoading } = useUserPalettes();
   const { data: punkSortData } = usePunkSortData();
@@ -236,6 +239,54 @@ export function ProjectPage({ project }: Props) {
   const punkCount = punks?.length ?? 0;
   const allColorCount = rawColors?.length ?? 0;
 
+  // ---- BaseWord share + download helpers ----
+  // Resolve the colours currently shown in the canvas (preview-priority)
+  // and look up friendly BaseColor names for the share caption.
+  const shareData = useMemo(() => {
+    if (!selectedBaseWord || !selectedBaseWordData) return null;
+    const toHex = (v: string | null | undefined) => {
+      if (!v) return null;
+      const t = v.trim();
+      if (/^#[0-9A-Fa-f]{6}$/.test(t)) return t.toUpperCase();
+      if (/^[0-9A-Fa-f]{6}$/.test(t)) return `#${t.toUpperCase()}`;
+      return null;
+    };
+    const textHex =
+      bwTextColor ?? toHex(selectedBaseWordData.textColor) ?? '#0052FF';
+    const bgHex =
+      bwBgColor ?? toHex(selectedBaseWordData.backgroundColor) ?? '#FFFFFF';
+    const nameByHex = new Map<string, string>();
+    for (const c of rawColors ?? []) {
+      if (c.isNamed) nameByHex.set(c.color.toUpperCase(), c.name);
+    }
+    const textName = nameByHex.get(textHex.toUpperCase()) ?? textHex;
+    const bgName = nameByHex.get(bgHex.toUpperCase()) ?? bgHex;
+    const words = selectedBaseWordData.words;
+    // Placeholder caption — easy to edit later.
+    const shareText =
+      `Just crafted "${words.join(' / ')}" on BaseWords — ` +
+      `${textName} text on ${bgName} background. ` +
+      `Mint yours at basewords.xyz`;
+    const svg = buildBaseWordsSvg(words, {
+      textColor: textHex,
+      bgColor: bgHex,
+    });
+    return { shareText, svg, tokenId: selectedBaseWord.tokenId, words };
+  }, [selectedBaseWord, selectedBaseWordData, bwTextColor, bwBgColor, rawColors]);
+
+  const handleDownloadSvg = () => {
+    if (!shareData) return;
+    const blob = new Blob([shareData.svg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `baseword-${shareData.tokenId}.svg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <>
       <ProjectHeader project={project} />
@@ -359,6 +410,32 @@ export function ProjectPage({ project }: Props) {
                   onClick={() => setBwCenterTab('details')}
                 >
                   DETAILS
+                </button>
+                <button
+                  type="button"
+                  className="center-tab"
+                  onClick={() => setShareOpen(true)}
+                  disabled={!shareData}
+                  title={
+                    shareData
+                      ? 'Share this BaseWord'
+                      : 'Select a BaseWord to share'
+                  }
+                >
+                  SHARE
+                </button>
+                <button
+                  type="button"
+                  className="center-tab"
+                  onClick={handleDownloadSvg}
+                  disabled={!shareData}
+                  title={
+                    shareData
+                      ? 'Download SVG'
+                      : 'Select a BaseWord to download'
+                  }
+                >
+                  DOWNLOAD
                 </button>
               </div>
             )}
@@ -558,6 +635,14 @@ export function ProjectPage({ project }: Props) {
           </div>
         </aside>
       </main>
+
+      {shareData && (
+        <ShareModal
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          shareText={shareData.shareText}
+        />
+      )}
 
       <Footer />
     </>

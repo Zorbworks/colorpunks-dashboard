@@ -1037,6 +1037,46 @@ img {
   text-underline-offset: 2px;
 }
 .about-links a:hover { color: var(--muted); }
+
+/* ---------- SHARE MODAL ---------- */
+.share-preview {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 12px;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--fg);
+  margin-bottom: 16px;
+}
+.share-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.share-btn {
+  background: var(--fg);
+  color: var(--bg);
+  border: 1px solid var(--rule);
+  padding: 10px;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.share-btn:hover {
+  background: var(--bg);
+  color: var(--fg);
+}
+.share-hint {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 12px;
+  line-height: 1.5;
+}
 .about-credits {
   display: flex;
   flex-direction: column;
