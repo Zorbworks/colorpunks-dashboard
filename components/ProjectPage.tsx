@@ -276,7 +276,7 @@ export function ProjectPage({ project }: Props) {
                 />
                 <button
                   type="button"
-                  className={`bw-new${selectedBaseWord === null ? ' active' : ''}`}
+                  className={`bw-new${selectedBaseWord ? ' active' : ''}`}
                   onClick={() => {
                     setSelectedBaseWord(null);
                     setBwCenterTab('canvas');
