@@ -8,6 +8,10 @@ interface Props {
   onSortChange: (s: BaseWordSort) => void;
   wordCount: WordCountFilter;
   onWordCountChange: (w: WordCountFilter) => void;
+  /** Optional — when provided, a small refresh icon is rendered at the
+   *  far right of the WORDS row. Used by the left-rail grid to resync
+   *  thumbnails after a cancelled tx or an edit from another device. */
+  onRefresh?: () => void;
 }
 
 const SORTS: { key: BaseWordSort; label: string }[] = [
@@ -28,6 +32,7 @@ export function BaseWordFilters({
   onSortChange,
   wordCount,
   onWordCountChange,
+  onRefresh,
 }: Props) {
   return (
     <>
@@ -60,6 +65,17 @@ export function BaseWordFilters({
             </button>
           ))}
         </div>
+        {onRefresh && (
+          <button
+            type="button"
+            className="chip chip-refresh"
+            onClick={onRefresh}
+            title="Refresh thumbnails from the chain"
+            aria-label="Refresh thumbnails"
+          >
+            ↻
+          </button>
+        )}
       </div>
     </>
   );

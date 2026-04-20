@@ -338,39 +338,43 @@ img {
 }
 .punk {
   background: transparent;
-  border: none;
+  border: 1px solid var(--rule);
   cursor: pointer;
   padding: 0;
+  position: relative;
+  aspect-ratio: 1;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 3px;
+  overflow: hidden;
 }
-.punk.sel .punk-img {
+.punk.sel {
   outline: 2px solid var(--rule);
   outline-offset: 2px;
 }
-.punk-img {
-  display: block;
-  aspect-ratio: 1;
-  width: 100%;
-  border: 1px solid var(--rule);
-  overflow: hidden;
-}
-.punk-img img {
+.punk img {
   width: 100%;
   height: 100%;
   display: block;
 }
+/* Bottom-bar label — mirrors .color-name on the BaseColors palette so
+   the two grids read as the same component. */
 .punk-num {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   font-family: var(--font-ui);
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--muted);
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--fg);
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  border-top: 1px solid var(--rule);
   text-align: center;
-  padding: 0;
+  padding: 3px 3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .punk-group-label {
   font-family: var(--font-ui);
@@ -1355,21 +1359,24 @@ img {
 }
 /* "NEW WORD" chip that sits above the BaseWords list in the left rail. */
 .bw-new {
-  display: block;
+  display: flex;
   width: 100%;
+  align-items: center;
+  justify-content: center;
   background: var(--bg);
   color: #0052FF;
   border: 1px dashed #0052FF;
-  padding: 12px;
+  padding: 0 10px;
+  height: 24px;
   font-family: var(--font-ui);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
   text-align: center;
-  line-height: 1.2;
-  margin-top: 10px;
+  line-height: 1;
+  margin-top: 6px;
 }
 .bw-new.active {
   background: #0052FF;

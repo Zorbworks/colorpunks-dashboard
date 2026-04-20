@@ -124,6 +124,19 @@ export function useUserBaseWords() {
   return query;
 }
 
+/**
+ * Force-run the background refresh now, bypassing the throttle. Used by
+ * the left-rail refresh button so the user can resync the grid after a
+ * cancelled tx, a save from another device, etc.
+ */
+export function refreshAllBaseWordImages(
+  address: string,
+  publicClient: PublicClient,
+  queryClient: QueryClient
+): Promise<void> {
+  return backgroundRefresh(address, publicClient, queryClient, true);
+}
+
 interface BaseWordMeta {
   name?: string;
   image?: string;
@@ -160,11 +173,14 @@ const REFRESH_INTERVAL_MS = STALE_TIME_MS;
 async function backgroundRefresh(
   address: string,
   publicClient: PublicClient,
-  queryClient: QueryClient
+  queryClient: QueryClient,
+  force = false
 ): Promise<void> {
   const key = address.toLowerCase();
-  const last = lastRefreshAt.get(key) ?? 0;
-  if (Date.now() - last < REFRESH_INTERVAL_MS) return;
+  if (!force) {
+    const last = lastRefreshAt.get(key) ?? 0;
+    if (Date.now() - last < REFRESH_INTERVAL_MS) return;
+  }
   lastRefreshAt.set(key, Date.now());
 
   const owned = await getUserBaseWords(address);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, usePublicClient } from 'wagmi';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { ConnectButton } from '@/components/ConnectButton';
@@ -27,7 +27,10 @@ import {
 } from '@/components/BaseWordFilters';
 
 import { useUserPunks, invalidateFreshImage } from '@/hooks/useUserPunks';
-import { useUserBaseWords } from '@/hooks/useUserBaseWords';
+import {
+  useUserBaseWords,
+  refreshAllBaseWordImages,
+} from '@/hooks/useUserBaseWords';
 import { useBaseWordsMeta } from '@/hooks/useBaseWordsMeta';
 import { useBaseWordData } from '@/hooks/useBaseWordData';
 import { BaseWordPalette } from '@/components/BaseWordPalette';
@@ -61,6 +64,7 @@ interface Props {
 
 export function ProjectPage({ project }: Props) {
   const { isConnected, address } = useAccount();
+  const publicClient = usePublicClient();
 
   const { data: punks, isLoading: punksLoading } = useUserPunks();
   const { data: baseWords, isLoading: baseWordsLoading } = useUserBaseWords();
@@ -324,6 +328,16 @@ export function ProjectPage({ project }: Props) {
                   onSortChange={setBwSort}
                   wordCount={bwWordCount}
                   onWordCountChange={setBwWordCount}
+                  onRefresh={
+                    address && publicClient
+                      ? () =>
+                          void refreshAllBaseWordImages(
+                            address,
+                            publicClient,
+                            queryClient
+                          )
+                      : undefined
+                  }
                 />
                 <button
                   type="button"
