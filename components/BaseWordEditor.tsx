@@ -132,18 +132,45 @@ export function BaseWordEditor({
     qc.invalidateQueries({ queryKey: ['user-basewords'] });
   };
 
+  const DEFAULT_TEXT = '#0052FF';
+  const DEFAULT_BG = '#FFFFFF';
+
   const handleSave = () => {
     if (!anyChanged) return;
+    if (sameColor) return; // belt-and-braces — picker already blocks this
+
+    const targetText = (textChanged ? textColor : savedText)?.toUpperCase() ?? null;
+    const targetBg = (bgChanged ? bgColor : savedBg)?.toUpperCase() ?? null;
+
     const textId = textChanged && textColor
       ? colorByHex.get(textColor.toUpperCase())?.tokenId ?? null
       : null;
     const bgId = bgChanged && bgColor
       ? colorByHex.get(bgColor.toUpperCase())?.tokenId ?? null
       : null;
-    // Guard: user must own the BaseColor for the hex they picked.
-    if (textChanged && !textId) return;
-    if (bgChanged && !bgId) return;
-    if (sameColor) return; // belt-and-braces — picker already blocks this
+    const missingTextId = textChanged && !textId;
+    const missingBgId = bgChanged && !bgId;
+
+    // Fallback path — target is the default pair and user doesn't own
+    // the BaseColors to pay for it. Use the contract's lightweight
+    // toggle / reset instead of updateAllColors so the save still works.
+    if (missingTextId || missingBgId) {
+      if (targetText === DEFAULT_BG && targetBg === DEFAULT_TEXT) {
+        // Target = inverted default (white-on-blue)
+        optimisticThumbnail(DEFAULT_BG, DEFAULT_TEXT);
+        invert(tokenId);
+        return;
+      }
+      if (targetText === DEFAULT_TEXT && targetBg === DEFAULT_BG) {
+        // Target = default (blue-on-white)
+        optimisticThumbnail(DEFAULT_TEXT, DEFAULT_BG);
+        reset(tokenId);
+        return;
+      }
+      // Can't resolve BaseColor ownership for the picked hex — bail.
+      return;
+    }
+
     optimisticThumbnail(
       textChanged ? textColor : savedText,
       bgChanged ? bgColor : savedBg
@@ -152,13 +179,19 @@ export function BaseWordEditor({
   };
 
   const handleReset = () => {
-    optimisticThumbnail('#0052FF', '#FFFFFF');
+    optimisticThumbnail(DEFAULT_TEXT, DEFAULT_BG);
     reset(tokenId);
   };
 
+  // Local-only preview swap. No wallet — SAVE commits via the normal
+  // updateAllColors path, or falls back to invertDefaultColors /
+  // resetColors when the target is a default pair the user doesn't
+  // own as BaseColor NFTs.
   const handleInvert = () => {
-    optimisticThumbnail('#FFFFFF', '#0052FF');
-    invert(tokenId);
+    const currentText = textColor ?? savedText ?? DEFAULT_TEXT;
+    const currentBg = bgColor ?? savedBg ?? DEFAULT_BG;
+    onTextColorChange(currentBg);
+    onBgColorChange(currentText);
   };
 
   const handleRandom = () => {
@@ -228,8 +261,7 @@ export function BaseWordEditor({
           type="button"
           className="bw-tool"
           onClick={handleInvert}
-          disabled={isPending || isConfirming}
-          title="Swap to default inverted (white-on-blue)"
+          title="Swap text and background colors — preview only; click SAVE to commit"
         >
           INVERT
         </button>
