@@ -600,7 +600,7 @@ export function ProjectPage({ project }: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                GET MORE <span aria-hidden="true">↗</span>
+                GET MORE
               </a>
               <a
                 className="fc-dot"
@@ -614,7 +614,7 @@ export function ProjectPage({ project }: Props) {
                 aria-label="Farcaster channel"
                 title="Farcaster channel"
               >
-                <FarcasterIcon size={12} />
+                <FarcasterIcon size={10} />
               </a>
               <div className="center-tabs rail-tabs-right">
                 <button
