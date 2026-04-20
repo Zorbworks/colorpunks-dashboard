@@ -59,6 +59,7 @@ export function ColorPalette({
             style={{ backgroundColor: c.color }}
             title={tooltip}
             aria-label={tooltip}
+            data-color-hex={c.color.toUpperCase()}
             disabled={isDisabled}
             onClick={() => !isDisabled && onSelect(c.color)}
           >

@@ -279,6 +279,20 @@ export function ProjectPage({ project }: Props) {
     return { shareText, svg, tokenId: selectedBaseWord.tokenId, words };
   }, [selectedBaseWord, selectedBaseWordData, bwTextColor, bwBgColor, rawColors]);
 
+  /** Scroll the BASECOLORS grid to the swatch matching `hex`. Used when the
+   *  user picks a colour in the BaseWord DETAILS panel — the rail may need
+   *  to switch back to the BASE COLORS tab first, so we defer the scroll to
+   *  the next frame after state flushes. */
+  const scrollToColorSwatch = (hex: string) => {
+    const target = hex.toUpperCase();
+    requestAnimationFrame(() => {
+      const el = document.querySelector<HTMLElement>(
+        `[data-color-hex="${target}"]`
+      );
+      el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+  };
+
   const handleDownloadSvg = () => {
     if (!shareData) return;
     const blob = new Blob([shareData.svg], { type: 'image/svg+xml' });
@@ -552,10 +566,14 @@ export function ProjectPage({ project }: Props) {
                   onPickText={(hex) => {
                     setBwEditTarget('text');
                     setBwTextColor(hex);
+                    setColorsTab('colors');
+                    scrollToColorSwatch(hex);
                   }}
                   onPickBg={(hex) => {
                     setBwEditTarget('bg');
                     setBwBgColor(hex);
+                    setColorsTab('colors');
+                    scrollToColorSwatch(hex);
                   }}
                 />
               </div>
@@ -573,7 +591,7 @@ export function ProjectPage({ project }: Props) {
                   : `[03] PALETTES · ${String(palettes?.length ?? 0).padStart(2, '0')}`}
               </h2>
               <a
-                className="center-tab"
+                className="rail-text-link"
                 href={
                   colorsTab === 'colors'
                     ? 'https://www.basecolors.com'
@@ -582,7 +600,7 @@ export function ProjectPage({ project }: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                GET MORE
+                GET MORE <span aria-hidden="true">↗</span>
               </a>
               <a
                 className="fc-dot"
