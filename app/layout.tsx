@@ -41,6 +41,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://cwoma.tools'),
   title: 'ColorPunks Toolbox — Power Tools for ColorPunk Collectors',
   description:
     'Paint your ColorPunks with your BaseColors. On-chain coloring book on Base mainnet.',
