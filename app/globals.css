@@ -170,6 +170,27 @@ img {
   padding: 2px 6px;
   line-height: 1;
 }
+/* Small round purple Farcaster badge — the icon inside uses
+   currentColor so setting color: #fff here paints it white. */
+.fc-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #855DCD;
+  color: #fff;
+  border: none;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.fc-dot:hover { opacity: 0.85; }
+/* Push the rail's primary tab group to the right of the head-row so
+   GET MORE + Farcaster dot flow from the title. */
+.rail-tabs-right {
+  margin-left: auto;
+}
 .rail-connect {
   display: flex;
   flex-direction: column;

@@ -572,7 +572,33 @@ export function ProjectPage({ project }: Props) {
                   ? `[03] BASECOLORS · ${String(filtered.length).padStart(2, '0')} / ${String(allColorCount).padStart(2, '0')}`
                   : `[03] PALETTES · ${String(palettes?.length ?? 0).padStart(2, '0')}`}
               </h2>
-              <div className="center-tabs">
+              <a
+                className="center-tab"
+                href={
+                  colorsTab === 'colors'
+                    ? 'https://www.basecolors.com'
+                    : 'https://www.palettes.fun'
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GET MORE
+              </a>
+              <a
+                className="fc-dot"
+                href={
+                  colorsTab === 'colors'
+                    ? 'https://farcaster.xyz/~/channel/basecolors'
+                    : 'https://farcaster.xyz/~/channel/palettes'
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Farcaster channel"
+                title="Farcaster channel"
+              >
+                <FarcasterIcon size={12} />
+              </a>
+              <div className="center-tabs rail-tabs-right">
                 <button
                   type="button"
                   className={`center-tab${colorsTab === 'colors' ? ' active' : ''}`}
@@ -591,32 +617,6 @@ export function ProjectPage({ project }: Props) {
                   PALETTES
                 </button>
               </div>
-              <a
-                className="center-tab"
-                href={
-                  colorsTab === 'colors'
-                    ? 'https://www.basecolors.com'
-                    : 'https://www.palettes.fun'
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GET MORE
-              </a>
-              <a
-                className="center-tab opensea-btn-icon"
-                href={
-                  colorsTab === 'colors'
-                    ? 'https://farcaster.xyz/~/channel/basecolors'
-                    : 'https://farcaster.xyz/~/channel/palettes'
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Farcaster channel"
-                title="Farcaster channel"
-              >
-                <FarcasterIcon size={14} />
-              </a>
             </div>
             {colorsTab === 'colors' && (
               <ColorFilters filters={filters} onChange={setFilters} />
