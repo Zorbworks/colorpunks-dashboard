@@ -1322,10 +1322,11 @@ img {
   text-transform: uppercase;
   font-family: Helvetica, Arial, sans-serif;
   font-weight: 700;
-  /* HTML text renders wider than SVG text at the same ratio (font fallback +
-     kerning differences). Nudge down so a 15-char word fits, matching the
-     grid thumbnails which render via SVG at 9.5% of the viewBox. */
-  font-size: 8cqw;
+  /* Match the on-chain SVG proportions: font-size 46 in a 600 viewBox
+     ≈ 7.67% of container width. 7.5cqw leaves a small safety margin so
+     a 15-character word stays inside the frame even if Arial is the
+     fallback (wider than Helvetica). */
+  font-size: 7.5cqw;
   line-height: 1.1;
   color: #0052FF;
   letter-spacing: 0;
