@@ -78,11 +78,10 @@ img {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 0 0 10px;
-  margin: 0 -16px 0;
-  padding-left: 16px;
-  padding-right: 16px;
-  border-bottom: 1px solid var(--rule);
+  padding: 6px 16px;
+  /* Break out of .page's 10px/16px padding so the background colour
+     bleeds to the viewport edges and the top of the page. */
+  margin: -10px -16px 0;
 }
 .topbar-title {
   font-family: var(--font-title);
