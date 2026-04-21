@@ -1,5 +1,7 @@
 'use client';
 
+import { RefreshIcon } from './RefreshIcon';
+
 export type BaseWordSort = 'recent' | 'oldest' | 'colored';
 export type WordCountFilter = 'all' | 1 | 2 | 3;
 
@@ -73,7 +75,7 @@ export function BaseWordFilters({
             title="Refresh thumbnails from the chain"
             aria-label="Refresh thumbnails"
           >
-            ↻
+            <RefreshIcon size={12} />
           </button>
         )}
       </div>

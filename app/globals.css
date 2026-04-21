@@ -772,11 +772,12 @@ img {
    Square-ish with a larger glyph so the ↻ icon reads at a glance. */
 .chip-refresh {
   margin-left: auto;
-  padding: 2px 7px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 0 6px;
   line-height: 1;
   letter-spacing: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .hue-swatch {
   width: 22px;

@@ -1,13 +1,40 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ConnectButton } from './ConnectButton';
 import { ThemeToggle } from './ThemeToggle';
 
+/** Complementary RGB/CMY colour pairs. Picking one at random on mount
+ *  gives a fresh "theme" on every page reload — bg and text are always
+ *  each other's complement (RGB → CMY or vice versa). */
+const PAIRS: Array<{ bg: string; fg: string }> = [
+  { bg: '#FF0000', fg: '#00FFFF' }, // red / cyan
+  { bg: '#00FF00', fg: '#FF00FF' }, // green / magenta
+  { bg: '#0000FF', fg: '#FFFF00' }, // blue / yellow
+  { bg: '#00FFFF', fg: '#FF0000' }, // cyan / red
+  { bg: '#FF00FF', fg: '#00FF00' }, // magenta / green
+  { bg: '#FFFF00', fg: '#0000FF' }, // yellow / blue
+];
+
 export function TopBar() {
+  const [pair, setPair] = useState<{ bg: string; fg: string } | null>(null);
+
+  // Pick on mount (not during render) to avoid SSR/client mismatch.
+  useEffect(() => {
+    setPair(PAIRS[Math.floor(Math.random() * PAIRS.length)]);
+  }, []);
+
   return (
-    <header className="topbar">
-      <Link href="/" className="topbar-title">
+    <header
+      className="topbar"
+      style={pair ? { background: pair.bg, color: pair.fg } : undefined}
+    >
+      <Link
+        href="/"
+        className="topbar-title"
+        style={pair ? { color: pair.fg } : undefined}
+      >
         CWOMA.TOOLS
       </Link>
 
