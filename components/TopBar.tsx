@@ -45,9 +45,10 @@ export function TopBar() {
             type="button"
             className="topbar-about"
             onClick={() => setAboutOpen(true)}
-            style={pair ? { color: pair.fg, borderColor: pair.fg } : undefined}
+            aria-label="About CWOMA"
+            title="About CWOMA"
           >
-            ABOUT CWOMA
+            ?
           </button>
           <ThemeToggle />
           <ConnectButton />

@@ -78,14 +78,14 @@ img {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 10px 20px;
+  padding: 6px 16px;
   /* Break out of .page's 10px/16px padding so the background colour
      bleeds to the viewport edges and the top of the page. */
   margin: -10px -16px 0;
 }
 .topbar-title {
   font-family: var(--font-title);
-  font-size: 16px;
+  font-size: 13px;
   line-height: 1;
   font-weight: 600;
   letter-spacing: -0.06em;
@@ -123,40 +123,43 @@ img {
   align-items: center;
   flex-shrink: 0;
 }
-/* ABOUT CWOMA pill — outlined in the topbar's fg colour so it contrasts
-   with the rotating background. Heights line up with connect button. */
+/* About CWOMA — small square white button, black border + "?" glyph.
+   Always high-contrast regardless of the rotating topbar background. */
 .topbar-about {
-  background: transparent;
-  color: var(--fg);
-  border: 1px solid currentColor;
-  height: 28px;
-  padding: 0 12px;
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  width: 21px;
+  height: 21px;
+  padding: 0;
   font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
   cursor: pointer;
-  white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
-.topbar-about:hover { opacity: 0.85; }
-/* Topbar-sized connect + theme controls. Connect button is a compact
-   pill, theme-toggle is a perfect square of the same height with a
-   slightly larger icon glyph. */
+.topbar-about:hover {
+  background: #000;
+  color: #fff;
+}
+/* Topbar-sized connect + theme controls — theme-toggle is a perfect
+   square of the same height as the connect button with a slightly
+   larger icon glyph. */
 .topbar .connect-btn {
-  height: 28px;
-  padding: 0 12px;
-  font-size: 11px;
+  height: 21px;
+  padding: 0 10px;
+  font-size: 9px;
   letter-spacing: 0.06em;
 }
 .topbar .theme-toggle {
-  width: 28px;
-  height: 28px;
+  width: 21px;
+  height: 21px;
   padding: 0;
-  font-size: 16px;
+  font-size: 12px;
   line-height: 1;
 }
 
