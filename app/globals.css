@@ -78,14 +78,14 @@ img {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 6px 16px;
+  padding: 10px 20px;
   /* Break out of .page's 10px/16px padding so the background colour
      bleeds to the viewport edges and the top of the page. */
   margin: -10px -16px 0;
 }
 .topbar-title {
   font-family: var(--font-title);
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1;
   font-weight: 600;
   letter-spacing: -0.06em;
@@ -123,17 +123,41 @@ img {
   align-items: center;
   flex-shrink: 0;
 }
-/* Keep the connect + theme controls visually matched to the compact bar. */
+/* ABOUT CWOMA pill — outlined in the topbar's fg colour so it contrasts
+   with the rotating background. Heights line up with connect button. */
+.topbar-about {
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid currentColor;
+  height: 28px;
+  padding: 0 12px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.topbar-about:hover { opacity: 0.85; }
+/* Topbar-sized connect + theme controls. Connect button is a compact
+   pill, theme-toggle is a perfect square of the same height with a
+   slightly larger icon glyph. */
 .topbar .connect-btn {
-  height: auto;
-  padding: 4px 10px;
-  font-size: 9px;
+  height: 28px;
+  padding: 0 12px;
+  font-size: 11px;
   letter-spacing: 0.06em;
 }
 .topbar .theme-toggle {
-  height: auto;
-  padding: 4px 6px;
-  font-size: 9px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
 }
 
 /* ---------- PROJECT HEADER (big title + right-aligned button group) ---------- */
