@@ -38,6 +38,9 @@ export function TopBar() {
           style={pair ? { color: pair.fg } : undefined}
         >
           CWOMA.TOOLS
+          <span className="topbar-subtitle">
+            {' '}| Colors, Words and Onchain Memetic Arts.
+          </span>
         </Link>
 
         <div className="topbar-right">
