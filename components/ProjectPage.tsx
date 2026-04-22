@@ -311,7 +311,9 @@ export function ProjectPage({ project }: Props) {
       <ProjectHeader project={project} />
       <main className="main">
         {/* ---------- Left: Projects rail ---------- */}
-        <aside className="rail punks-rail">
+        <aside
+          className={`rail punks-rail rail-project-${project}`}
+        >
           <div className="rail-head">
             <div className="rail-head-row">
               <h2>

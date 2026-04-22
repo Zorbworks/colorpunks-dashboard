@@ -1613,6 +1613,28 @@ img {
     flex-shrink: 0;
   }
 
+  /* BaseWords rail uses a 4-col vertical-scroll grid on mobile —
+     matches the colours rail's layout and ensures thumbnails are
+     visible beneath the filter/sort rows. */
+  .rail.punks-rail.rail-project-basewords {
+    max-height: 320px;
+    overflow: hidden;
+  }
+  .rail-project-basewords .rail-scroll {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .rail-project-basewords .punks-list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    width: auto;
+  }
+  .rail-project-basewords .punk {
+    width: auto;
+    flex-shrink: 1;
+  }
+
   .center {
     order: 1;
     display: block;
