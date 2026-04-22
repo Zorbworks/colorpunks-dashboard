@@ -58,14 +58,14 @@ export function ProjectHeader({ project }: Props) {
             RECENT
           </button>
           <a
-            className="opensea-btn opensea-btn-icon"
+            className="fc-square"
             href={FARCASTER[project]}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Farcaster channel"
             title="Farcaster channel"
           >
-            <FarcasterIcon size={14} />
+            <FarcasterIcon size={18} />
           </a>
         </div>
       </section>

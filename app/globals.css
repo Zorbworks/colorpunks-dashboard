@@ -220,6 +220,23 @@ img {
   white-space: nowrap;
 }
 .rail-text-link:hover { opacity: 0.75; }
+/* Square purple Farcaster button — used in the project header next to
+   OPENSEA / RECENT / ABOUT. Matches .opensea-btn's height so all four
+   pills line up. */
+.fc-square {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: #855DCD;
+  color: #fff;
+  border: 1px solid #855DCD;
+  text-decoration: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.fc-square:hover { opacity: 0.85; }
 /* Small round purple Farcaster badge — the icon inside uses
    currentColor so setting color: #fff here paints it white. */
 .fc-dot {
@@ -496,7 +513,10 @@ img {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
+  /* Same height as .rail-head-row so underlines across all three
+     columns sit on the same horizontal line. */
+  height: 40px;
+  padding: 0 12px;
   border-bottom: 1px solid var(--rule);
   flex-shrink: 0;
   font-family: var(--font-title);
@@ -754,11 +774,17 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  /* Matches the .center-head bottom border so the title block in the
-     left/right rails visually lines up with the centre panel. */
+  /* Fixed height + zero vertical padding so all three column title
+     rows (both rails + centre) sit on the same horizontal baseline
+     regardless of what content they carry (e.g. the 18px Farcaster
+     dot in the colours rail vs plain text in the basewords rail). */
+  height: 40px;
+  padding: 0 12px;
+  /* Negative horizontal margin pulls the border-bottom all the way
+     to the inner edge of the rail's border — so the underline spans
+     the full column width like the .center-head's does. */
+  margin: 0 -12px 8px;
   border-bottom: 1px solid var(--rule);
-  margin-bottom: 8px;
 }
 .filter-row {
   display: flex;
