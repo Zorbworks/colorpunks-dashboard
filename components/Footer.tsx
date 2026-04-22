@@ -28,15 +28,16 @@ interface FooterLink {
 }
 
 const LINKS: FooterLink[] = [
-  { label: 'BASECOLORS', href: 'https://www.basecolors.com' },
+  {
+    label: 'BASECOLORS',
+    href: 'https://www.basecolors.com',
+    by: [{ handle: '@jake', href: 'https://farcaster.xyz/jake' }],
+  },
   {
     label: 'BASEWORDS',
     href: '/basewords',
     internal: true,
-    by: [
-      { handle: '@jake', href: 'https://farcaster.xyz/jake' },
-      { handle: '@deebee', href: 'https://farcaster.xyz/deebee' },
-    ],
+    by: [{ handle: '@deebee', href: 'https://farcaster.xyz/deebee' }],
   },
   {
     label: 'COLORPUNKS',
@@ -47,7 +48,7 @@ const LINKS: FooterLink[] = [
   {
     label: 'SOULBOUNDS',
     href: 'https://www.basecolors.com/soulbounds',
-    by: [{ handle: '@apex', href: 'https://farcaster.xyz/apex' }],
+    by: [{ handle: '@apex777', href: 'https://farcaster.xyz/apex777' }],
   },
   {
     label: 'PALETTES.FUN',

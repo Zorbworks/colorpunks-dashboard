@@ -604,8 +604,8 @@ export function ProjectPage({ project }: Props) {
             <div className="rail-head-row">
               <h2>
                 {colorsTab === 'colors'
-                  ? `[03] BASECOLORS · ${String(filtered.length).padStart(2, '0')} / ${String(allColorCount).padStart(2, '0')}`
-                  : `[03] PALETTES · ${String(palettes?.length ?? 0).padStart(2, '0')}`}
+                  ? '[03] BASECOLORS'
+                  : '[03] PALETTES'}
               </h2>
               <a
                 className="rail-text-link"
@@ -617,7 +617,9 @@ export function ProjectPage({ project }: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                GET MORE
+                {colorsTab === 'colors'
+                  ? 'GET MORE BASECOLORS'
+                  : 'GET MORE PALETTES'}
               </a>
               <a
                 className="fc-dot"

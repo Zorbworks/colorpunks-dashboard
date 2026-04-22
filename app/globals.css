@@ -206,20 +206,20 @@ img {
   padding: 2px 6px;
   line-height: 1;
 }
-/* Plain text-style link used in rail headers (e.g. "GET MORE ↗").
-   No border, muted colour, small gap from the preceding element. */
+/* Plain text-style link used in rail headers (e.g. "GET MORE BASECOLORS").
+   Painted in Base blue; small gap from the preceding element. */
 .rail-text-link {
   font-family: var(--font-ui);
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #0052FF;
   text-decoration: none;
   margin-left: 20px;
   white-space: nowrap;
 }
-.rail-text-link:hover { color: var(--fg); }
+.rail-text-link:hover { opacity: 0.75; }
 /* Small round purple Farcaster badge — the icon inside uses
    currentColor so setting color: #fff here paints it white. */
 .fc-dot {
