@@ -718,6 +718,7 @@ export function ProjectPage({ project }: Props) {
           open={shareOpen}
           onClose={() => setShareOpen(false)}
           shareText={shareData.shareText}
+          tokenId={shareData.tokenId}
         />
       )}
 

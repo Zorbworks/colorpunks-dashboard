@@ -1011,16 +1011,33 @@ img {
   flex-shrink: 0;
   flex-wrap: wrap;
 }
-.footer-link {
+.footer-item {
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  text-decoration: none;
   white-space: nowrap;
 }
+.footer-link {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-decoration: none;
+}
 .footer-link:hover { opacity: 0.75; }
+.footer-credit {
+  font-weight: 500;
+  opacity: 0.8;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.footer-credit-link {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.footer-credit-link:hover { opacity: 0.75; }
 .credits {
   font-family: var(--font-ui);
   font-size: 10px;
@@ -1192,16 +1209,71 @@ img {
   text-transform: uppercase;
   cursor: pointer;
 }
-.share-btn:hover {
+.share-btn:hover,
+.share-btn.active {
   background: var(--bg);
   color: var(--fg);
 }
-.share-hint {
+/* "Send NFT to another wallet" form, revealed below the share buttons
+   when SEND is pressed. */
+.share-send {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+.share-send-label {
+  display: block;
   font-family: var(--font-ui);
   font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--muted);
-  margin-top: 12px;
-  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.share-send-row {
+  display: flex;
+  gap: 8px;
+}
+.share-send-input {
+  flex: 1;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--rule);
+  padding: 8px 10px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  min-width: 0;
+}
+.share-send-input:disabled { opacity: 0.5; }
+.share-send-btn {
+  background: var(--fg);
+  color: var(--bg);
+  border: 1px solid var(--rule);
+  padding: 8px 14px;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.share-send-btn:hover:not(:disabled) {
+  background: var(--bg);
+  color: var(--fg);
+}
+.share-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.share-send-error {
+  margin-top: 8px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: #e53935;
+  line-height: 1.4;
 }
 .about-credits {
   display: flex;

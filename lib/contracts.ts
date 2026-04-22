@@ -144,6 +144,18 @@ export const BASEWORDS_ABI = [
     stateMutability: 'view',
     type: 'function',
   },
+  // Standard ERC-721 transfer — used by the "send to wallet" share flow.
+  {
+    inputs: [
+      { type: 'address', name: 'from' },
+      { type: 'address', name: 'to' },
+      { type: 'uint256', name: 'tokenId' },
+    ],
+    name: 'safeTransferFrom',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
   // Read — token data (words + colors + flags).
   {
     inputs: [{ type: 'uint256', name: 'tokenId' }],
