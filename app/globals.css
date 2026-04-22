@@ -1508,6 +1508,19 @@ img {
 .bw-status-ok { color: #16a34a; border-color: #16a34a; }
 .bw-status-err { color: #e53935; border-color: #e53935; }
 .bw-status-wait { color: var(--muted); }
+/* Same slot as .bw-status but clickable — e.g. MINT ANOTHER after a
+   successful mint — so it replaces the AVAILABLE / NOT AVAILABLE
+   indicator in place. */
+button.bw-status-action {
+  background: transparent;
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
+}
+button.bw-status-action:hover {
+  background: #16a34a;
+  color: #fff;
+}
 .bw-mint-btn {
   width: 100%;
   background: var(--fg);

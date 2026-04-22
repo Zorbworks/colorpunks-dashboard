@@ -11,7 +11,6 @@ import {
   BASEWORDS_MAX_CHARS,
   BASEWORDS_MAX_WORDS,
 } from '@/lib/basewords';
-import { BASEWORDS_ADDRESS } from '@/lib/contracts';
 
 export function BaseWordsMintForm() {
   const { isConnected, address } = useAccount();
@@ -158,9 +157,20 @@ export function BaseWordsMintForm() {
         </span>
       </div>
 
-      {statusLabel && (
+      {isSuccess ? (
+        <button
+          type="button"
+          className="bw-status bw-status-ok bw-status-action"
+          onClick={() => {
+            reset();
+            setRaw('');
+          }}
+        >
+          MINT ANOTHER
+        </button>
+      ) : statusLabel ? (
         <div className={`bw-status bw-status-${statusKind}`}>{statusLabel}</div>
-      )}
+      ) : null}
 
       <button
         type="button"
@@ -172,36 +182,6 @@ export function BaseWordsMintForm() {
       </button>
 
       {error && <div className="save-status error">{errorText}</div>}
-
-      {isSuccess && hash && (
-        <div className="save-status success">
-          MINTED.
-          <a
-            href={`https://basescan.org/tx/${hash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            TX
-          </a>
-          <a
-            href={`https://opensea.io/assets/base/${BASEWORDS_ADDRESS}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            OPENSEA
-          </a>
-          <button
-            type="button"
-            className="bw-mint-reset"
-            onClick={() => {
-              reset();
-              setRaw('');
-            }}
-          >
-            MINT ANOTHER
-          </button>
-        </div>
-      )}
     </div>
   );
 }
