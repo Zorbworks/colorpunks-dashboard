@@ -98,6 +98,12 @@ export function BaseWordEditor({
       if (client) {
         await refreshBaseWordImage(tokenId, client);
       }
+      // Re-invalidate tokenData now that the tx has had time to
+      // propagate to the RPC — the immediate invalidation above can
+      // refetch before the new state is readable, leaving the
+      // METADATA panel showing stale values until the user refreshes.
+      qc.invalidateQueries({ queryKey: ['baseword-data', tokenId] });
+      qc.invalidateQueries({ queryKey: ['baseword-meta'] });
       qc.invalidateQueries({ queryKey: ['user-basewords'] });
     }, 2000);
   }, [isSuccess, hash, tokenId, qc, publicClient]);
