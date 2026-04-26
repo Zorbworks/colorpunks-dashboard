@@ -13,7 +13,7 @@ export function AboutCwomaModal({ open, onClose }: Props) {
     <Modal open={open} onClose={onClose} title="[ ABOUT ] CWOMA.TOOLS">
       <p>
         CWOMA (Colors, Words &amp; Onchain Memetic Arts) is an experimental
-        platform bringing together projects from the Basecolor and Basewords
+        platform bringing together projects from the Basecolors and Basewords
         ecosystem.
       </p>
       <div className="about-credits">
