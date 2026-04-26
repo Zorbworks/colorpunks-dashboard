@@ -269,7 +269,7 @@ export function ProjectPage({ project }: Props) {
     const words = selectedBaseWordData.words;
     // Placeholder caption — easy to edit later.
     const shareText =
-      `Just crafted "${words.join(' / ')}" on BaseWords — ` +
+      `"${words.join(' / ')}" on BaseWords — ` +
       `${textName} text on ${bgName} background. ` +
       `Mint yours at basewords.xyz`;
     const svg = buildBaseWordsSvg(words, {

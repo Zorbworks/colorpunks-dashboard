@@ -32,9 +32,42 @@ export function AboutModal({ open, onClose, project = 'colorpunks' }: Props) {
             onchain metastory. A composable source of dynamic metadata for new
             projects to plug into.
           </p>
+
+          <p style={{ fontWeight: 600 }}>To mint a BaseWord:</p>
+          <ul className="about-list">
+            <li>Click + NEW WORD in the left rail</li>
+            <li>
+              Enter 1–3 words in the canvas (A–Z and 0–9, max 15 chars per
+              line)
+            </li>
+            <li>Check that your combination is AVAILABLE</li>
+            <li>Hit MINT to create your 1/1 onchain</li>
+          </ul>
+
+          <p style={{ fontWeight: 600 }}>To color a BaseWord:</p>
+          <ul className="about-list">
+            <li>Select one of your minted BaseWords from the left rail</li>
+            <li>Pick a BaseColor from the right panel for TEXT and BG</li>
+            <li>Hit SAVE to write the new colors onchain</li>
+          </ul>
+
           <p>
             <strong>What word will you mint first?</strong>
           </p>
+
+          <div className="about-credits">
+            <span>
+              BaseWords by{' '}
+              <a
+                href="https://farcaster.xyz/deebee"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                @deebee
+              </a>
+            </span>
+          </div>
+
           <p className="about-terms">
             BASEWORDS is a public arena of expression. Please use your
             judgement when minting. We reserve the right to block offensive
