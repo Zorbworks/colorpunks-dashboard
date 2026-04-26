@@ -1171,6 +1171,35 @@ img {
 .modal-body p + p {
   margin-top: 12px;
 }
+/* Disclaimer paragraph at the bottom of the BaseWords ABOUT modal +
+   above the MINT button, with an inline TERMS button styled as a link. */
+.about-terms,
+.bw-mint-terms {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin-top: 12px;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--rule);
+}
+.about-terms-link,
+.bw-mint-terms-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.about-terms-link:hover,
+.bw-mint-terms-link:hover {
+  color: var(--muted);
+}
+
 .about-list {
   list-style: none;
   padding: 12px 0;

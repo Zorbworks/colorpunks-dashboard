@@ -5,6 +5,7 @@ import { formatEther } from 'viem';
 import { useAccount } from 'wagmi';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMintBaseWord } from '@/hooks/useMintBaseWord';
+import { TermsModal } from './TermsModal';
 import {
   sanitizeWord,
   isValidWord,
@@ -18,6 +19,7 @@ export function BaseWordsMintForm() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // The textarea value is the source of truth. Each line is a word.
   const [raw, setRaw] = useState('');
+  const [termsOpen, setTermsOpen] = useState(false);
 
   const words = useMemo(
     () =>
@@ -172,6 +174,20 @@ export function BaseWordsMintForm() {
         <div className={`bw-status bw-status-${statusKind}`}>{statusLabel}</div>
       ) : null}
 
+      <p className="bw-mint-terms">
+        BASEWORDS is a public arena of expression. Please use your judgement
+        when minting. We reserve the right to block offensive mints at our
+        sole discretion without refund. By minting you are agreeing to these{' '}
+        <button
+          type="button"
+          className="bw-mint-terms-link"
+          onClick={() => setTermsOpen(true)}
+        >
+          TERMS
+        </button>
+        .
+      </p>
+
       <button
         type="button"
         className="bw-mint-btn"
@@ -182,6 +198,8 @@ export function BaseWordsMintForm() {
       </button>
 
       {error && <div className="save-status error">{errorText}</div>}
+
+      <TermsModal open={termsOpen} onClose={() => setTermsOpen(false)} />
     </div>
   );
 }
