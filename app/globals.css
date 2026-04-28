@@ -1050,16 +1050,20 @@ img {
   color: var(--muted);
 }
 
-/* ---------- FOOTER (matches the TopBar's rotating RGB/CMY stripe) ---------- */
+/* ---------- FOOTER (theme-aware, mirrors the TopBar treatment) ---------- */
 .footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 6px 16px;
-  /* Break out of .page's left/right/bottom padding so the stripe
-     reaches the viewport edges and the bottom of the page. */
+  padding: 10px 16px;
+  /* Break out of .page's left/right/bottom padding so the bar
+     (and its 1px top rule) reaches the viewport edges and the
+     bottom of the page. */
   margin: 0 -16px -10px;
+  border-top: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--fg);
   flex-shrink: 0;
   flex-wrap: wrap;
 }
