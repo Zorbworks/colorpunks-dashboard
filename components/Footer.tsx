@@ -1,18 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-/** Same six RGB/CMY pairs the TopBar uses. Fresh pick on each mount so
- *  the footer stripe re-themes on every page load. */
-const PAIRS: Array<{ bg: string; fg: string }> = [
-  { bg: '#FF0000', fg: '#00FFFF' },
-  { bg: '#00FF00', fg: '#FF00FF' },
-  { bg: '#0000FF', fg: '#FFFF00' },
-  { bg: '#00FFFF', fg: '#FF0000' },
-  { bg: '#FF00FF', fg: '#00FF00' },
-  { bg: '#FFFF00', fg: '#0000FF' },
-];
 
 interface Creator {
   handle: string;
@@ -59,24 +47,16 @@ const LINKS: FooterLink[] = [
   },
 ];
 
+/** Footer with a static (theme-aware) background — the previous rotating
+ *  RGB/CMY stripe was retired in favour of a calmer "white" footer that
+ *  matches the new TopBar treatment. */
 export function Footer() {
-  const [pair, setPair] = useState<{ bg: string; fg: string } | null>(null);
-
-  useEffect(() => {
-    setPair(PAIRS[Math.floor(Math.random() * PAIRS.length)]);
-  }, []);
-
-  const colorStyle = pair ? { color: pair.fg } : undefined;
-
   return (
-    <footer
-      className="footer"
-      style={pair ? { background: pair.bg, color: pair.fg } : undefined}
-    >
+    <footer className="footer">
       {LINKS.map((l) => (
         <span key={l.href} className="footer-item">
           {l.internal ? (
-            <Link href={l.href} className="footer-link" style={colorStyle}>
+            <Link href={l.href} className="footer-link">
               {l.label}
             </Link>
           ) : (
@@ -85,13 +65,12 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className="footer-link"
-              style={colorStyle}
             >
               {l.label}
             </a>
           )}
           {l.by && l.by.length > 0 && (
-            <span className="footer-credit" style={colorStyle}>
+            <span className="footer-credit">
               {' '}by{' '}
               {l.by.map((c, i) => (
                 <span key={c.href}>
@@ -101,7 +80,6 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="footer-credit-link"
-                    style={colorStyle}
                   >
                     {c.handle}
                   </a>

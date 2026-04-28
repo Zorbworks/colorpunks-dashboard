@@ -65,7 +65,7 @@ export function ProjectHeader({ project }: Props) {
             aria-label="Farcaster channel"
             title="Farcaster channel"
           >
-            <FarcasterIcon size={18} />
+            <FarcasterIcon size={14} />
           </a>
         </div>
       </section>
