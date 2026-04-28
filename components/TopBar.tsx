@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ConnectButton } from './ConnectButton';
-import { ThemeToggle } from './ThemeToggle';
+// Theme toggle is hidden for now — keeping the import path commented
+// so we can re-enable it later without rewiring anything.
+// import { ThemeToggle } from './ThemeToggle';
 import { AboutCwomaModal } from './AboutCwomaModal';
 
 /** Top navigation for CWOMA — the parent site. Background follows the
@@ -32,7 +34,7 @@ export function TopBar() {
           >
             ?
           </button>
-          <ThemeToggle />
+          {/* <ThemeToggle /> — hidden for now; re-add to bring it back */}
           <ConnectButton />
         </div>
       </header>
