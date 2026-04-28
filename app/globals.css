@@ -84,9 +84,9 @@ img {
   justify-content: space-between;
   gap: 16px;
   padding: 12px 16px;
-  background: var(--bg);
-  color: var(--fg);
-  border-bottom: 1px solid var(--rule);
+  background: #eeeeee;
+  color: #000;
+  border-bottom: 1px solid #000;
   /* Break out of .page's 10px/16px padding so the bar reaches the
      viewport edges and the top of the page. */
   margin: -10px -16px 0;
@@ -98,7 +98,7 @@ img {
   font-weight: 700;
   letter-spacing: -0.04em;
   text-transform: uppercase;
-  color: var(--fg);
+  color: #000;
   text-decoration: none;
   flex-shrink: 1;
   min-width: 0;
@@ -146,9 +146,9 @@ img {
    the theme toggle and connect button so the three controls form a
    single 26px-tall cluster on the right of the topbar. */
 .topbar-about {
-  background: var(--bg);
-  color: var(--fg);
-  border: 1px solid var(--rule);
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
   width: 26px;
   height: 26px;
   padding: 0;
@@ -163,16 +163,25 @@ img {
   flex-shrink: 0;
 }
 .topbar-about:hover {
-  background: var(--fg);
-  color: var(--bg);
+  background: #000;
+  color: #fff;
 }
 /* Topbar-sized connect + theme controls — both 26px tall so the trio
-   (?, theme, connect) line up exactly. */
+   (?, theme, connect) line up exactly. Pinned to white-on-black so the
+   cluster stays visually consistent against the #eeeeee bar in both
+   light and dark themes. */
 .topbar .connect-btn {
   height: 26px;
   padding: 0 12px;
   font-size: 10px;
   letter-spacing: 0.06em;
+  background: #fff;
+  color: #000;
+  border-color: #000;
+}
+.topbar .connect-btn:hover {
+  background: #000;
+  color: #fff;
 }
 .topbar .theme-toggle {
   width: 26px;
@@ -180,6 +189,13 @@ img {
   padding: 0;
   font-size: 14px;
   line-height: 1;
+  background: #fff;
+  color: #000;
+  border-color: #000;
+}
+.topbar .theme-toggle:hover {
+  background: #000;
+  color: #fff;
 }
 
 /* ---------- PROJECT HEADER (BaseWords / ColorPunks sub-project bar)
@@ -1061,9 +1077,9 @@ img {
      (and its 1px top rule) reaches the viewport edges and the
      bottom of the page. */
   margin: 0 -16px -10px;
-  border-top: 1px solid var(--rule);
-  background: var(--bg);
-  color: var(--fg);
+  border-top: 1px solid #000;
+  background: #eeeeee;
+  color: #000;
   flex-shrink: 0;
   flex-wrap: wrap;
 }
