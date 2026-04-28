@@ -1521,6 +1521,8 @@ img {
 .bw-meta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 8px;
   font-family: var(--font-ui);
   font-size: 9px;
   color: var(--muted);
@@ -1528,6 +1530,18 @@ img {
   text-transform: uppercase;
   padding: 0 2px;
 }
+/* Inline AVAILABLE / NOT AVAILABLE / CHECKING status that sits in the
+   bw-meta row between the WORDS and CHARS counters. Replaces the old
+   bordered .bw-status block so the canvas above can stay square. */
+.bw-meta-status {
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-align: center;
+  flex: 1;
+}
+.bw-meta-status-ok { color: #16a34a; }
+.bw-meta-status-err { color: #e53935; }
+.bw-meta-status-wait { color: var(--muted); }
 /* Editor canvas variant: borderless, renders the word as an SVG <img>
    so it matches the grid thumbnails byte-for-byte. */
 .bw-canvas-borderless {

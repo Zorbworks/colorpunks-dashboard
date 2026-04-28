@@ -98,14 +98,23 @@ export function BaseWordsMintForm() {
     }
   }
 
-  const mintDisabled =
-    !isConnected ||
-    !allValid ||
-    !isUnique ||
-    !mintPrice ||
-    isPending ||
-    isConfirming ||
-    isSuccess;
+  // After a successful mint the button flips to a "MINT ANOTHER" reset
+  // action so the user can clear the canvas and start a fresh word
+  // without reloading. Before success it's the normal mint CTA.
+  const handleMintAnother = useCallback(() => {
+    reset();
+    setRaw('');
+    textareaRef.current?.focus();
+  }, [reset]);
+
+  const mintDisabled = isSuccess
+    ? false
+    : !isConnected ||
+      !allValid ||
+      !isUnique ||
+      !mintPrice ||
+      isPending ||
+      isConfirming;
 
   const mintLabel = !isConnected
     ? 'CONNECT WALLET TO MINT'
@@ -114,7 +123,7 @@ export function BaseWordsMintForm() {
       : isConfirming
         ? 'MINTING…'
         : isSuccess
-          ? 'MINTED ✓'
+          ? 'MINT ANOTHER'
           : mintPrice
             ? `MINT · ${formatEther(mintPrice)} ETH`
             : 'MINT';
@@ -154,25 +163,17 @@ export function BaseWordsMintForm() {
         <span>
           {nonEmpty.length}/{BASEWORDS_MAX_WORDS} WORDS
         </span>
+        {isSuccess ? (
+          <span className="bw-meta-status bw-meta-status-ok">MINTED ✓</span>
+        ) : statusLabel ? (
+          <span className={`bw-meta-status bw-meta-status-${statusKind}`}>
+            {statusLabel}
+          </span>
+        ) : null}
         <span>
           {lastLineLen}/{BASEWORDS_MAX_CHARS} CHARS
         </span>
       </div>
-
-      {isSuccess ? (
-        <button
-          type="button"
-          className="bw-status bw-status-ok bw-status-action"
-          onClick={() => {
-            reset();
-            setRaw('');
-          }}
-        >
-          MINT ANOTHER
-        </button>
-      ) : statusLabel ? (
-        <div className={`bw-status bw-status-${statusKind}`}>{statusLabel}</div>
-      ) : null}
 
       <p className="bw-mint-terms">
         BASEWORDS is a public arena of expression. Please use your judgement
@@ -191,7 +192,7 @@ export function BaseWordsMintForm() {
       <button
         type="button"
         className="bw-mint-btn"
-        onClick={mint}
+        onClick={isSuccess ? handleMintAnother : mint}
         disabled={mintDisabled}
       >
         {mintLabel}
