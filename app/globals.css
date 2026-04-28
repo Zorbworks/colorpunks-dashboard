@@ -213,10 +213,13 @@ img {
   margin: 0;
 }
 .project-title {
+  /* Matches .topbar-title exactly so the CWOMA wordmark and the
+     project title (BASEWORDS / COLORPUNKS) share the same type
+     treatment — only the surrounding chrome differs in scale. */
   font-family: var(--font-title);
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
-  letter-spacing: 0;
+  letter-spacing: -0.04em;
   line-height: 1;
   text-transform: uppercase;
   margin: 0;
