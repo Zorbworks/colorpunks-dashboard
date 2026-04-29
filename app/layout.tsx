@@ -42,29 +42,29 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://cwoma.tools'),
-  title: 'ColorPunks Toolbox — Power Tools for ColorPunk Collectors',
+  title: 'CWOMA: Colors, Words & Onchain Memetic Arts',
   description:
-    'Paint your ColorPunks with your BaseColors. On-chain coloring book on Base mainnet.',
+    'Building onchain systems for all the colors and words on the internet.',
   openGraph: {
-    title: 'ColorPunks Toolbox',
+    title: 'CWOMA: Colors, Words & Onchain Memetic Arts',
     description:
-      'Power tools for ColorPunk collectors. Paint your punks with BaseColors and save on-chain.',
+      'Building onchain systems for all the colors and words on the internet.',
     images: [
       {
-        url: '/og-image.png?v=2',
+        url: '/og-image.png?v=3',
         width: 1200,
         height: 630,
-        alt: 'ColorPunks Toolbox — on-chain coloring book for ColorPunks on Base',
+        alt: 'CWOMA — Colors, Words & Onchain Memetic Arts',
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ColorPunks Toolbox',
+    title: 'CWOMA: Colors, Words & Onchain Memetic Arts',
     description:
-      'Power tools for ColorPunk collectors. Paint your punks with BaseColors and save on-chain.',
-    images: ['/og-image.png?v=2'],
+      'Building onchain systems for all the colors and words on the internet.',
+    images: ['/og-image.png?v=3'],
   },
 };
 
