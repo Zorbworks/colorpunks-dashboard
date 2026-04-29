@@ -51,7 +51,7 @@ export const metadata: Metadata = {
       'Power tools for ColorPunk collectors. Paint your punks with BaseColors and save on-chain.',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.png?v=2',
         width: 1200,
         height: 630,
         alt: 'ColorPunks Toolbox — on-chain coloring book for ColorPunks on Base',
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     title: 'ColorPunks Toolbox',
     description:
       'Power tools for ColorPunk collectors. Paint your punks with BaseColors and save on-chain.',
-    images: ['/og-image.png'],
+    images: ['/og-image.png?v=2'],
   },
 };
 

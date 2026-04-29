@@ -20,7 +20,8 @@ export function TopBar() {
         <Link href="/" className="topbar-title">
           CWOMA.TOOLS
           <span className="topbar-subtitle">
-            {' '}| Colors, Words and Onchain Memetic Arts.
+            {' '}| Building onchain systems for all the colors and words on
+            the internet.
           </span>
         </Link>
 
