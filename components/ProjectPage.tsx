@@ -87,7 +87,7 @@ export function ProjectPage({ project }: Props) {
   const [centerTab, setCenterTab] = useState<'canvas' | 'details'>('canvas');
   const [paletteColors, setPaletteColors] = useState<ColorInfo[]>([]);
   const [punkTypeFilter, setPunkTypeFilter] = useState<PunkTypeFilter>('all');
-  const [punkSort, setPunkSort] = useState<PunkSort>('default');
+  const [punkSort, setPunkSort] = useState<PunkSort>('recent');
   const [traitGroupBy, setTraitGroupBy] = useState<string | null>(null);
   const [colorsTab, setColorsTab] = useState<'colors' | 'palettes'>('colors');
   const [activePalette, setActivePalette] = useState<UserPalette | null>(null);

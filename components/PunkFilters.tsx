@@ -19,10 +19,10 @@ interface Props {
 const TYPES: PunkType[] = ['male', 'female', 'zombie', 'ape', 'alien'];
 
 const SORTS: { key: PunkSort; label: string }[] = [
-  { key: 'id-desc', label: 'ID ↓' },
-  { key: 'id-asc', label: 'ID ↑' },
   { key: 'recent', label: 'RECENT' },
   { key: 'rare', label: 'RARITY' },
+  { key: 'id-desc', label: 'ID ↓' },
+  { key: 'id-asc', label: 'ID ↑' },
 ];
 
 export function PunkFilters({
@@ -77,13 +77,6 @@ export function PunkFilters({
       <div className="filter-row">
         <span className="filter-label">SORT</span>
         <div className="filter-group">
-          <button
-            type="button"
-            className={`chip${sort === 'default' ? ' active' : ''}`}
-            onClick={() => onSortChange('default')}
-          >
-            —
-          </button>
           {SORTS.map(({ key, label }) => (
             <button
               key={key}
