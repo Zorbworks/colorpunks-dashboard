@@ -111,13 +111,18 @@ export function ProjectPage({ project }: Props) {
   useEffect(() => {
     if (project !== 'colorpunks') return;
     if (!punks || punks.length === 0) return;
+    // Auto-pick the FIRST punk in the user's current view (filteredPunks
+    // honours type filter + active sort). The previous version used
+    // punks[0] which is the raw, ID-ascending list — so the canvas would
+    // load the lowest token ID even though the rail was sorted by RECENT.
+    const firstVisible = filteredPunks[0] ?? punks[0];
     if (!selectedPunk) {
-      setSelectedPunk(punks[0]);
+      setSelectedPunk(firstVisible);
       return;
     }
     const fresh = punks.find((p) => p.tokenId === selectedPunk.tokenId);
     if (!fresh) {
-      setSelectedPunk(punks[0]);
+      setSelectedPunk(firstVisible);
       return;
     }
     const freshImg =

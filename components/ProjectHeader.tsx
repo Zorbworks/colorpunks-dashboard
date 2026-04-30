@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { AboutModal } from './AboutModal';
 import { RecentModal } from './RecentModal';
@@ -15,6 +16,11 @@ const LABELS: Record<Project, string> = {
   basewords: 'BASEWORDS',
   colorpunks: 'COLORPUNKS',
 };
+
+const TAB_ORDER: { project: Project; href: string }[] = [
+  { project: 'basewords', href: '/basewords' },
+  { project: 'colorpunks', href: '/colorpunks' },
+];
 
 const OPENSEA: Record<Project, string> = {
   basewords: `https://opensea.io/assets/base/${BASEWORDS_ADDRESS}`,
@@ -33,7 +39,26 @@ export function ProjectHeader({ project }: Props) {
   return (
     <>
       <section className="project-header">
-        <h1 className="project-title">{LABELS[project]}</h1>
+        {/* Project switcher — both labels render at the same size and
+            font as the original .project-title; the active one is fully
+            opaque, the other dims slightly so the row reads as a tab
+            pair rather than two equal headings. */}
+        <nav className="project-tabs" aria-label="Switch project">
+          {TAB_ORDER.map((t, i) => (
+            <span key={t.project} className="project-tabs-row">
+              {i > 0 && <span className="project-tabs-sep" aria-hidden>|</span>}
+              <Link
+                href={t.href}
+                className={`project-title project-tab${
+                  t.project === project ? ' active' : ''
+                }`}
+                aria-current={t.project === project ? 'page' : undefined}
+              >
+                {LABELS[t.project]}
+              </Link>
+            </span>
+          ))}
+        </nav>
         <div className="project-nav">
           <button
             type="button"

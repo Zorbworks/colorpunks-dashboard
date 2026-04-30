@@ -224,6 +224,48 @@ img {
   text-transform: uppercase;
   margin: 0;
 }
+/* Project switcher pair — sits where the lone .project-title used to
+   live. Each tab uses the .project-title type treatment so the row
+   reads as one wordmark broken into two clickable halves; the inactive
+   side dims to ~40% opacity so it reads as the secondary tab. */
+.project-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: 0;
+}
+.project-tabs-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.project-tabs-row + .project-tabs-row {
+  margin-left: 8px;
+}
+.project-tabs-sep {
+  font-family: var(--font-title);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+  opacity: 0.3;
+}
+.project-tab {
+  text-decoration: none;
+  color: var(--fg);
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+}
+.project-tab:not(.active) {
+  opacity: 0.35;
+}
+.project-tab:not(.active):hover {
+  opacity: 0.7;
+}
+.project-tab.active {
+  opacity: 1;
+  cursor: default;
+  pointer-events: none;
+}
 .project-nav {
   display: flex;
   gap: 6px;
