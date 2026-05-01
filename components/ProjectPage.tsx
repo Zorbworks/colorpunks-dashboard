@@ -297,16 +297,26 @@ export function ProjectPage({ project }: Props) {
       typeof window !== 'undefined'
         ? window.location.origin
         : 'https://cwoma.tools';
+    // Strip the leading "#" from each hex so the URL contains only
+    // alphanumerics + commas — no characters that need URL-encoding.
+    // This is critical because some downstream consumers (Farcaster,
+    // X) re-encode the embed URL when passing it through their
+    // pipelines: a "%23"-encoded "#" becomes "%2523", which our
+    // route then sees as a literal "%23..." and fails to recognise as
+    // a hex color, falling back to the default blue/white. Bare hex
+    // dodges that entirely; the route's normalizeHex already accepts
+    // both "#E53935" and "E53935".
     const imageQs = new URLSearchParams({
       words: words.join(','),
-      text: textHex,
-      bg: bgHex,
+      text: textHex.replace(/^#/, ''),
+      bg: bgHex.replace(/^#/, ''),
     });
-    // SVG URL ends in `.svg` so Farcaster recognises it
-    // unambiguously as an image-only URL — without the extension it
-    // would attach BOTH an inline image and a separate URL preview
-    // card for the same embed (the duplicate-preview bug).
-    const imageUrl = `${origin}/api/og/baseword.svg?${imageQs.toString()}`;
+    // PNG URL ends in `.png` so Farcaster treats it as a single
+    // image embed and skips the URL-preview card — `.svg` still
+    // produced two embeds (image + card) in testing. The PNG is
+    // rasterised on demand from the same on-chain SVG via
+    // @resvg/resvg-js so it visually matches the on-chain art.
+    const imageUrl = `${origin}/api/og/baseword.png?${imageQs.toString()}`;
     // Per-token landing page — its <head> declares the .png variant
     // as og:image, so Twitter (which does not unfurl SVG og:images)
     // unfurls a card with the actual BaseWord artwork when this URL
