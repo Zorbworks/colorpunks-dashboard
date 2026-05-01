@@ -5,6 +5,7 @@ import { isAddress } from 'viem';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { Modal } from './Modal';
+import { FarcasterIcon } from './FarcasterIcon';
 import { BASEWORDS_ABI, BASEWORDS_ADDRESS } from '@/lib/contracts';
 
 interface Props {
@@ -116,6 +117,18 @@ export function ShareModal({
       (error as { shortMessage?: string }).shortMessage) ||
       (error as Error).message);
 
+  const handleCastToFarcaster = () => {
+    if (typeof window === 'undefined' || !tokenId) return;
+    const origin = window.location.origin;
+    const imageUrl = `${origin}/api/og/baseword/${tokenId}`;
+    const pageUrl = `${origin}/baseword/${tokenId}`;
+    const url =
+      `https://farcaster.xyz/~/compose?text=${encodeURIComponent(shareText)}` +
+      `&embeds[]=${encodeURIComponent(imageUrl)}` +
+      `&embeds[]=${encodeURIComponent(pageUrl)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <Modal
       open={open}
@@ -133,6 +146,16 @@ export function ShareModal({
             onClick={onDownload}
           >
             DOWNLOAD
+          </button>
+        )}
+        {tokenId && (
+          <button
+            type="button"
+            className="share-btn share-btn-farcaster"
+            onClick={handleCastToFarcaster}
+          >
+            <FarcasterIcon size={14} />
+            <span>CAST</span>
           </button>
         )}
         {tokenId && (
