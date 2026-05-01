@@ -984,9 +984,15 @@ img {
 .color.sel::after {
   content: '';
   position: absolute;
-  inset: 4px;
+  /* Inset 0 so the selection outline traces the tile's actual outer
+     edge — matching the size of the swatch instead of pulling inward
+     and clipping the .color-name strip at the bottom. The inner
+     box-shadow keeps the original "double ring" feel without changing
+     the tile's footprint. */
+  inset: 0;
   border: 2px solid var(--rule);
   box-shadow: 0 0 0 2px var(--bg) inset;
+  pointer-events: none;
 }
 .color.disabled {
   cursor: not-allowed;
@@ -1001,6 +1007,9 @@ img {
   left: 0;
   right: 0;
   bottom: 0;
+  /* Sit above the .color.sel::after ring so the swatch name is never
+     clipped by the selection outline. */
+  z-index: 1;
   font-family: var(--font-ui);
   font-size: 8px;
   text-align: center;
