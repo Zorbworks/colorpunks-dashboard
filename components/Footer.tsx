@@ -29,8 +29,7 @@ const LINKS: FooterLink[] = [
   },
   {
     label: 'COLORPUNKS',
-    href: '/colorpunks',
-    internal: true,
+    href: 'https://colorpunks.com/',
     by: [{ handle: '@myk', href: 'https://farcaster.xyz/myk' }],
   },
   {
