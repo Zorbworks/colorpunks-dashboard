@@ -113,7 +113,34 @@ export function ColorPalette({
             disabled={isDisabled}
             onClick={() => !isDisabled && onSelect(c.color)}
           >
-            {/* The bottom strip is its own click target: clicking it
+            {/* Copy chip overlay — only on the currently-selected tile.
+                Sits in the top-right corner above the .sel ring and
+                gives the active swatch a more discoverable copy
+                affordance than the bottom-strip click. Same handler
+                + flash-to-tick pattern as everywhere else. */}
+            {isSelected && !isDisabled && (
+              <span
+                className={`color-copy${isCopied ? ' copied' : ''}`}
+                role="button"
+                tabIndex={0}
+                title={isCopied ? 'Copied!' : `Copy ${c.color.toUpperCase()}`}
+                aria-label={`Copy ${c.color.toUpperCase()}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCopy(c.color);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleCopy(c.color);
+                  }
+                }}
+              >
+                {isCopied ? '✓' : '⎘'}
+              </span>
+            )}
+            {/* The bottom strip is also a click target: clicking it
                 copies the swatch's hex to the clipboard and briefly
                 flashes "COPIED!" while leaving the colored area to
                 handle selection. stopPropagation prevents the outer

@@ -748,7 +748,7 @@ img {
 .punk-palette-text {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 7px;
   flex: 1;
   min-width: 0;
 }
@@ -1068,6 +1068,44 @@ img {
   box-shadow: 0 0 0 2px var(--bg) inset;
   pointer-events: none;
 }
+/* Copy-hex overlay rendered only on the currently-selected swatch.
+   Sits in the top-right corner above the .sel ring; bordered + filled
+   so it stays legible against any underlying tile color. Click copies
+   the hex and the glyph flips to a ✓ for ~1.2s. */
+.color-copy {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  cursor: copy;
+  user-select: none;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.color-copy:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+.color-copy:focus-visible {
+  outline: 2px solid var(--rule);
+  outline-offset: 1px;
+}
+.color-copy.copied,
+.color-copy.copied:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
 .color.disabled {
   cursor: not-allowed;
   opacity: 0.4;
@@ -1258,7 +1296,10 @@ img {
   cursor: copy;
   flex-shrink: 0;
   user-select: none;
-  margin-left: 4px;
+  /* Negative margin trims the row's flex gap (10px) down to ~7px
+     between the hex column and the copy glyph — half the previous
+     14px feels tighter and reads as one cluster instead of two. */
+  margin-left: -3px;
   transition: opacity 0.12s ease, transform 0.12s ease;
 }
 .palette-color-copy:hover {
