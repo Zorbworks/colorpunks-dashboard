@@ -10,22 +10,15 @@ import { BASEWORDS_ABI, BASEWORDS_ADDRESS } from '@/lib/contracts';
 interface Props {
   open: boolean;
   onClose: () => void;
-  /** Pre-composed message body with color names + basewords.xyz. */
+  /** Pre-composed message body — token id, words, colour names, and a
+   *  cwoma.tools link for the brand mention + URL unfurl. */
   shareText: string;
   /** The NFT tokenId to SEND. If omitted, the SEND action is hidden. */
   tokenId?: string | null;
-  /** Public PNG of the BaseWord. Attached to the Farcaster compose URL
-   *  via embeds[] so the cast renders the actual artwork inline. */
-  imageUrl?: string | null;
-  /** Per-token landing-page URL whose <head> exposes the same PNG as
-   *  og:image. Used in tweet bodies (Twitter cannot attach images via
-   *  intent URLs, so it unfurls this URL into an image card instead).
-   *  Replaces the human-readable "basewords.xyz" line in the tweet
-   *  body so Twitter only sees one URL to unfurl. */
-  landingUrl?: string | null;
   /** When provided, a DOWNLOAD button appears alongside the share
-   *  destinations and triggers this callback. Lets the share modal
-   *  carry the SVG download action instead of the toolbar. */
+   *  destinations and triggers this callback. Hands the user a PNG of
+   *  the current BaseWord which they attach to their cast / tweet via
+   *  the platform's own composer. */
   onDownload?: () => void;
 }
 
@@ -34,8 +27,6 @@ export function ShareModal({
   onClose,
   shareText,
   tokenId,
-  imageUrl,
-  landingUrl,
   onDownload,
 }: Props) {
   const [showSend, setShowSend] = useState(false);
@@ -64,19 +55,13 @@ export function ShareModal({
     }
   }, [open, reset]);
 
-  // Each platform appends its own URL so the post body has exactly
-  // one source of attached preview:
-  //  - Farcaster: SVG embed via embeds[] (renders the actual on-chain
-  //    artwork inline; no URL in cast text means no double unfurl).
-  //  - Twitter: landing-page URL appended to the tweet body — Twitter
-  //    unfurls it into a card showing the same BaseWord via og:image.
-  const tweetText = landingUrl ? `${shareText}\n\n${landingUrl}` : shareText;
-  const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+  // Plain text-only compose URLs — the cwoma.tools link inside
+  // shareText is what unfurls into a card on either platform. Users
+  // attach the BaseWord PNG manually via the platform composer's
+  // image button (DOWNLOAD on the modal hands them the file).
   const encoded = encodeURIComponent(shareText);
-  const fcBase = `https://farcaster.xyz/~/compose?text=${encoded}&channelKey=basewords`;
-  const farcasterUrl = imageUrl
-    ? `${fcBase}&embeds[]=${encodeURIComponent(imageUrl)}`
-    : fcBase;
+  const xUrl = `https://x.com/intent/tweet?text=${encoded}`;
+  const farcasterUrl = `https://farcaster.xyz/~/compose?text=${encoded}&channelKey=basewords`;
 
   const openExternal = (href: string) => {
     window.open(href, '_blank', 'noopener,noreferrer');

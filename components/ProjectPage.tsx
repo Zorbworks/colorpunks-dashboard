@@ -273,62 +273,32 @@ export function ProjectPage({ project }: Props) {
     const textName = nameByHex.get(textHex.toUpperCase()) ?? textHex;
     const bgName = nameByHex.get(bgHex.toUpperCase()) ?? bgHex;
     const words = selectedBaseWordData.words;
-    // Share caption — words listed one-per-line (no slashes) and the
-    // two colors each on their own line so the post reads as a
-    // poem-y stack rather than a sentence. No URL in the body — each
-    // platform appends its own URL at compose time (Farcaster uses
-    // the SVG embed, X uses the per-token landing page) so the cast /
-    // tweet only ever has ONE preview attached.
+    // Share caption — token id headline, words stacked one-per-line,
+    // colours each on their own line, then a link to the cwoma site
+    // for the brand mention + URL unfurl. The image itself isn't
+    // attached in the URL (no per-token PNG endpoint anymore); users
+    // hit DOWNLOAD to grab a PNG, then attach it via the platform's
+    // own composer using the paperclip / image button. Avoids the
+    // server-side SVG -> PNG rendering pipeline entirely.
     const shareText = [
+      `BaseWord #${selectedBaseWord.tokenId}`,
+      '',
       ...words,
       '',
       `text: ${textName}`,
       `bg: ${bgName}`,
+      '',
+      'cwoma.tools/basewords',
     ].join('\n');
     const svg = buildBaseWordsSvg(words, {
       textColor: textHex,
       bgColor: bgHex,
     });
-    // Public PNG of the BaseWord — passed to Farcaster as an embeds[]
-    // URL so the cast attaches the actual artwork inline. Built at
-    // useMemo time using window.location.origin so it resolves to the
-    // current host (cwoma.tools, www.cwoma.tools, or localhost in dev).
-    const origin =
-      typeof window !== 'undefined'
-        ? window.location.origin
-        : 'https://cwoma.tools';
-    // Strip the leading "#" from each hex so the URL contains only
-    // alphanumerics + commas — no characters that need URL-encoding.
-    // This is critical because some downstream consumers (Farcaster,
-    // X) re-encode the embed URL when passing it through their
-    // pipelines: a "%23"-encoded "#" becomes "%2523", which our
-    // route then sees as a literal "%23..." and fails to recognise as
-    // a hex color, falling back to the default blue/white. Bare hex
-    // dodges that entirely; the route's normalizeHex already accepts
-    // both "#E53935" and "E53935".
-    const imageQs = new URLSearchParams({
-      words: words.join(','),
-      text: textHex.replace(/^#/, ''),
-      bg: bgHex.replace(/^#/, ''),
-    });
-    // PNG URL ends in `.png` so Farcaster treats it as a single
-    // image embed and skips the URL-preview card — `.svg` still
-    // produced two embeds (image + card) in testing. The PNG is
-    // rasterised on demand from the same on-chain SVG via
-    // @resvg/resvg-js so it visually matches the on-chain art.
-    const imageUrl = `${origin}/api/og/baseword.png?${imageQs.toString()}`;
-    // Per-token landing page — its <head> declares the .png variant
-    // as og:image, so Twitter (which does not unfurl SVG og:images)
-    // unfurls a card with the actual BaseWord artwork when this URL
-    // appears in tweet text.
-    const landingUrl = `${origin}/baseword/${selectedBaseWord.tokenId}?${imageQs.toString()}`;
     return {
       shareText,
       svg,
       tokenId: selectedBaseWord.tokenId,
       words,
-      imageUrl,
-      landingUrl,
     };
   }, [selectedBaseWord, selectedBaseWordData, bwTextColor, bwBgColor, rawColors]);
 
@@ -346,17 +316,43 @@ export function ProjectPage({ project }: Props) {
     });
   };
 
-  const handleDownloadSvg = () => {
+  /**
+   * Renders the current BaseWord SVG to a 1200x1200 PNG using the
+   * user's installed fonts (Helvetica on macOS) via a hidden
+   * <canvas>. Hands the resulting blob to the browser as a file
+   * download — exact-match font, exact colours, no server render.
+   */
+  const handleDownloadPng = () => {
     if (!shareData) return;
+    const SIZE = 1200;
     const blob = new Blob([shareData.svg], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `baseword-${shareData.tokenId}.svg`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const objectUrl = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = SIZE;
+      canvas.height = SIZE;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        URL.revokeObjectURL(objectUrl);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, SIZE, SIZE);
+      URL.revokeObjectURL(objectUrl);
+      canvas.toBlob((png) => {
+        if (!png) return;
+        const pngUrl = URL.createObjectURL(png);
+        const a = document.createElement('a');
+        a.href = pngUrl;
+        a.download = `baseword-${shareData.tokenId}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(pngUrl);
+      }, 'image/png');
+    };
+    img.onerror = () => URL.revokeObjectURL(objectUrl);
+    img.src = objectUrl;
   };
 
   return (
@@ -775,9 +771,7 @@ export function ProjectPage({ project }: Props) {
           onClose={() => setShareOpen(false)}
           shareText={shareData.shareText}
           tokenId={shareData.tokenId}
-          imageUrl={shareData.imageUrl}
-          landingUrl={shareData.landingUrl}
-          onDownload={handleDownloadSvg}
+          onDownload={handleDownloadPng}
         />
       )}
 
