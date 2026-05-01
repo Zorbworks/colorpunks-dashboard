@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ColorInfo } from './Canvas';
 import type { UserColor, AlchemyNft } from '@/lib/alchemy';
 import { getPunkType, getPunkTraits } from '@/lib/punk-traits';
@@ -36,6 +37,41 @@ export function PunkPalette({
 
   const punkType = punk ? getPunkType(punk) : null;
   const traits = punk ? getPunkTraits(punk) : [];
+
+  // Tracks which hex is flashing the "copied" tick. Cleared on a
+  // 1.2s timer so the chip glyph snaps back to ⎘. Same pattern used
+  // in the BaseWords metadata tab and the palette browser.
+  const [copiedHex, setCopiedHex] = useState<string | null>(null);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleCopy = useCallback(async (hex: string) => {
+    const value = hex.toUpperCase();
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      // Clipboard fallback for restricted contexts.
+      const ta = document.createElement('textarea');
+      ta.value = value;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    setCopiedHex(value);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedHex(null), 1200);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
 
   return (
     <>
@@ -80,6 +116,10 @@ export function PunkPalette({
       {colors.map((c) => {
         const name = nameByHex.get(c.hex);
         const isSelected = selectedColor === c.hex;
+        const isCopied = copiedHex === c.hex.toUpperCase();
+        // Combined NAME / #HEX cell so the row matches the BaseWords
+        // metadata tab. Falls back to just the hex for unnamed colors.
+        const display = name ? `${name.toUpperCase()} / ${c.hex}` : c.hex;
         return (
           <button
             type="button"
@@ -91,10 +131,32 @@ export function PunkPalette({
               className="punk-palette-swatch"
               style={{ backgroundColor: c.hex }}
             />
-            <span className="punk-palette-name">
-              {name ? name.toUpperCase() : c.hex}
+            {/* name + copy live in the flex:1 cluster so the copy
+                glyph sits next to the hex text, while the wrapper
+                pushes the % column to the far right of the row. */}
+            <span className="punk-palette-text">
+              <span className="punk-palette-name">{display}</span>
+              <span
+                className={`punk-palette-copy${isCopied ? ' copied' : ''}`}
+                role="button"
+                tabIndex={0}
+                title={isCopied ? 'Copied!' : `Copy ${c.hex}`}
+                aria-label={`Copy ${c.hex}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCopy(c.hex);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleCopy(c.hex);
+                  }
+                }}
+              >
+                {isCopied ? '✓' : '⎘'}
+              </span>
             </span>
-            {name && <span className="punk-palette-hex">{c.hex}</span>}
             <span className="punk-palette-pct">{c.percentage}%</span>
           </button>
         );
