@@ -12,6 +12,10 @@
   --fg: #000;
   --rule: #000;
   --muted: #666;
+  /* Tiny5 — pixel display face loaded via a Google Fonts <link> in
+     app/layout.tsx (next/font/google types pre-date Tiny5 so we can't
+     route it through the standard next-font variable mechanism). */
+  --font-pixel: 'Tiny5', 'JetBrains Mono', monospace;
   color-scheme: light;
 }
 html[data-theme='dark'] {
@@ -84,21 +88,25 @@ img {
   justify-content: space-between;
   gap: 16px;
   padding: 12px 16px;
-  background: #eeeeee;
-  color: #000;
+  background: #000;
+  color: #fff;
   border-bottom: 1px solid #000;
   /* Break out of .page's 10px/16px padding so the bar reaches the
      viewport edges and the top of the page. */
   margin: -10px -16px 0;
 }
 .topbar-title {
-  font-family: var(--font-title);
-  font-size: 18px;
+  /* CWOMA.TOOLS wordmark — Tiny5 is a pixel display face, so it reads
+     best a hair larger than the JetBrains Mono treatment it replaced
+     and without the negative tracking. The subtitle below resets the
+     font back to the UI face so the tagline stays readable. */
+  font-family: var(--font-pixel), var(--font-title);
+  font-size: 22px;
   line-height: 1;
-  font-weight: 700;
-  letter-spacing: -0.04em;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: #000;
+  color: #fff;
   text-decoration: none;
   flex-shrink: 1;
   min-width: 0;
@@ -107,6 +115,7 @@ img {
   text-overflow: ellipsis;
 }
 .topbar-subtitle {
+  font-family: var(--font-ui);
   font-weight: 500;
   font-size: 13px;
   letter-spacing: 0;
@@ -146,9 +155,9 @@ img {
    the theme toggle and connect button so the three controls form a
    single 26px-tall cluster on the right of the topbar. */
 .topbar-about {
-  background: #fff;
-  color: #000;
-  border: 1px solid #000;
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
   width: 26px;
   height: 26px;
   padding: 0;
@@ -163,25 +172,28 @@ img {
   flex-shrink: 0;
 }
 .topbar-about:hover {
-  background: #000;
-  color: #fff;
+  background: #fff;
+  color: #000;
+  border-color: #fff;
 }
 /* Topbar-sized connect + theme controls — both 26px tall so the trio
-   (?, theme, connect) line up exactly. Pinned to white-on-black so the
-   cluster stays visually consistent against the #eeeeee bar in both
-   light and dark themes. */
+   (?, theme, connect) line up exactly. Painted as outlined chips on
+   the new black topbar: black bg, white border, white text by default;
+   hover inverts to white bg / black text so the chips never blend
+   into the bar. */
 .topbar .connect-btn {
   height: 26px;
   padding: 0 12px;
   font-size: 10px;
   letter-spacing: 0.06em;
-  background: #fff;
-  color: #000;
-  border-color: #000;
-}
-.topbar .connect-btn:hover {
   background: #000;
   color: #fff;
+  border-color: #fff;
+}
+.topbar .connect-btn:hover {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
 }
 .topbar .theme-toggle {
   width: 26px;
@@ -189,13 +201,14 @@ img {
   padding: 0;
   font-size: 14px;
   line-height: 1;
-  background: #fff;
-  color: #000;
-  border-color: #000;
-}
-.topbar .theme-toggle:hover {
   background: #000;
   color: #fff;
+  border-color: #fff;
+}
+.topbar .theme-toggle:hover {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
 }
 
 /* ---------- PROJECT HEADER (BaseWords / ColorPunks sub-project bar)
@@ -1123,8 +1136,8 @@ img {
      bottom of the page. */
   margin: 0 -16px -10px;
   border-top: 1px solid #000;
-  background: #eeeeee;
-  color: #000;
+  background: #000;
+  color: #fff;
   flex-shrink: 0;
   flex-wrap: wrap;
 }

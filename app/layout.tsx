@@ -75,6 +75,23 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" data-theme="light" suppressHydrationWarning>
+      <head>
+        {/* Tiny5 — pixel display face used for the CWOMA.TOOLS topbar
+            wordmark. Loaded via a Google Fonts <link> because the
+            current next/font/google types pre-date Tiny5 being added
+            to the catalogue. Globals.css picks it up through the
+            --font-pixel CSS variable. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Tiny5&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className={`${pressStart.variable} ${jost.variable} ${ibmPlexMono.variable} ${jetbrainsMono.variable}`}>
         <Providers>
           <div className="page">
