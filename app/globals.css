@@ -2078,24 +2078,31 @@ button.bw-status-action:hover {
     flex-shrink: 0;
   }
 
-  /* BaseWords rail uses a 4-col vertical-scroll grid on mobile —
-     matches the colours rail's layout and ensures thumbnails are
-     visible beneath the filter/sort rows. */
-  .rail.punks-rail.rail-project-basewords {
+  /* BaseWords + ColorPunks rails both use a 4-col vertical-scroll
+     grid on mobile — matches the colours rail's layout, gives the
+     filter/sort rows room to wrap, and ensures the thumbnail grid
+     remains usable inside the rail. The default .punks-rail rules
+     above describe the legacy horizontal-flex layout, but in
+     practice both projects use this override. */
+  .rail.punks-rail.rail-project-basewords,
+  .rail.punks-rail.rail-project-colorpunks {
     max-height: 320px;
     overflow: hidden;
   }
-  .rail-project-basewords .rail-scroll {
+  .rail-project-basewords .rail-scroll,
+  .rail-project-colorpunks .rail-scroll {
     overflow-x: hidden;
     overflow-y: auto;
   }
-  .rail-project-basewords .punks-list {
+  .rail-project-basewords .punks-list,
+  .rail-project-colorpunks .punks-list {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 6px;
     width: auto;
   }
-  .rail-project-basewords .punk {
+  .rail-project-basewords .punk,
+  .rail-project-colorpunks .punk {
     width: auto;
     flex-shrink: 1;
   }
