@@ -11,6 +11,10 @@ interface Props {
   /** Inline styles applied to the modal container — used by the About
    *  CWOMA modal to theme its background/foreground on each open. */
   style?: CSSProperties;
+  /** Optional extra class on the modal container — used for size or
+   *  layout variants (e.g. the square share modal). Concatenated with
+   *  the base `.modal` class. */
+  className?: string;
 }
 
 /**
@@ -20,7 +24,14 @@ interface Props {
  *   - header with close button
  * Uses the brutalist .modal* classes from globals.css.
  */
-export function Modal({ open, onClose, title, children, style }: Props) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  style,
+  className,
+}: Props) {
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
@@ -41,7 +52,7 @@ export function Modal({ open, onClose, title, children, style }: Props) {
       }}
     >
       <div
-        className="modal"
+        className={`modal${className ? ` ${className}` : ''}`}
         role="dialog"
         aria-modal="true"
         aria-label={title}

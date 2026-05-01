@@ -8,6 +8,7 @@ import type {
   Sort,
 } from '@/lib/color';
 import type { ColorLabelMode } from './ColorPalette';
+import { FarcasterIcon } from './FarcasterIcon';
 
 interface Props {
   filters: Filters;
@@ -95,6 +96,31 @@ export function ColorFilters({
           >
             MUTED
           </button>
+        </div>
+        {/* External BASECOLORS controls — BUY MORE links to the mint
+            site, Farcaster button opens the /basecolors channel.
+            Right-aligned so the chip cluster on the left stays
+            grouped with the TONE label. */}
+        <div className="filter-group filter-group-right">
+          <a
+            className="chip chip-buy"
+            href="https://www.basecolors.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Buy more BaseColors at basecolors.com"
+          >
+            BUY MORE
+          </a>
+          <a
+            className="chip-fc"
+            href="https://farcaster.xyz/~/channel/basecolors"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="BaseColors Farcaster channel"
+            title="BaseColors Farcaster channel"
+          >
+            <FarcasterIcon size={12} />
+          </a>
         </div>
       </div>
 

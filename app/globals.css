@@ -307,7 +307,11 @@ img {
   line-height: 1;
 }
 /* Plain text-style link used in rail headers (e.g. "GET MORE BASECOLORS").
-   Painted in Base blue; small gap from the preceding element. */
+   Painted in Base blue; small gap from the preceding element. The link
+   is the row's shrinkable element — at narrow widths it truncates with
+   an ellipsis instead of forcing siblings to wrap, and below the
+   480px breakpoint it disappears entirely so the title + tabs stay on
+   one line. */
 .rail-text-link {
   font-family: var(--font-ui);
   font-size: 10px;
@@ -318,8 +322,15 @@ img {
   text-decoration: none;
   margin-left: 20px;
   white-space: nowrap;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .rail-text-link:hover { opacity: 0.75; }
+@media (max-width: 480px) {
+  .rail-text-link { display: none; }
+}
 /* Square purple Farcaster button — used in the project header next to
    OPENSEA / RECENT / ABOUT. Matches .opensea-btn's height so all four
    pills line up. */
@@ -355,9 +366,12 @@ img {
 }
 .fc-dot:hover { opacity: 0.85; }
 /* Push the rail's primary tab group to the right of the head-row so
-   GET MORE + Farcaster dot flow from the title. */
+   GET MORE + Farcaster dot flow from the title. flex-shrink:0 keeps
+   the BASECOLORS / PALETTES tabs at full width regardless of how
+   narrow the surrounding window gets. */
 .rail-tabs-right {
   margin-left: auto;
+  flex-shrink: 0;
 }
 .rail-connect {
   display: flex;
@@ -509,6 +523,10 @@ img {
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  /* Pinned in the rail-head-row — only .rail-text-link is allowed to
+     shrink so the title never collapses or wraps. */
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .rail-scroll {
   overflow-y: auto;
@@ -1008,6 +1026,36 @@ img {
   font-size: 8px;
   height: 22px;
 }
+/* Base-blue "BUY MORE" link rendered as a chip on the right-hand side
+   of the TONE filter row in the BASECOLORS rail. Inherits .chip's
+   shape + height; just swaps the colors so it reads as a primary CTA. */
+.chip-buy {
+  color: #0052FF;
+  border-color: #0052FF;
+  text-decoration: none;
+}
+.chip-buy:hover {
+  background: #0052FF;
+  color: #fff;
+  border-color: #0052FF;
+}
+/* Purple Farcaster button matching the chip row height — sits next
+   to BUY MORE on the same line so the pair flows as one cluster of
+   external BASECOLORS controls. */
+.chip-fc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #855DCD;
+  color: #fff;
+  border: 1px solid #855DCD;
+  text-decoration: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.chip-fc:hover { opacity: 0.85; }
 /* Refresh-thumbnails chip — pushed to the far right of the WORDS row.
    Square-ish with a larger glyph so the ↻ icon reads at a glance. */
 .chip-refresh {
@@ -1434,6 +1482,12 @@ img {
   flex-direction: column;
   min-height: 0;
 }
+/* Compact square variant used by the share modal — narrows the max
+   width so the 2 x 2 button grid + preview text stack into a roughly
+   square footprint instead of stretching to the 760px default. */
+.modal.modal-share {
+  max-width: 420px;
+}
 .modal-head {
   padding: 14px 16px;
   border-bottom: 2px solid var(--rule);
@@ -1560,8 +1614,16 @@ img {
 }
 .share-buttons {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* 2 x 2 grid: X / FARCASTER on top, SEND / DOWNLOAD on bottom.
+     Pair-of-pairs reads better than the old 3 x 1 row that had a
+     dangling fourth button and made the modal feel oddly wide. */
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
+}
+.share-buttons .share-btn {
+  /* Taller cells so the 2 x 2 grid feels balanced instead of two
+     squat rows. */
+  padding: 16px 10px;
 }
 .share-btn {
   background: var(--fg);

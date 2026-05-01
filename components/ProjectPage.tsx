@@ -273,16 +273,50 @@ export function ProjectPage({ project }: Props) {
     const textName = nameByHex.get(textHex.toUpperCase()) ?? textHex;
     const bgName = nameByHex.get(bgHex.toUpperCase()) ?? bgHex;
     const words = selectedBaseWordData.words;
-    // Placeholder caption — easy to edit later.
-    const shareText =
-      `"${words.join(' / ')}" on BaseWords — ` +
-      `${textName} text on ${bgName} background. ` +
-      `Mint yours at basewords.xyz`;
+    // Share caption — words listed one-per-line (no slashes) and the
+    // two colors each on their own line so the post reads as a
+    // poem-y stack rather than a sentence. The trailing
+    // basewords.xyz line gives Twitter / Farcaster a URL to unfurl
+    // into the post body.
+    const shareText = [
+      ...words,
+      '',
+      `text: ${textName}`,
+      `bg: ${bgName}`,
+      '',
+      'basewords.xyz',
+    ].join('\n');
     const svg = buildBaseWordsSvg(words, {
       textColor: textHex,
       bgColor: bgHex,
     });
-    return { shareText, svg, tokenId: selectedBaseWord.tokenId, words };
+    // Public PNG of the BaseWord — passed to Farcaster as an embeds[]
+    // URL so the cast attaches the actual artwork inline. Built at
+    // useMemo time using window.location.origin so it resolves to the
+    // current host (cwoma.tools, www.cwoma.tools, or localhost in dev).
+    const origin =
+      typeof window !== 'undefined'
+        ? window.location.origin
+        : 'https://cwoma.tools';
+    const imageQs = new URLSearchParams({
+      words: words.join(','),
+      text: textHex,
+      bg: bgHex,
+    });
+    const imageUrl = `${origin}/api/og/baseword?${imageQs.toString()}`;
+    // Per-token landing page — its <head> declares the same PNG as
+    // og:image, so Twitter (which can not accept inline images via
+    // intent URLs) unfurls a card with the actual BaseWord artwork
+    // when this URL appears in tweet text.
+    const landingUrl = `${origin}/baseword/${selectedBaseWord.tokenId}?${imageQs.toString()}`;
+    return {
+      shareText,
+      svg,
+      tokenId: selectedBaseWord.tokenId,
+      words,
+      imageUrl,
+      landingUrl,
+    };
   }, [selectedBaseWord, selectedBaseWordData, bwTextColor, bwBgColor, rawColors]);
 
   /** Scroll the BASECOLORS grid to the swatch matching `hex`. Used when the
@@ -466,19 +500,6 @@ export function ProjectPage({ project }: Props) {
                 >
                   SHARE
                 </button>
-                <button
-                  type="button"
-                  className="center-tab"
-                  onClick={handleDownloadSvg}
-                  disabled={!shareData}
-                  title={
-                    shareData
-                      ? 'Download SVG'
-                      : 'Select a BaseWord to download'
-                  }
-                >
-                  DOWNLOAD
-                </button>
               </div>
             )}
             <b>
@@ -613,34 +634,14 @@ export function ProjectPage({ project }: Props) {
                   ? '[03] BASECOLORS'
                   : '[03] PALETTES'}
               </h2>
-              <a
-                className="rail-text-link"
-                href={
-                  colorsTab === 'colors'
-                    ? 'https://www.basecolors.com'
-                    : 'https://www.palettes.fun'
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {colorsTab === 'colors'
-                  ? 'GET MORE BASECOLORS'
-                  : 'GET MORE PALETTES'}
-              </a>
-              <a
-                className="fc-dot"
-                href={
-                  colorsTab === 'colors'
-                    ? 'https://farcaster.xyz/~/channel/basecolors'
-                    : 'https://farcaster.xyz/~/channel/palettes'
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Farcaster channel"
-                title="Farcaster channel"
-              >
-                <FarcasterIcon size={10} />
-              </a>
+              {/* GET MORE link + Farcaster icon are no longer rendered
+                  in the rail-head-row for either tab — they live in a
+                  filter-row below (TONE row for BASECOLORS via
+                  ColorFilters, or a dedicated actions row for PALETTES
+                  rendered just below this head-row). Keeps the head
+                  uncluttered and the controls discoverable in the
+                  same horizontal slot regardless of which tab is
+                  active. */}
               <div className="center-tabs rail-tabs-right">
                 <button
                   type="button"
@@ -650,7 +651,7 @@ export function ProjectPage({ project }: Props) {
                     setActivePalette(null);
                   }}
                 >
-                  BASE COLORS
+                  BASECOLORS
                 </button>
                 <button
                   type="button"
@@ -668,6 +669,34 @@ export function ProjectPage({ project }: Props) {
                 labelMode={colorLabelMode}
                 onLabelModeChange={setColorLabelMode}
               />
+            )}
+            {colorsTab === 'palettes' && (
+              /* Palettes has no filters of its own, so the action row
+                 is just the BUY MORE + Farcaster pair right-justified
+                 — same visual slot as the BASECOLORS TONE row. */
+              <div className="filter-row">
+                <div className="filter-group filter-group-right">
+                  <a
+                    className="chip chip-buy"
+                    href="https://www.palettes.fun"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Get more palettes at palettes.fun"
+                  >
+                    BUY MORE
+                  </a>
+                  <a
+                    className="chip-fc"
+                    href="https://farcaster.xyz/~/channel/palettes"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Palettes Farcaster channel"
+                    title="Palettes Farcaster channel"
+                  >
+                    <FarcasterIcon size={12} />
+                  </a>
+                </div>
+              </div>
             )}
           </div>
           <div className="rail-scroll">
@@ -733,6 +762,9 @@ export function ProjectPage({ project }: Props) {
           onClose={() => setShareOpen(false)}
           shareText={shareData.shareText}
           tokenId={shareData.tokenId}
+          imageUrl={shareData.imageUrl}
+          landingUrl={shareData.landingUrl}
+          onDownload={handleDownloadSvg}
         />
       )}
 

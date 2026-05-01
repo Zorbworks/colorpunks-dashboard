@@ -14,9 +14,30 @@ interface Props {
   shareText: string;
   /** The NFT tokenId to SEND. If omitted, the SEND action is hidden. */
   tokenId?: string | null;
+  /** Public PNG of the BaseWord. Attached to the Farcaster compose URL
+   *  via embeds[] so the cast renders the actual artwork inline. */
+  imageUrl?: string | null;
+  /** Per-token landing-page URL whose <head> exposes the same PNG as
+   *  og:image. Used in tweet bodies (Twitter cannot attach images via
+   *  intent URLs, so it unfurls this URL into an image card instead).
+   *  Replaces the human-readable "basewords.xyz" line in the tweet
+   *  body so Twitter only sees one URL to unfurl. */
+  landingUrl?: string | null;
+  /** When provided, a DOWNLOAD button appears alongside the share
+   *  destinations and triggers this callback. Lets the share modal
+   *  carry the SVG download action instead of the toolbar. */
+  onDownload?: () => void;
 }
 
-export function ShareModal({ open, onClose, shareText, tokenId }: Props) {
+export function ShareModal({
+  open,
+  onClose,
+  shareText,
+  tokenId,
+  imageUrl,
+  landingUrl,
+  onDownload,
+}: Props) {
   const [showSend, setShowSend] = useState(false);
   const [recipient, setRecipient] = useState('');
   const [resolveError, setResolveError] = useState<string | null>(null);
@@ -43,9 +64,20 @@ export function ShareModal({ open, onClose, shareText, tokenId }: Props) {
     }
   }, [open, reset]);
 
+  // Twitter cannot attach images via intent URLs, so the landing-page
+  // URL replaces "basewords.xyz" in the tweet body — Twitter unfurls
+  // it into an image card via og:image. Farcaster gets the PNG
+  // attached directly via embeds[] so the cast renders the actual
+  // BaseWord artwork inline.
+  const tweetText = landingUrl
+    ? shareText.replace('basewords.xyz', landingUrl)
+    : shareText;
+  const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
   const encoded = encodeURIComponent(shareText);
-  const xUrl = `https://x.com/intent/tweet?text=${encoded}`;
-  const farcasterUrl = `https://farcaster.xyz/~/compose?text=${encoded}&channelKey=basewords`;
+  const fcBase = `https://farcaster.xyz/~/compose?text=${encoded}&channelKey=basewords`;
+  const farcasterUrl = imageUrl
+    ? `${fcBase}&embeds[]=${encodeURIComponent(imageUrl)}`
+    : fcBase;
 
   const openExternal = (href: string) => {
     window.open(href, '_blank', 'noopener,noreferrer');
@@ -115,7 +147,12 @@ export function ShareModal({ open, onClose, shareText, tokenId }: Props) {
       (error as Error).message);
 
   return (
-    <Modal open={open} onClose={onClose} title="[ SHARE ] BASEWORD">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="[ SHARE ] BASEWORD"
+      className="modal-share"
+    >
       <p className="share-preview">{shareText}</p>
 
       <div className="share-buttons">
@@ -141,6 +178,15 @@ export function ShareModal({ open, onClose, shareText, tokenId }: Props) {
             onClick={() => setShowSend((v) => !v)}
           >
             SEND
+          </button>
+        )}
+        {onDownload && (
+          <button
+            type="button"
+            className="share-btn"
+            onClick={onDownload}
+          >
+            DOWNLOAD
           </button>
         )}
       </div>
