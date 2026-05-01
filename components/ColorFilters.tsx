@@ -7,10 +7,15 @@ import type {
   Tone,
   Sort,
 } from '@/lib/color';
+import type { ColorLabelMode } from './ColorPalette';
 
 interface Props {
   filters: Filters;
   onChange: (next: Filters) => void;
+  /** Toggle for the swatch tile label — name vs raw hex. Lives on the
+   *  right-hand side of the SORT row. */
+  labelMode: ColorLabelMode;
+  onLabelModeChange: (mode: ColorLabelMode) => void;
 }
 
 const HUES: { key: HueBucket; color: string; label: string }[] = [
@@ -24,7 +29,12 @@ const HUES: { key: HueBucket; color: string; label: string }[] = [
   { key: 'gray', color: '#999999', label: 'Gray' },
 ];
 
-export function ColorFilters({ filters, onChange }: Props) {
+export function ColorFilters({
+  filters,
+  onChange,
+  labelMode,
+  onLabelModeChange,
+}: Props) {
   const setTone = (tone: Tone) => onChange({ ...filters, tone });
   const setSort = (sort: Sort) => onChange({ ...filters, sort });
 
@@ -135,6 +145,27 @@ export function ColorFilters({ filters, onChange }: Props) {
             onClick={() => setSort('az')}
           >
             A-Z
+          </button>
+        </div>
+        {/* Swatch label-mode toggle — pushed to the right of the SORT
+            row so the chips read as a separate "view" control rather
+            than another sort option. */}
+        <div className="filter-group filter-group-right">
+          <button
+            type="button"
+            className={`chip chip-sm${labelMode === 'name' ? ' active' : ''}`}
+            onClick={() => onLabelModeChange('name')}
+            title="Show color names"
+          >
+            NAME
+          </button>
+          <button
+            type="button"
+            className={`chip chip-sm${labelMode === 'hex' ? ' active' : ''}`}
+            onClick={() => onLabelModeChange('hex')}
+            title="Show hex codes"
+          >
+            HEX
           </button>
         </div>
       </div>

@@ -934,6 +934,20 @@ img {
   background: var(--fg);
   color: var(--bg);
 }
+/* Right-aligned filter sub-group — used for the swatch label-mode
+   toggle (NAME / HEX) so it reads as a separate "view" control on
+   the far side of the SORT row. */
+.filter-group-right {
+  margin-left: auto;
+}
+/* Smaller chip variant for tertiary toggles — slightly tighter
+   padding + a hair smaller type so NAME / HEX reads as a quieter
+   secondary control next to the main SORT chips. */
+.chip-sm {
+  padding: 3px 6px;
+  font-size: 8px;
+  height: 22px;
+}
 /* Refresh-thumbnails chip — pushed to the far right of the WORDS row.
    Square-ish with a larger glyph so the ↻ icon reads at a glance. */
 .chip-refresh {
@@ -1023,6 +1037,34 @@ img {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* The strip is its own click target — clicking it copies the swatch
+     hex. The copy cursor + hover bump make the affordance discoverable
+     without adding visual clutter inside the small tile. */
+  cursor: copy;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.color-name:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+.color-name:focus-visible {
+  outline: 2px solid var(--rule);
+  outline-offset: -2px;
+}
+/* Brief copied-confirmation flash — black bar, white text. Cleared
+   ~1.2s after the click by the React state timer. */
+.color-name.copied,
+.color-name.copied:hover {
+  background: var(--fg);
+  color: var(--bg);
+  font-weight: 600;
+}
+.color.disabled .color-name {
+  cursor: not-allowed;
+}
+.color.disabled .color-name:hover {
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  color: var(--fg);
 }
 /* ---------- PALETTE BROWSER ---------- */
 .palette-browser {

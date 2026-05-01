@@ -91,6 +91,7 @@ export function ProjectPage({ project }: Props) {
   const [traitGroupBy, setTraitGroupBy] = useState<string | null>(null);
   const [colorsTab, setColorsTab] = useState<'colors' | 'palettes'>('colors');
   const [activePalette, setActivePalette] = useState<UserPalette | null>(null);
+  const [colorLabelMode, setColorLabelMode] = useState<'name' | 'hex'>('name');
   const canvasRef = useRef<CanvasHandle>(null);
   const {
     resetPunk,
@@ -661,7 +662,12 @@ export function ProjectPage({ project }: Props) {
               </div>
             </div>
             {colorsTab === 'colors' && (
-              <ColorFilters filters={filters} onChange={setFilters} />
+              <ColorFilters
+                filters={filters}
+                onChange={setFilters}
+                labelMode={colorLabelMode}
+                onLabelModeChange={setColorLabelMode}
+              />
             )}
           </div>
           <div className="rail-scroll">
@@ -701,6 +707,7 @@ export function ProjectPage({ project }: Props) {
                   }
                 }}
                 isLoading={colorsLoading}
+                labelMode={colorLabelMode}
               />
             ) : (
               <PaletteBrowser
