@@ -121,7 +121,7 @@ export function ShareModal({
     if (typeof window === 'undefined' || !tokenId) return;
     const origin = window.location.origin;
     const imageUrl = `${origin}/api/og/baseword/${tokenId}`;
-    const pageUrl = `${origin}/baseword/${tokenId}`;
+    const pageUrl = `${origin}/basewords`;
     const url =
       `https://farcaster.xyz/~/compose?text=${encodeURIComponent(shareText)}` +
       `&embeds[]=${encodeURIComponent(imageUrl)}` +
