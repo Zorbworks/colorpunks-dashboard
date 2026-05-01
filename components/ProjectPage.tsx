@@ -302,11 +302,15 @@ export function ProjectPage({ project }: Props) {
       text: textHex,
       bg: bgHex,
     });
-    const imageUrl = `${origin}/api/og/baseword?${imageQs.toString()}`;
-    // Per-token landing page — its <head> declares the same PNG as
-    // og:image, so Twitter (which can not accept inline images via
-    // intent URLs) unfurls a card with the actual BaseWord artwork
-    // when this URL appears in tweet text.
+    // SVG URL ends in `.svg` so Farcaster recognises it
+    // unambiguously as an image-only URL — without the extension it
+    // would attach BOTH an inline image and a separate URL preview
+    // card for the same embed (the duplicate-preview bug).
+    const imageUrl = `${origin}/api/og/baseword.svg?${imageQs.toString()}`;
+    // Per-token landing page — its <head> declares the .png variant
+    // as og:image, so Twitter (which does not unfurl SVG og:images)
+    // unfurls a card with the actual BaseWord artwork when this URL
+    // appears in tweet text.
     const landingUrl = `${origin}/baseword/${selectedBaseWord.tokenId}?${imageQs.toString()}`;
     return {
       shareText,

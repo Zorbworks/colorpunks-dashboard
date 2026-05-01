@@ -6,6 +6,12 @@ const nextConfig = {
       { protocol: 'https', hostname: '**' },
     ],
   },
+  // @resvg/resvg-js ships native bindings that webpack cannot bundle.
+  // Listing it here tells Next to load it via runtime require() in the
+  // server bundle instead of trying to parse the .node file.
+  experimental: {
+    serverComponentsExternalPackages: ['@resvg/resvg-js'],
+  },
   webpack: (config) => {
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
     return config;

@@ -22,7 +22,10 @@ export function generateMetadata({
   if (searchParams.text) ogQs.set('text', searchParams.text);
   if (searchParams.bg) ogQs.set('bg', searchParams.bg);
   if (searchParams.words) ogQs.set('words', searchParams.words);
-  const ogImage = `/api/og/baseword?${ogQs.toString()}`;
+  // PNG variant — Twitter does not unfurl SVG og:images, so we point
+  // og:image at the rasterised PNG endpoint. Farcaster uses the .svg
+  // endpoint via embeds[] separately and never reads this metadata.
+  const ogImage = `/api/og/baseword.png?${ogQs.toString()}`;
 
   const words = (searchParams.words ?? '')
     .split(',')
