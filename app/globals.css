@@ -741,8 +741,24 @@ img {
   border: 1px solid var(--rule);
   flex-shrink: 0;
 }
-.punk-palette-name {
+/* Wrapper that holds the swatch's "NAME / #HEX" text and the inline
+   copy glyph as one cluster. Takes the row's free space (flex:1) so
+   the .punk-palette-pct label drifts to the far right; inside the
+   cluster, name + copy stay close together with a fixed gap. */
+.punk-palette-text {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   flex: 1;
+  min-width: 0;
+}
+.punk-palette-name {
+  /* Sized to its own content inside .punk-palette-text — the cluster
+     keeps the copy glyph pinned next to the hex value rather than
+     letting the name span eat all available row width. min-width:0 +
+     overflow ellipsis still kicks in if a custom name is exceptionally
+     long for the current row width. */
+  flex: 0 1 auto;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -755,12 +771,56 @@ img {
   flex-shrink: 0;
 }
 .punk-palette-pct {
+  /* Row label (TEXT / BACKGROUND). The .punk-palette-text wrapper
+     above takes flex:1, so this column naturally drifts to the far
+     right of the row without needing margin-left:auto. */
   font-family: ui-monospace, Menlo, monospace;
   font-size: 9px;
   color: var(--muted);
   flex-shrink: 0;
-  width: 32px;
   text-align: right;
+  white-space: nowrap;
+  padding-left: 12px;
+}
+/* Inline copy-hex glyph — borderless, sits flush next to the
+   "NAME / #HEX" label. Slightly larger than the surrounding text so
+   the affordance reads clearly without a chrome box around it. Click
+   copies the hex; the glyph briefly flips to ✓ via .copied. */
+.punk-palette-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--fg);
+  background: transparent;
+  border: none;
+  cursor: copy;
+  flex-shrink: 0;
+  user-select: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.punk-palette-copy:hover {
+  opacity: 0.65;
+  transform: translateY(-1px);
+}
+.punk-palette-copy:focus-visible {
+  outline: 2px solid var(--rule);
+  outline-offset: 1px;
+}
+.punk-palette-copy.copied,
+.punk-palette-copy.copied:hover {
+  color: var(--fg);
+  opacity: 1;
+  transform: none;
+}
+/* Selected (filled) row inverts the glyph color so it stays legible. */
+.punk-palette-row.selected .punk-palette-copy {
+  color: var(--bg);
 }
 
 .canvas-error {
@@ -1162,6 +1222,61 @@ img {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+/* Right-justified hex column used when the row also shows a custom
+   name on the left. Monospace so the digits read evenly and the
+   .palette-color-copy glyph next to it sits on a stable baseline. */
+.palette-color-hex {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 9px;
+  color: var(--muted);
+  flex-shrink: 0;
+  white-space: nowrap;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.palette-color-btn.sel .palette-color-hex {
+  color: color-mix(in srgb, var(--bg) 60%, var(--fg));
+}
+/* Borderless copy glyph — same visual treatment as the metadata-tab
+   chip in BaseWordPalette so palette rows and metadata rows share one
+   copy affordance. Larger glyph + opacity-only hover so the icon reads
+   without a chrome box around it. */
+.palette-color-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--fg);
+  background: transparent;
+  border: none;
+  cursor: copy;
+  flex-shrink: 0;
+  user-select: none;
+  margin-left: 4px;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.palette-color-copy:hover {
+  opacity: 0.65;
+  transform: translateY(-1px);
+}
+.palette-color-copy:focus-visible {
+  outline: 2px solid var(--rule);
+  outline-offset: 1px;
+}
+.palette-color-copy.copied,
+.palette-color-copy.copied:hover {
+  color: var(--fg);
+  opacity: 1;
+  transform: none;
+}
+.palette-color-btn.sel .palette-color-copy {
+  color: var(--bg);
 }
 
 .empty-state {

@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { UserColor } from '@/lib/alchemy';
 import type { BaseWordTokenData } from '@/hooks/useBaseWordData';
 
@@ -25,6 +26,41 @@ export function BaseWordPalette({
   onPickBg,
   selectedHex,
 }: Props) {
+  // Tracks which hex value is currently flashing "COPIED!" — same
+  // pattern used in the swatch grid. Cleared on a 1.2s timer so the
+  // chip returns to its normal hex glyph.
+  const [copiedHex, setCopiedHex] = useState<string | null>(null);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleCopy = useCallback(async (hex: string) => {
+    const value = hex.toUpperCase();
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      // Fallback for restricted contexts (e.g. embedded preview frames).
+      const ta = document.createElement('textarea');
+      ta.value = value;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+      } catch {}
+      document.body.removeChild(ta);
+    }
+    setCopiedHex(value);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedHex(null), 1200);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
+
   if (!tokenId) {
     return (
       <div className="punk-palette-trait">
@@ -83,6 +119,8 @@ export function BaseWordPalette({
         name={textHex ? nameByHex.get(textHex.toUpperCase()) : undefined}
         selected={selectedHex === textHex}
         onClick={() => textHex && onPickText(textHex)}
+        copiedHex={copiedHex}
+        onCopy={handleCopy}
       />
       <ColorRow
         label="BACKGROUND"
@@ -90,6 +128,8 @@ export function BaseWordPalette({
         name={bgHex ? nameByHex.get(bgHex.toUpperCase()) : undefined}
         selected={selectedHex === bgHex}
         onClick={() => bgHex && onPickBg(bgHex)}
+        copiedHex={copiedHex}
+        onCopy={handleCopy}
       />
     </>
   );
@@ -101,13 +141,25 @@ function ColorRow({
   name,
   selected,
   onClick,
+  copiedHex,
+  onCopy,
 }: {
   label: string;
   hex: string | null;
   name: string | undefined;
   selected: boolean;
   onClick: () => void;
+  copiedHex: string | null;
+  onCopy: (hex: string) => void;
 }) {
+  const isCopied = !!hex && copiedHex === hex.toUpperCase();
+  // Combined "NAME / #HEX" display — falls back to just the hex when
+  // the swatch has no custom name. Empty rows show an em-dash.
+  const display = hex
+    ? name
+      ? `${name.toUpperCase()} / ${hex}`
+      : hex
+    : '—';
   return (
     <button
       type="button"
@@ -119,10 +171,35 @@ function ColorRow({
         className="punk-palette-swatch"
         style={{ backgroundColor: hex ?? 'transparent' }}
       />
-      <span className="punk-palette-name">
-        {name ? name.toUpperCase() : hex ?? '—'}
+      {/* name + copy live together in a flex:1 wrapper so the copy
+          glyph sits right after the hex text with a fixed gap, while
+          the wrapper itself absorbs the row's free space — pushing
+          the TEXT / BACKGROUND label to the far right. */}
+      <span className="punk-palette-text">
+        <span className="punk-palette-name">{display}</span>
+        {hex && (
+          <span
+            className={`punk-palette-copy${isCopied ? ' copied' : ''}`}
+            role="button"
+            tabIndex={0}
+            title={isCopied ? 'Copied!' : `Copy ${hex}`}
+            aria-label={`Copy ${hex}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onCopy(hex);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
+                onCopy(hex);
+              }
+            }}
+          >
+            {isCopied ? '✓' : '⎘'}
+          </span>
+        )}
       </span>
-      {name && hex && <span className="punk-palette-hex">{hex}</span>}
       <span className="punk-palette-pct">{label}</span>
     </button>
   );
