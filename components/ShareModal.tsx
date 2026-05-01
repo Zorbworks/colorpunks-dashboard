@@ -64,14 +64,13 @@ export function ShareModal({
     }
   }, [open, reset]);
 
-  // Twitter cannot attach images via intent URLs, so the landing-page
-  // URL replaces "basewords.xyz" in the tweet body — Twitter unfurls
-  // it into an image card via og:image. Farcaster gets the PNG
-  // attached directly via embeds[] so the cast renders the actual
-  // BaseWord artwork inline.
-  const tweetText = landingUrl
-    ? shareText.replace('basewords.xyz', landingUrl)
-    : shareText;
+  // Each platform appends its own URL so the post body has exactly
+  // one source of attached preview:
+  //  - Farcaster: SVG embed via embeds[] (renders the actual on-chain
+  //    artwork inline; no URL in cast text means no double unfurl).
+  //  - Twitter: landing-page URL appended to the tweet body — Twitter
+  //    unfurls it into a card showing the same BaseWord via og:image.
+  const tweetText = landingUrl ? `${shareText}\n\n${landingUrl}` : shareText;
   const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
   const encoded = encodeURIComponent(shareText);
   const fcBase = `https://farcaster.xyz/~/compose?text=${encoded}&channelKey=basewords`;

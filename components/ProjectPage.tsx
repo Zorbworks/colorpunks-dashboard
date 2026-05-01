@@ -275,16 +275,15 @@ export function ProjectPage({ project }: Props) {
     const words = selectedBaseWordData.words;
     // Share caption — words listed one-per-line (no slashes) and the
     // two colors each on their own line so the post reads as a
-    // poem-y stack rather than a sentence. The trailing
-    // basewords.xyz line gives Twitter / Farcaster a URL to unfurl
-    // into the post body.
+    // poem-y stack rather than a sentence. No URL in the body — each
+    // platform appends its own URL at compose time (Farcaster uses
+    // the SVG embed, X uses the per-token landing page) so the cast /
+    // tweet only ever has ONE preview attached.
     const shareText = [
       ...words,
       '',
       `text: ${textName}`,
       `bg: ${bgName}`,
-      '',
-      'basewords.xyz',
     ].join('\n');
     const svg = buildBaseWordsSvg(words, {
       textColor: textHex,
