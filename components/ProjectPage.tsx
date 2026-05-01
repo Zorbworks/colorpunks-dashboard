@@ -520,7 +520,11 @@ export function ProjectPage({ project }: Props) {
                   colors={paletteColors}
                   baseColors={rawColors ?? []}
                   selectedColor={selectedColor}
-                  onSelect={setSelectedColor}
+                  onSelect={(hex) => {
+                    setSelectedColor(hex);
+                    setColorsTab('colors');
+                    scrollToColorSwatch(hex);
+                  }}
                   punk={selectedPunk}
                 />
               </div>
