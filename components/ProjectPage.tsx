@@ -19,7 +19,7 @@ import { BaseWordsMintForm } from '@/components/BaseWordsMintForm';
 import { ProjectHeader } from '@/components/ProjectHeader';
 import { ShareModal } from '@/components/ShareModal';
 import { FarcasterIcon } from '@/components/FarcasterIcon';
-import { buildBaseWordsSvg, svgToDataUri } from '@/lib/basewords';
+import { buildBaseWordsSvg, renderSvgToPng, svgToDataUri } from '@/lib/basewords';
 import { BaseWordEditor, type EditTarget } from '@/components/BaseWordEditor';
 import {
   BaseWordFilters,
@@ -273,13 +273,9 @@ export function ProjectPage({ project }: Props) {
     const textName = nameByHex.get(textHex.toUpperCase()) ?? textHex;
     const bgName = nameByHex.get(bgHex.toUpperCase()) ?? bgHex;
     const words = selectedBaseWordData.words;
-    // Share caption — token id headline, words stacked one-per-line,
-    // colours each on their own line, then a link to the cwoma site
-    // for the brand mention + URL unfurl. The image itself isn't
-    // attached in the URL (no per-token PNG endpoint anymore); users
-    // hit DOWNLOAD to grab a PNG, then attach it via the platform's
-    // own composer using the paperclip / image button. Avoids the
-    // server-side SVG -> PNG rendering pipeline entirely.
+    // Caption shown above the modal action buttons — purely
+    // informational summary of the current BaseWord (token id,
+    // words, named colours).
     const shareText = [
       `BaseWord #${selectedBaseWord.tokenId}`,
       '',
@@ -287,8 +283,6 @@ export function ProjectPage({ project }: Props) {
       '',
       `text: ${textName}`,
       `bg: ${bgName}`,
-      '',
-      'cwoma.tools/basewords',
     ].join('\n');
     const svg = buildBaseWordsSvg(words, {
       textColor: textHex,
@@ -317,42 +311,26 @@ export function ProjectPage({ project }: Props) {
   };
 
   /**
-   * Renders the current BaseWord SVG to a 1200x1200 PNG using the
-   * user's installed fonts (Helvetica on macOS) via a hidden
-   * <canvas>. Hands the resulting blob to the browser as a file
-   * download — exact-match font, exact colours, no server render.
+   * Saves a 1200x1200 PNG of the current BaseWord to the user's
+   * downloads folder. Renders client-side via the shared
+   * renderSvgToPng helper so the user's local Helvetica is used —
+   * exact-match font, exact colours, no server render.
    */
-  const handleDownloadPng = () => {
+  const handleDownloadPng = async () => {
     if (!shareData) return;
-    const SIZE = 1200;
-    const blob = new Blob([shareData.svg], { type: 'image/svg+xml' });
-    const objectUrl = URL.createObjectURL(blob);
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = SIZE;
-      canvas.height = SIZE;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        URL.revokeObjectURL(objectUrl);
-        return;
-      }
-      ctx.drawImage(img, 0, 0, SIZE, SIZE);
-      URL.revokeObjectURL(objectUrl);
-      canvas.toBlob((png) => {
-        if (!png) return;
-        const pngUrl = URL.createObjectURL(png);
-        const a = document.createElement('a');
-        a.href = pngUrl;
-        a.download = `baseword-${shareData.tokenId}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(pngUrl);
-      }, 'image/png');
-    };
-    img.onerror = () => URL.revokeObjectURL(objectUrl);
-    img.src = objectUrl;
+    try {
+      const png = await renderSvgToPng(shareData.svg, 1200);
+      const pngUrl = URL.createObjectURL(png);
+      const a = document.createElement('a');
+      a.href = pngUrl;
+      a.download = `baseword-${shareData.tokenId}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(pngUrl);
+    } catch (err) {
+      console.error('Failed to render BaseWord PNG:', err);
+    }
   };
 
   return (

@@ -15,10 +15,8 @@ interface Props {
   shareText: string;
   /** The NFT tokenId to SEND. If omitted, the SEND action is hidden. */
   tokenId?: string | null;
-  /** When provided, a DOWNLOAD button appears alongside the share
-   *  destinations and triggers this callback. Hands the user a PNG of
-   *  the current BaseWord which they attach to their cast / tweet via
-   *  the platform's own composer. */
+  /** Renders a PNG of the current BaseWord and saves it to the user's
+   *  Downloads folder. Triggered by the DOWNLOAD button. */
   onDownload?: () => void;
 }
 
@@ -54,18 +52,6 @@ export function ShareModal({
       reset();
     }
   }, [open, reset]);
-
-  // Plain text-only compose URLs — the cwoma.tools link inside
-  // shareText is what unfurls into a card on either platform. Users
-  // attach the BaseWord PNG manually via the platform composer's
-  // image button (DOWNLOAD on the modal hands them the file).
-  const encoded = encodeURIComponent(shareText);
-  const xUrl = `https://x.com/intent/tweet?text=${encoded}`;
-  const farcasterUrl = `https://farcaster.xyz/~/compose?text=${encoded}&channelKey=basewords`;
-
-  const openExternal = (href: string) => {
-    window.open(href, '_blank', 'noopener,noreferrer');
-  };
 
   /** Accept either a 0x address or an ENS name; resolve ENS via
    *  ensideas.com (same free endpoint we use for reverse lookups). */
@@ -140,30 +126,6 @@ export function ShareModal({
       <p className="share-preview">{shareText}</p>
 
       <div className="share-buttons">
-        <button
-          type="button"
-          className="share-btn"
-          onClick={() => openExternal(xUrl)}
-        >
-          X
-        </button>
-        <button
-          type="button"
-          className="share-btn"
-          onClick={() => openExternal(farcasterUrl)}
-          title="Share to /basewords on Farcaster"
-        >
-          FARCASTER
-        </button>
-        {tokenId && (
-          <button
-            type="button"
-            className={`share-btn${showSend ? ' active' : ''}`}
-            onClick={() => setShowSend((v) => !v)}
-          >
-            SEND
-          </button>
-        )}
         {onDownload && (
           <button
             type="button"
@@ -171,6 +133,15 @@ export function ShareModal({
             onClick={onDownload}
           >
             DOWNLOAD
+          </button>
+        )}
+        {tokenId && (
+          <button
+            type="button"
+            className={`share-btn${showSend ? ' active' : ''}`}
+            onClick={() => setShowSend((v) => !v)}
+          >
+            SEND
           </button>
         )}
       </div>

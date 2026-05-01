@@ -1614,16 +1614,12 @@ img {
 }
 .share-buttons {
   display: grid;
-  /* 2 x 2 grid: X / FARCASTER on top, SEND / DOWNLOAD on bottom.
-     Pair-of-pairs reads better than the old 3 x 1 row that had a
-     dangling fourth button and made the modal feel oddly wide. */
+  /* Two equal-width buttons: DOWNLOAD on the left, SEND on the right. */
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
 }
 .share-buttons .share-btn {
-  /* Taller cells so the 2 x 2 grid feels balanced instead of two
-     squat rows. */
-  padding: 16px 10px;
+  padding: 14px 10px;
 }
 .share-btn {
   background: var(--fg);

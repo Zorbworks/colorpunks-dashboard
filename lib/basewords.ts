@@ -76,6 +76,51 @@ export function svgToDataUri(svg: string): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
+/**
+ * Render an SVG string to a PNG Blob via a hidden <canvas>.
+ *
+ * Runs entirely client-side and uses the browser's font engine, so
+ * the BaseWord renders with whichever Helvetica install the user
+ * has (perfect on macOS, system fallback elsewhere). Used by both
+ * the share modal's DOWNLOAD action and the Farcaster share path
+ * which uploads the resulting blob to IPFS.
+ *
+ * Resolves with a square PNG of the requested edge size; rejects if
+ * the SVG fails to load or canvas blob extraction fails.
+ */
+export function renderSvgToPng(svg: string, size = 1200): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const svgBlob = new Blob([svg], { type: 'image/svg+xml' });
+    const objectUrl = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error('Could not get 2d context'));
+        return;
+      }
+      ctx.drawImage(img, 0, 0, size, size);
+      URL.revokeObjectURL(objectUrl);
+      canvas.toBlob((png) => {
+        if (!png) {
+          reject(new Error('Canvas toBlob failed'));
+          return;
+        }
+        resolve(png);
+      }, 'image/png');
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('SVG image failed to load'));
+    };
+    img.src = objectUrl;
+  });
+}
+
 function escapeXml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
