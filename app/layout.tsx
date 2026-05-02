@@ -9,6 +9,7 @@ import './globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 import { Providers } from './providers';
 import { TopBar } from '@/components/TopBar';
+import { Analytics } from '@vercel/analytics/next';
 
 // next/font sets the resolved font-family as CSS custom properties on the
 // <body>. globals.css reads these via var(--font-silkscreen) / var(--font-jost).
@@ -99,6 +100,7 @@ export default function RootLayout({
             {children}
           </div>
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
